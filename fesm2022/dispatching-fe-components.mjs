@@ -2248,30 +2248,33 @@ const authGuard = () => {
     const platformId = inject(PLATFORM_ID);
     const router = inject(Router);
     const authService = inject(AuthService);
-    if (isPlatformBrowser(platformId)) {
-        if (authService.isLoggedIn()) {
-            return true;
-        }
-        else {
-            router.navigateByUrl('/auth');
-            return false;
-        }
+    console.log('authGuard called');
+    if (!isPlatformBrowser(platformId)) {
+        return false;
+    }
+    if (authService.isLoggedIn()) {
+        return true;
+    }
+    else {
+        router.navigateByUrl('/auth');
+        return false;
     }
     return false;
 };
 
 const noAuthGuard = () => {
-    const platformId = inject(PLATFORM_ID);
     const router = inject(Router);
     const authService = inject(AuthService);
-    if (isPlatformBrowser(platformId)) {
-        if (authService.isLoggedIn()) {
-            router.navigateByUrl(`${ModuleRoutes.MAIN_PAGE}`);
-            return false;
-        }
-        return true;
+    const platformId = inject(PLATFORM_ID);
+    console.log('noAuthGuard called');
+    if (!isPlatformBrowser(platformId)) {
+        return false; // Exit early for non-browser platforms
     }
-    return false;
+    if (authService.isLoggedIn()) {
+        router.navigateByUrl(ModuleRoutes.MAIN_PAGE);
+        return false;
+    }
+    return true;
 };
 
 class PermissionGuard {
