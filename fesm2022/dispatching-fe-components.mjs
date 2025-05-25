@@ -14,7 +14,9 @@ import { Router } from '@angular/router';
 class ModuleRoutes {
     static AUTH = 'auth';
     static USER_PROFILE = `profile`;
-    static MAIN_PAGE = `modules`;
+    static MAIN_PAGE = `main`; // overview page
+    static TASK_MANAGEMENT_HOME = `task-management`;
+    static PLAN_MANAGEMENT_HOME = `plan-management`;
 }
 
 var AuthConstant;
@@ -584,26 +586,26 @@ const ErrorInterceptor = (req, next) => {
     return next(req).pipe(catchError((error) => {
         if (error instanceof HttpErrorResponse && error.status === 401) {
             localStorage.clear();
-            console.log('Unauthorized', error);
+            console.error('Unauthorized', error);
         }
         if (error instanceof HttpErrorResponse && error.status === 400) {
-            console.log('Bad Request');
+            console.error('Bad Request');
         }
         if (error instanceof HttpErrorResponse && error.status === 403) {
-            console.log('Forbidden');
+            console.error('Forbidden');
         }
         if (error.error && isPlatformBrowser(PLATFORM_ID)) {
             if (error.error.errors) {
                 const errorMessages = Object.values(error.error.errors).flat();
                 errorMessages.forEach((errorMessage) => {
-                    console.log(errorMessage);
+                    console.error(errorMessage);
                 });
             }
             else if (error?.error?.message) {
-                console.log(error.error.message);
+                console.error(error.error.message);
             }
             else {
-                console.log('Something went wrong');
+                console.error('Something went wrong');
             }
         }
         return throwError(error);
