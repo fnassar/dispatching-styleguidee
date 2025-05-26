@@ -2256,6 +2256,7 @@ i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.13", ngImpo
 
 class CustomModalComponent {
     modalTitle = '';
+    showDot = false;
     hideEvent = new EventEmitter();
     isVisible = false;
     open() {
@@ -2265,19 +2266,20 @@ class CustomModalComponent {
         this.isVisible = false;
         this.hideEvent.emit();
     }
-    // Handles overlay clicks (outside modal content)
     onOverlayClick(event) {
         if (event.target === event.currentTarget) {
             this.close();
         }
     }
     static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "19.2.13", ngImport: i0, type: CustomModalComponent, deps: [], target: i0.ɵɵFactoryTarget.Component });
-    static ɵcmp = i0.ɵɵngDeclareComponent({ minVersion: "14.0.0", version: "19.2.13", type: CustomModalComponent, isStandalone: true, selector: "app-modal", inputs: { modalTitle: "modalTitle" }, outputs: { hideEvent: "hideEvent" }, ngImport: i0, template: "<div *ngIf=\"isVisible\" class=\"modal-overlay\" (click)=\"onOverlayClick($event)\">\n  <div class=\"modal-content\" (click)=\"$event.stopPropagation()\">\n    <button class=\"modal-close\" (click)=\"close()\">\u00D7</button>\n    <h2>{{ modalTitle }}</h2>\n    <ng-content></ng-content>\n  </div>\n</div>\n", styles: [".modal-overlay{position:fixed;top:0;left:0;width:100vw;height:100vh;background:#000000b3;display:flex;align-items:center;justify-content:center;z-index:1000}.modal-content{background:#fff;padding:24px;border-radius:8px;min-width:320px;position:relative}.modal-close{position:absolute;right:16px;top:12px;font-size:24px;background:none;border:none;cursor:pointer}\n"], dependencies: [{ kind: "ngmodule", type: CommonModule }, { kind: "directive", type: i1$1.NgIf, selector: "[ngIf]", inputs: ["ngIf", "ngIfThen", "ngIfElse"] }] });
+    static ɵcmp = i0.ɵɵngDeclareComponent({ minVersion: "14.0.0", version: "19.2.13", type: CustomModalComponent, isStandalone: true, selector: "modal", inputs: { modalTitle: "modalTitle", showDot: "showDot" }, outputs: { hideEvent: "hideEvent" }, ngImport: i0, template: "<div *ngIf=\"isVisible\" class=\"modal-overlay\" (click)=\"onOverlayClick($event)\">\n  <div class=\"modal-content\" (click)=\"$event.stopPropagation()\">\n    <div class=\"modal-header\">\n      <!-- Optional colored dot -->\n      <span *ngIf=\"showDot\" class=\"modal-dot\"></span>\n      <span class=\"modal-title\">{{ modalTitle }}</span>\n      <button type=\"button\" class=\"btn-close\" aria-label=\"Close\" (click)=\"close()\"></button>\n    </div>\n    <ng-content></ng-content>\n  </div>\n</div>\n", styles: [".modal-overlay{position:fixed;top:0;left:0;width:100vw;height:100vh;background:#000000b3;display:flex;align-items:center;justify-content:center;z-index:1000}.modal-content{background:#fff;border-radius:10px;min-width:600px;max-width:90vw;box-shadow:0 5px 15px #0000004d;position:relative;padding-bottom:24px}.modal-header{display:flex;align-items:center;justify-content:center;padding:24px 24px 0;position:relative}.modal-title{flex:1;text-align:center;font-size:1.25rem;font-weight:600}.modal-dot{width:12px;height:12px;background:#00d084;border-radius:50%;margin-right:10px}.btn-close{position:absolute;right:24px;top:24px;background:transparent;border:none;font-size:1.5rem;opacity:.6;cursor:pointer}.btn-close:hover{opacity:1}\n"], dependencies: [{ kind: "ngmodule", type: CommonModule }, { kind: "directive", type: i1$1.NgIf, selector: "[ngIf]", inputs: ["ngIf", "ngIfThen", "ngIfElse"] }] });
 }
 i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.13", ngImport: i0, type: CustomModalComponent, decorators: [{
             type: Component,
-            args: [{ selector: 'app-modal', imports: [CommonModule], standalone: true, template: "<div *ngIf=\"isVisible\" class=\"modal-overlay\" (click)=\"onOverlayClick($event)\">\n  <div class=\"modal-content\" (click)=\"$event.stopPropagation()\">\n    <button class=\"modal-close\" (click)=\"close()\">\u00D7</button>\n    <h2>{{ modalTitle }}</h2>\n    <ng-content></ng-content>\n  </div>\n</div>\n", styles: [".modal-overlay{position:fixed;top:0;left:0;width:100vw;height:100vh;background:#000000b3;display:flex;align-items:center;justify-content:center;z-index:1000}.modal-content{background:#fff;padding:24px;border-radius:8px;min-width:320px;position:relative}.modal-close{position:absolute;right:16px;top:12px;font-size:24px;background:none;border:none;cursor:pointer}\n"] }]
+            args: [{ selector: 'modal', standalone: true, imports: [CommonModule], template: "<div *ngIf=\"isVisible\" class=\"modal-overlay\" (click)=\"onOverlayClick($event)\">\n  <div class=\"modal-content\" (click)=\"$event.stopPropagation()\">\n    <div class=\"modal-header\">\n      <!-- Optional colored dot -->\n      <span *ngIf=\"showDot\" class=\"modal-dot\"></span>\n      <span class=\"modal-title\">{{ modalTitle }}</span>\n      <button type=\"button\" class=\"btn-close\" aria-label=\"Close\" (click)=\"close()\"></button>\n    </div>\n    <ng-content></ng-content>\n  </div>\n</div>\n", styles: [".modal-overlay{position:fixed;top:0;left:0;width:100vw;height:100vh;background:#000000b3;display:flex;align-items:center;justify-content:center;z-index:1000}.modal-content{background:#fff;border-radius:10px;min-width:600px;max-width:90vw;box-shadow:0 5px 15px #0000004d;position:relative;padding-bottom:24px}.modal-header{display:flex;align-items:center;justify-content:center;padding:24px 24px 0;position:relative}.modal-title{flex:1;text-align:center;font-size:1.25rem;font-weight:600}.modal-dot{width:12px;height:12px;background:#00d084;border-radius:50%;margin-right:10px}.btn-close{position:absolute;right:24px;top:24px;background:transparent;border:none;font-size:1.5rem;opacity:.6;cursor:pointer}.btn-close:hover{opacity:1}\n"] }]
         }], propDecorators: { modalTitle: [{
+                type: Input
+            }], showDot: [{
                 type: Input
             }], hideEvent: [{
                 type: Output
