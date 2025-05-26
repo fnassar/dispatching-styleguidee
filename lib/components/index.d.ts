@@ -21,3 +21,4 @@ export * from './custom-toggle-switch/custom-toggle-switch.component';
 export * from './custom-toggle-switch-form/custom-toggle-switch-form.component';
 export * from './overlay-panel/overlay-panel.component';
 export * from './custom-toast/custom-toast.component';
+export * from './custom-modal/custom-modal.component';
