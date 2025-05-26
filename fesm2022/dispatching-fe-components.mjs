@@ -2034,6 +2034,7 @@ class CustomBreadcrumbComponent {
     breadcrumbItems = [];
     breadcrumbItemClicked = (item) => {
         // route to url
+        console.log('Breadcrumb item clicked:', item);
         this.router.navigate([item.url]);
     };
     constructor(router) {
