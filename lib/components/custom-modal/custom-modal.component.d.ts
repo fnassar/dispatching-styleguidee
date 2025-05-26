@@ -8,5 +8,5 @@ export declare class CustomModalComponent {
     close(): void;
     onOverlayClick(event: MouseEvent): void;
     static ɵfac: i0.ɵɵFactoryDeclaration<CustomModalComponent, never>;
-    static ɵcmp: i0.ɵɵComponentDeclaration<CustomModalComponent, "modal", never, { "modalTitle": { "alias": "modalTitle"; "required": false; }; }, { "hideEvent": "hideEvent"; }, never, ["*"], true, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<CustomModalComponent, "app-modal", never, { "modalTitle": { "alias": "modalTitle"; "required": false; }; }, { "hideEvent": "hideEvent"; }, never, ["*"], true, never>;
 }
