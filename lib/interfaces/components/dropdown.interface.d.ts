@@ -1,4 +1,5 @@
 export interface IDropdownOption {
     id: number | string;
-    name: string;
+    nameAr: string;
+    nameEn: string;
 }

@@ -1,3 +1,4 @@
+export * from './api-base-url.token';
 /**
  * Checks if any fields in an object contain data (not empty string or undefined)
  * @param {any} obj - The object to check
@@ -103,6 +104,12 @@ export declare function isDocumentPath(path: string): boolean;
  * @returns {Blob} Blob object representing the image
  */
 export declare function b64toBlob(dataURI: string): Blob;
+/**
+ * Converts a Blob object to Base64 data URI
+ * @param {Blob} blob - Blob object to convert
+ * @returns {Promise<string>} Promise resolving to Base64 encoded data URI
+ */
+export declare function blobToB64(blob: Blob): Promise<string>;
 /**
  * Simple logger function that console.logs the input
  * @param {any} [data=''] - Data to log (defaults to empty string)

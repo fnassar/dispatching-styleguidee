@@ -1,3 +1,4 @@
+import { EventEmitter } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { IComponentFormError, IDropdownOption } from '../../interfaces';
 import * as i0 from "@angular/core";
@@ -15,17 +16,20 @@ export declare class CustomDropdownFormComponent {
     options: IDropdownOption[];
     name: string;
     validation: IComponentFormError[];
+    valueChange: EventEmitter<IDropdownOption | null>;
     isOpen: boolean;
     selectedOption: IDropdownOption | null;
     filteredOptions: IDropdownOption[];
     filterText: string;
+    value: any;
     ngOnInit(): void;
     toggleDropdown(): void;
+    writeValue(value: any): void;
     selectOption(option: IDropdownOption): void;
     clearSelection(event: Event): void;
     filterOptions(): void;
     set reset(value: boolean);
     containRequiredError(): boolean;
     static ɵfac: i0.ɵɵFactoryDeclaration<CustomDropdownFormComponent, never>;
-    static ɵcmp: i0.ɵɵComponentDeclaration<CustomDropdownFormComponent, "custom-dropdown-form", never, { "parentForm": { "alias": "parentForm"; "required": true; }; "controlName": { "alias": "controlName"; "required": true; }; "label": { "alias": "label"; "required": false; }; "labelClass": { "alias": "labelClass"; "required": false; }; "dropdownOptionsClass": { "alias": "dropdownOptionsClass"; "required": false; }; "dropdownHeaderClass": { "alias": "dropdownHeaderClass"; "required": false; }; "dropdownContainerClass": { "alias": "dropdownContainerClass"; "required": false; }; "placeholder": { "alias": "placeholder"; "required": false; }; "enableFilter": { "alias": "enableFilter"; "required": false; }; "showClear": { "alias": "showClear"; "required": false; }; "options": { "alias": "options"; "required": true; }; "name": { "alias": "name"; "required": true; }; "validation": { "alias": "validation"; "required": true; }; "reset": { "alias": "reset"; "required": false; }; }, {}, never, never, true, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<CustomDropdownFormComponent, "custom-dropdown-form", never, { "parentForm": { "alias": "parentForm"; "required": true; }; "controlName": { "alias": "controlName"; "required": true; }; "label": { "alias": "label"; "required": false; }; "labelClass": { "alias": "labelClass"; "required": false; }; "dropdownOptionsClass": { "alias": "dropdownOptionsClass"; "required": false; }; "dropdownHeaderClass": { "alias": "dropdownHeaderClass"; "required": false; }; "dropdownContainerClass": { "alias": "dropdownContainerClass"; "required": false; }; "placeholder": { "alias": "placeholder"; "required": false; }; "enableFilter": { "alias": "enableFilter"; "required": false; }; "showClear": { "alias": "showClear"; "required": false; }; "options": { "alias": "options"; "required": true; }; "name": { "alias": "name"; "required": true; }; "validation": { "alias": "validation"; "required": true; }; "reset": { "alias": "reset"; "required": false; }; }, { "valueChange": "valueChange"; }, never, never, true, never>;
 }
