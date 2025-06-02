@@ -10,6 +10,24 @@ import * as i1$2 from '@angular/forms';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import * as i1$3 from '@angular/router';
 import { Router } from '@angular/router';
+import { trigger, state, transition, style, animate } from '@angular/animations';
+
+var planPriorityEnum;
+(function (planPriorityEnum) {
+    planPriorityEnum["LOW"] = "LOW";
+    planPriorityEnum["MEDIUM"] = "MEDIUM";
+    planPriorityEnum["HIGH"] = "HIGH";
+})(planPriorityEnum || (planPriorityEnum = {}));
+var planTypeNameEnum;
+(function (planTypeNameEnum) {
+    planTypeNameEnum["WEEKLY"] = "WEEKLY";
+    planTypeNameEnum["CAMPAIGN"] = "CAMPAIGN";
+})(planTypeNameEnum || (planTypeNameEnum = {}));
+var PlanStatusEnum;
+(function (PlanStatusEnum) {
+    PlanStatusEnum["DRAFT"] = "DRAFT";
+    PlanStatusEnum["ACTIVE"] = "ACTIVE";
+})(PlanStatusEnum || (PlanStatusEnum = {}));
 
 class ModuleRoutes {
     static AUTH = 'auth';
@@ -2371,6 +2389,44 @@ i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.13", ngImpo
                 type: Output
             }] } });
 
+class CustomNotionPopupComponent {
+    isOpen = false;
+    data;
+    buttons;
+    closePanel = new EventEmitter();
+    downloadAtt = new EventEmitter();
+    static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "19.2.13", ngImport: i0, type: CustomNotionPopupComponent, deps: [], target: i0.ɵɵFactoryTarget.Component });
+    static ɵcmp = i0.ɵɵngDeclareComponent({ minVersion: "14.0.0", version: "19.2.13", type: CustomNotionPopupComponent, isStandalone: true, selector: "custom-notion-popup", inputs: { isOpen: "isOpen", data: "data", buttons: "buttons" }, outputs: { closePanel: "closePanel", downloadAtt: "downloadAtt" }, ngImport: i0, template: "<div class=\"notion-popup\" [@slideInOut]=\"isOpen ? 'in' : 'out'\" *ngIf=\"isOpen\">\n  <div class=\"header\">\n    <h2>{{ data.nameEn }}</h2>\n    <span class=\"priority\" [ngClass]=\"data.priority\">{{ data.priority }}</span>\n    <span class=\"status\">{{ data.status }}</span>\n    <button class=\"close-btn\" (click)=\"isOpen = false\">&times;</button>\n  </div>\n  <div class=\"progress-bar\">\n    <div class=\"progress\" [style.width.%]=\"data.progress\"></div>\n  </div>\n  <div class=\"details\">\n    <div><strong>Start Date:</strong> {{ data.startDate }}</div>\n    <div><strong>End Date:</strong> {{ data.endDate }}</div>\n    <div><strong>Supervisor:</strong> {{ data.supervisor }}</div>\n    <div><strong>Backup Supervisor:</strong> {{ data.backupSupervisor }}</div>\n    <div>\n      <strong>Zone:</strong>\n      <span *ngFor=\"let zone of data.zones\">{{ zone.nameAr }}</span>\n    </div>\n    <div><strong>Description:</strong> {{ data.description }}</div>\n    <div *ngIf=\"data.attachments?.length\">\n      <strong>Attachments:</strong>\n      <button\n        *ngFor=\"let att of data.attachments\"\n        (click)=\"downloadAtt.emit(att.id)\"\n      >\n        {{ att }}\n      </button>\n    </div>\n    <ng-container *ngTemplateOutlet=\"buttons ?? null\"></ng-container>\n  </div>\n</div>\n", styles: [".notion-popup{position:fixed;top:0;left:0;width:50vw;height:100vh;background:#fff;box-shadow:2px 0 8px #0003;z-index:1000;overflow-y:auto;transition:transform .3s;display:flex;flex-direction:column}.notion-popup .header{display:flex;align-items:center;justify-content:space-between;padding:1rem;background:#f5f5f5}.notion-popup .header .close-btn{background:none;border:none;font-size:2rem;cursor:pointer}.notion-popup .progress-bar{height:8px;background:#eee}.notion-popup .progress-bar .progress{height:100%;background:#ffb300;transition:width .3s}.notion-popup .details{padding:1rem}.notion-popup .details div{margin-bottom:.5rem}\n"], dependencies: [{ kind: "ngmodule", type: CommonModule }, { kind: "directive", type: i1$1.NgClass, selector: "[ngClass]", inputs: ["class", "ngClass"] }, { kind: "directive", type: i1$1.NgForOf, selector: "[ngFor][ngForOf]", inputs: ["ngForOf", "ngForTrackBy", "ngForTemplate"] }, { kind: "directive", type: i1$1.NgIf, selector: "[ngIf]", inputs: ["ngIf", "ngIfThen", "ngIfElse"] }, { kind: "directive", type: i1$1.NgTemplateOutlet, selector: "[ngTemplateOutlet]", inputs: ["ngTemplateOutletContext", "ngTemplateOutlet", "ngTemplateOutletInjector"] }], animations: [
+            trigger('slideInOut', [
+                state('in', style({ transform: 'translateX(0)' })),
+                state('out', style({ transform: 'translateX(-100%)' })),
+                transition('out => in', animate('300ms ease-in')),
+                transition('in => out', animate('300ms ease-out')),
+            ]),
+        ] });
+}
+i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.13", ngImport: i0, type: CustomNotionPopupComponent, decorators: [{
+            type: Component,
+            args: [{ selector: 'custom-notion-popup', imports: [CommonModule], animations: [
+                        trigger('slideInOut', [
+                            state('in', style({ transform: 'translateX(0)' })),
+                            state('out', style({ transform: 'translateX(-100%)' })),
+                            transition('out => in', animate('300ms ease-in')),
+                            transition('in => out', animate('300ms ease-out')),
+                        ]),
+                    ], template: "<div class=\"notion-popup\" [@slideInOut]=\"isOpen ? 'in' : 'out'\" *ngIf=\"isOpen\">\n  <div class=\"header\">\n    <h2>{{ data.nameEn }}</h2>\n    <span class=\"priority\" [ngClass]=\"data.priority\">{{ data.priority }}</span>\n    <span class=\"status\">{{ data.status }}</span>\n    <button class=\"close-btn\" (click)=\"isOpen = false\">&times;</button>\n  </div>\n  <div class=\"progress-bar\">\n    <div class=\"progress\" [style.width.%]=\"data.progress\"></div>\n  </div>\n  <div class=\"details\">\n    <div><strong>Start Date:</strong> {{ data.startDate }}</div>\n    <div><strong>End Date:</strong> {{ data.endDate }}</div>\n    <div><strong>Supervisor:</strong> {{ data.supervisor }}</div>\n    <div><strong>Backup Supervisor:</strong> {{ data.backupSupervisor }}</div>\n    <div>\n      <strong>Zone:</strong>\n      <span *ngFor=\"let zone of data.zones\">{{ zone.nameAr }}</span>\n    </div>\n    <div><strong>Description:</strong> {{ data.description }}</div>\n    <div *ngIf=\"data.attachments?.length\">\n      <strong>Attachments:</strong>\n      <button\n        *ngFor=\"let att of data.attachments\"\n        (click)=\"downloadAtt.emit(att.id)\"\n      >\n        {{ att }}\n      </button>\n    </div>\n    <ng-container *ngTemplateOutlet=\"buttons ?? null\"></ng-container>\n  </div>\n</div>\n", styles: [".notion-popup{position:fixed;top:0;left:0;width:50vw;height:100vh;background:#fff;box-shadow:2px 0 8px #0003;z-index:1000;overflow-y:auto;transition:transform .3s;display:flex;flex-direction:column}.notion-popup .header{display:flex;align-items:center;justify-content:space-between;padding:1rem;background:#f5f5f5}.notion-popup .header .close-btn{background:none;border:none;font-size:2rem;cursor:pointer}.notion-popup .progress-bar{height:8px;background:#eee}.notion-popup .progress-bar .progress{height:100%;background:#ffb300;transition:width .3s}.notion-popup .details{padding:1rem}.notion-popup .details div{margin-bottom:.5rem}\n"] }]
+        }], propDecorators: { isOpen: [{
+                type: Input
+            }], data: [{
+                type: Input
+            }], buttons: [{
+                type: Input
+            }], closePanel: [{
+                type: Output
+            }], downloadAtt: [{
+                type: Output
+            }] } });
+
 const authGuard = () => {
     const platformId = inject(PLATFORM_ID);
     const router = inject(Router);
@@ -2436,5 +2492,5 @@ i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.13", ngImpo
  * Generated bundle index. Do not edit.
  */
 
-export { API_BASE_URL, AllowNumberOnlyDirective, ArabicOnlyDirective, AuthConstant, AuthService, BlurBackdropDirective, ClickOutsideDirective, CommonHttpService, ComponentFormErrorConstant, CustomAppErrorComponent, CustomBreadcrumbComponent, CustomButtonComponent, CustomCalendarComponent, CustomCalenderFormComponent, CustomCheckBoxComponent, CustomCheckBoxFormComponent, CustomDropdownComponent, CustomDropdownFormComponent, CustomInputComponent, CustomInputFormComponent, CustomModalComponent, CustomMultiSelectComponent, CustomMultiSelectFormComponent, CustomPaginationComponent, CustomPopUpComponent, CustomTableComponent, CustomTextareaComponent, CustomTextareaFormComponent, CustomToastComponent, CustomToggleSwitchComponent, CustomToggleSwitchFormComponent, EnglishOnlyDirective, ErrorInterceptor, I18nConstant, ModuleRoutes, NetworkConnectionInterceptor, OverlayPanelComponent, PermissionGuard, ToastService, ToggleElementDirective, TokenInterceptor, TranslationService, UserDataService, authGuard, b64toBlob, blobToB64, convertDateFormat, convertFileToBase64, convertFormGroupToFormData, diffTime, excelDateToJSDate, flattenTree, formatDate, formatDateWithTime, formatTimestamp, formatinitialTakeTime, generateRandomColor, generateUniqueNumber, getFormValidationErrors, isDocumentPath, isImagePath, isVedioPath, logger, noAuthGuard, someFieldsContainData, timeAgo };
+export { API_BASE_URL, AllowNumberOnlyDirective, ArabicOnlyDirective, AuthConstant, AuthService, BlurBackdropDirective, ClickOutsideDirective, CommonHttpService, ComponentFormErrorConstant, CustomAppErrorComponent, CustomBreadcrumbComponent, CustomButtonComponent, CustomCalendarComponent, CustomCalenderFormComponent, CustomCheckBoxComponent, CustomCheckBoxFormComponent, CustomDropdownComponent, CustomDropdownFormComponent, CustomInputComponent, CustomInputFormComponent, CustomModalComponent, CustomMultiSelectComponent, CustomMultiSelectFormComponent, CustomNotionPopupComponent, CustomPaginationComponent, CustomPopUpComponent, CustomTableComponent, CustomTextareaComponent, CustomTextareaFormComponent, CustomToastComponent, CustomToggleSwitchComponent, CustomToggleSwitchFormComponent, EnglishOnlyDirective, ErrorInterceptor, I18nConstant, ModuleRoutes, NetworkConnectionInterceptor, OverlayPanelComponent, PermissionGuard, PlanStatusEnum, ToastService, ToggleElementDirective, TokenInterceptor, TranslationService, UserDataService, authGuard, b64toBlob, blobToB64, convertDateFormat, convertFileToBase64, convertFormGroupToFormData, diffTime, excelDateToJSDate, flattenTree, formatDate, formatDateWithTime, formatTimestamp, formatinitialTakeTime, generateRandomColor, generateUniqueNumber, getFormValidationErrors, isDocumentPath, isImagePath, isVedioPath, logger, noAuthGuard, planPriorityEnum, planTypeNameEnum, someFieldsContainData, timeAgo };
 //# sourceMappingURL=dispatching-fe-components.mjs.map
