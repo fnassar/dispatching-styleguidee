@@ -1,4 +1,4 @@
-import { EventEmitter } from '@angular/core';
+import { EventEmitter, SimpleChanges } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { IComponentFormError, IDropdownOption } from '../../interfaces';
 import * as i0 from "@angular/core";
@@ -24,6 +24,9 @@ export declare class CustomDropdownFormComponent {
     filterText: string;
     value: any;
     ngOnInit(): void;
+    ngOnChanges(changes: SimpleChanges): void;
+    private setupFormControlSubscription;
+    private updateSelectedOptionFromFormValue;
     toggleDropdown(): void;
     writeValue(value: any): void;
     selectOption(option: IDropdownOption): void;
