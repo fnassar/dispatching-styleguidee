@@ -22,3 +22,5 @@ export * from './custom-toggle-switch-form/custom-toggle-switch-form.component';
 export * from './overlay-panel/overlay-panel.component';
 export * from './custom-toast/custom-toast.component';
 export * from './custom-modal/custom-modal.component';
+export * from './custom-svg-icon/custom-svg-icon.component';
+export * from './custom-loading-spinner/custom-loading-spinner.component';
