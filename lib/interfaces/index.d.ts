@@ -4,3 +4,4 @@ export * from './components/table.interface';
 export * from './components/pop-up.interface';
 export * from './auth/user.data.interface';
 export * from './modulePaths/routerPaths.constants';
+export * from './components/steppers.interface';

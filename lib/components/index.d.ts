@@ -26,3 +26,4 @@ export * from './custom-file-upload/custom-file-upload.component';
 export * from './custom-file-viewer/custom-file-viewer.component';
 export * from './custom-svg-icon/custom-svg-icon.component';
 export * from './custom-loading-spinner/custom-loading-spinner.component';
+export * from './custom-steppers-container/custom-steppers-container.component';

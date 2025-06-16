@@ -1,0 +1,1 @@
+export declare const checkedIconSrc = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"13\" viewBox=\"0 0 16 13\" fill=\"none\">\n<path d=\"M15.1789 1.42682L5.81605 12.6623L0.855469 7.55999L1.81146 6.63055L5.73977 10.6711L14.1547 0.573242L15.1789 1.42682Z\" fill=\"#602650\"/>\n</svg>";
