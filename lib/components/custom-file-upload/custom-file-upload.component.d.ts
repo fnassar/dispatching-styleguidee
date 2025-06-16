@@ -1,0 +1,33 @@
+import { FormGroup } from '@angular/forms';
+import { IComponentFormError } from '../../interfaces';
+import * as i0 from "@angular/core";
+export declare class CustomFileUploadComponent {
+    parentForm: FormGroup;
+    FileTypes: string[];
+    maxFileSize: string;
+    controlName: string;
+    label: string;
+    labelClass: string;
+    buttonSelectLabel: string;
+    FileTypesMessage: string;
+    placeholder: string;
+    validation: IComponentFormError[];
+    disabled: boolean;
+    private blobUrlCache;
+    private mimeTypesMap;
+    private fileTypeIcons;
+    private defaultIcon;
+    selectedFileName: string | null;
+    fileUrl(file: File): string;
+    removeSelectedFile(id: number): void;
+    ngOnDestroy(): void;
+    onFileSelected($event: Event): void;
+    containRequiredError(): boolean;
+    getFileTypesText(): string;
+    get mimeTypes(): string[];
+    getFileIconSvg(mimeType: string): string;
+    isImageFile(mimeType: string): boolean;
+    onImageError(event: any): void;
+    static ɵfac: i0.ɵɵFactoryDeclaration<CustomFileUploadComponent, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<CustomFileUploadComponent, "custom-file-upload", never, { "parentForm": { "alias": "parentForm"; "required": true; }; "FileTypes": { "alias": "FileTypes"; "required": true; }; "maxFileSize": { "alias": "maxFileSize"; "required": true; }; "controlName": { "alias": "controlName"; "required": true; }; "label": { "alias": "label"; "required": true; }; "labelClass": { "alias": "labelClass"; "required": false; }; "buttonSelectLabel": { "alias": "buttonSelectLabel"; "required": false; }; "FileTypesMessage": { "alias": "FileTypesMessage"; "required": false; }; "placeholder": { "alias": "placeholder"; "required": false; }; "validation": { "alias": "validation"; "required": true; }; "disabled": { "alias": "disabled"; "required": false; }; }, {}, never, never, true, never>;
+}

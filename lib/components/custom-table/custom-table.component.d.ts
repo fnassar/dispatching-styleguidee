@@ -2,6 +2,7 @@ import { EventEmitter, TemplateRef } from '@angular/core';
 import { IStatusCol, ITableCategory, ITableHeader } from '../../interfaces';
 import * as i0 from "@angular/core";
 export declare class CustomTableComponent<T> {
+    path: string;
     tableData: T[] | null;
     tableCategories: ITableCategory<T>[] | null;
     tableHeader: ITableHeader<T>[];
