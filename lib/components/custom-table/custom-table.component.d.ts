@@ -1,5 +1,5 @@
 import { EventEmitter, TemplateRef } from '@angular/core';
-import { ITableCategory, ITableHeader } from '../../interfaces';
+import { IStatusCol, ITableCategory, ITableHeader } from '../../interfaces';
 import * as i0 from "@angular/core";
 export declare class CustomTableComponent<T> {
     path: string;
@@ -8,6 +8,7 @@ export declare class CustomTableComponent<T> {
     tableHeader: ITableHeader<T>[];
     showStatusColumn: boolean;
     showActionColumn: boolean;
+    statusCol: IStatusCol<T>;
     rowClass: string;
     headerClass: string;
     templates: {
@@ -22,5 +23,5 @@ export declare class CustomTableComponent<T> {
     onRowClick: EventEmitter<T>;
     ngOnInit(): void;
     static ɵfac: i0.ɵɵFactoryDeclaration<CustomTableComponent<any>, never>;
-    static ɵcmp: i0.ɵɵComponentDeclaration<CustomTableComponent<any>, "custom-table", never, { "tableData": { "alias": "tableData"; "required": false; }; "tableCategories": { "alias": "tableCategories"; "required": false; }; "tableHeader": { "alias": "tableHeader"; "required": true; }; "showStatusColumn": { "alias": "showStatusColumn"; "required": true; }; "showActionColumn": { "alias": "showActionColumn"; "required": true; }; "rowClass": { "alias": "rowClass"; "required": false; }; "headerClass": { "alias": "headerClass"; "required": false; }; "templates": { "alias": "templates"; "required": false; }; "enableEdit": { "alias": "enableEdit"; "required": false; }; "enableDelete": { "alias": "enableDelete"; "required": false; }; "enableView": { "alias": "enableView"; "required": false; }; }, { "onEdit": "onEdit"; "onView": "onView"; "onDelete": "onDelete"; "onRowClick": "onRowClick"; }, never, never, true, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<CustomTableComponent<any>, "custom-table", never, { "tableData": { "alias": "tableData"; "required": false; }; "tableCategories": { "alias": "tableCategories"; "required": false; }; "tableHeader": { "alias": "tableHeader"; "required": true; }; "showStatusColumn": { "alias": "showStatusColumn"; "required": true; }; "showActionColumn": { "alias": "showActionColumn"; "required": true; }; "statusCol": { "alias": "statusCol"; "required": false; }; "rowClass": { "alias": "rowClass"; "required": false; }; "headerClass": { "alias": "headerClass"; "required": false; }; "templates": { "alias": "templates"; "required": false; }; "enableEdit": { "alias": "enableEdit"; "required": false; }; "enableDelete": { "alias": "enableDelete"; "required": false; }; "enableView": { "alias": "enableView"; "required": false; }; }, { "onEdit": "onEdit"; "onView": "onView"; "onDelete": "onDelete"; "onRowClick": "onRowClick"; }, never, never, true, never>;
 }
