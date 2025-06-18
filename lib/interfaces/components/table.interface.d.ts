@@ -1,8 +1,11 @@
+import { TemplateRef } from '@angular/core';
 export interface ITableHeader<T> {
     header: string;
     body?: keyof T;
     clickFn?: (value: T) => void;
-    htmlRef?: string;
+    htmlRef?: TemplateRef<any>;
+    sort: boolean;
+    type?: 'Status' | 'Actions' | undefined;
 }
 export interface ITableCategory<T> {
     category: string;
@@ -18,4 +21,5 @@ export interface IStatusCol<T> {
     trueValue: string | boolean;
     trueText: string;
     falseText: string;
+    sort: boolean;
 }

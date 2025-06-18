@@ -1,7 +1,10 @@
+import { ElementRef } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { IComponentFormError } from '../../interfaces';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import * as i0 from "@angular/core";
 export declare class CustomFileUploadComponent {
+    private sanitizer;
     parentForm: FormGroup;
     FileTypes: string[];
     maxFileSize: string;
@@ -13,11 +16,18 @@ export declare class CustomFileUploadComponent {
     placeholder: string;
     validation: IComponentFormError[];
     disabled: boolean;
+    fileInput: ElementRef<HTMLInputElement>;
+    private clearFileInput;
+    checkedUploadCloud: SafeHtml;
+    checkedGenAttachmentIcon: SafeHtml;
+    checkedPptIcon: SafeHtml;
+    checkedXlsIcon: SafeHtml;
     private blobUrlCache;
     private mimeTypesMap;
     private fileTypeIcons;
     private defaultIcon;
     selectedFileName: string | null;
+    constructor(sanitizer: DomSanitizer);
     fileUrl(file: File): string;
     removeSelectedFile(id: number): void;
     ngOnDestroy(): void;
