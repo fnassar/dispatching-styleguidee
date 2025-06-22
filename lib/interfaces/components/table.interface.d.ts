@@ -6,6 +6,7 @@ export interface ITableHeader<T> {
     htmlRef?: TemplateRef<any>;
     sort: boolean;
     type?: 'Status' | 'Actions' | undefined;
+    inputTransform?: (item: any) => any;
 }
 export interface ITableCategory<T> {
     category: string;

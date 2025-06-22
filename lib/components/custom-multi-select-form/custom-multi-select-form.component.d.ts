@@ -20,7 +20,7 @@ export declare class CustomMultiSelectFormComponent {
     filterText: string;
     ngOnInit(): void;
     get selectedOptions(): IDropdownOption[];
-    getSelectedLabels(): string;
+    getSelectedLabels(): string[];
     isSelected(id: any): boolean;
     toggleDropdown(): void;
     toggleOptionSelection(option: IDropdownOption): void;

@@ -5,8 +5,9 @@ export declare class CustomAppErrorComponent {
     control: AbstractControl;
     validation: IComponentFormError[];
     name: string;
+    showErrors: import("@angular/core").InputSignal<boolean>;
     shouldShowError(item: IComponentFormError): boolean;
     getErrorMessage(item: IComponentFormError): string;
     static ɵfac: i0.ɵɵFactoryDeclaration<CustomAppErrorComponent, never>;
-    static ɵcmp: i0.ɵɵComponentDeclaration<CustomAppErrorComponent, "custom-app-error", never, { "control": { "alias": "control"; "required": true; }; "validation": { "alias": "validation"; "required": true; }; "name": { "alias": "name"; "required": true; }; }, {}, never, never, true, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<CustomAppErrorComponent, "custom-app-error", never, { "control": { "alias": "control"; "required": true; }; "validation": { "alias": "validation"; "required": true; }; "name": { "alias": "name"; "required": true; }; "showErrors": { "alias": "showErrors"; "required": false; "isSignal": true; }; }, {}, never, never, true, never>;
 }

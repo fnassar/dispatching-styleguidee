@@ -1,0 +1,30 @@
+import { EventEmitter } from '@angular/core';
+import { FormGroup } from '@angular/forms';
+import { IComponentFormError } from '../../interfaces';
+import * as i0 from "@angular/core";
+export declare class CustomTimeInputFormComponent {
+    parentForm: FormGroup;
+    name: string;
+    controlName: string;
+    label: string;
+    labelClass: string;
+    inputClass: string;
+    validation: IComponentFormError[];
+    defaultTime: string;
+    timeChange: EventEmitter<string | null>;
+    showErrors: import("@angular/core").WritableSignal<boolean>;
+    dropdownOpen: import("@angular/core").WritableSignal<boolean>;
+    hours: string[];
+    minutes: string[];
+    selectedHour: string | null;
+    selectedMinute: string | null;
+    selectedPeriod: string | null;
+    get displayTime(): string | null;
+    ngOnInit(): void;
+    toggleDropdown(): void;
+    setFormValue(): void;
+    confirmTime(): void;
+    private setTimeFromString;
+    static ɵfac: i0.ɵɵFactoryDeclaration<CustomTimeInputFormComponent, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<CustomTimeInputFormComponent, "custom-time-input-form", never, { "parentForm": { "alias": "parentForm"; "required": true; }; "name": { "alias": "name"; "required": true; }; "controlName": { "alias": "controlName"; "required": false; }; "label": { "alias": "label"; "required": false; }; "labelClass": { "alias": "labelClass"; "required": false; }; "inputClass": { "alias": "inputClass"; "required": false; }; "validation": { "alias": "validation"; "required": false; }; "defaultTime": { "alias": "defaultTime"; "required": false; }; }, { "timeChange": "timeChange"; }, never, never, true, never>;
+}

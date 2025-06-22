@@ -29,3 +29,5 @@ export * from './custom-loading-spinner/custom-loading-spinner.component';
 export * from './custom-steppers-container/custom-steppers-container.component';
 export * from './custom-fields-form/custom-fields-form.component';
 export * from './custom-steppers-controllers/custom-steppers-controllers.component';
+export * from './custom-radio-group-form/custom-radio-group-form.component';
+export * from './custom-time-input-form/custom-time-input-form.component';
