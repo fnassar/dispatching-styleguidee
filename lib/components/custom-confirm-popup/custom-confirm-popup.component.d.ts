@@ -11,7 +11,10 @@ export declare class CustomConfirmPopupComponent {
     confirmEvent: EventEmitter<any>;
     cancelEvent: EventEmitter<void>;
     extraEvent: EventEmitter<void>;
+    showSucessScreen: import("@angular/core").InputSignal<boolean>;
+    sucessMsg: import("@angular/core").InputSignal<string>;
     checkedInfoSvg: SafeHtml;
+    checkIcon: SafeHtml;
     constructor(sanitizer: DomSanitizer);
     isVisible: boolean;
     eventVal: any;
@@ -19,5 +22,5 @@ export declare class CustomConfirmPopupComponent {
     close(): void;
     onOverlayClick(event: MouseEvent): void;
     static ɵfac: i0.ɵɵFactoryDeclaration<CustomConfirmPopupComponent, never>;
-    static ɵcmp: i0.ɵɵComponentDeclaration<CustomConfirmPopupComponent, "custom-confirm-popup", never, { "message": { "alias": "message"; "required": true; }; "type": { "alias": "type"; "required": true; }; "confirmButtonText": { "alias": "confirmButtonText"; "required": false; }; "cancelButtonText": { "alias": "cancelButtonText"; "required": false; }; "extraButton": { "alias": "extraButton"; "required": false; }; }, { "confirmEvent": "confirmEvent"; "cancelEvent": "cancelEvent"; "extraEvent": "extraEvent"; }, never, never, true, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<CustomConfirmPopupComponent, "custom-confirm-popup", never, { "message": { "alias": "message"; "required": true; }; "type": { "alias": "type"; "required": true; }; "confirmButtonText": { "alias": "confirmButtonText"; "required": false; }; "cancelButtonText": { "alias": "cancelButtonText"; "required": false; }; "extraButton": { "alias": "extraButton"; "required": false; }; "showSucessScreen": { "alias": "showSucessScreen"; "required": false; "isSignal": true; }; "sucessMsg": { "alias": "sucessMsg"; "required": false; "isSignal": true; }; }, { "confirmEvent": "confirmEvent"; "cancelEvent": "cancelEvent"; "extraEvent": "extraEvent"; }, never, never, true, never>;
 }

@@ -7,3 +7,4 @@ export * from './modulePaths/routerPaths.constants';
 export * from './components/steppers.interface';
 export * from './components/radioInuptOption.interface';
 export * from './components/time-input.interface';
+export * from './components/attachments.interface';
