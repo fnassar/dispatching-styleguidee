@@ -33,3 +33,4 @@ export * from './custom-radio-group-form/custom-radio-group-form.component';
 export * from './custom-time-input-form/custom-time-input-form.component';
 export * from './custom-search-input/custom-search-input.component';
 export * from './custom-confirm-popup/custom-confirm-popup.component';
+export * from './custom-category-table/custom-category-table.component';

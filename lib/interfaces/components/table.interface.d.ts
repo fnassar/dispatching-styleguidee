@@ -22,5 +22,5 @@ export interface IStatusCol<T> {
     trueValue: string | boolean;
     trueText: string;
     falseText: string;
-    sort: boolean;
+    sort?: boolean;
 }

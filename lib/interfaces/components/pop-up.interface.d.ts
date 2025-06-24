@@ -1,5 +1,6 @@
 import { TemplateRef } from '@angular/core';
 import { IDropdownOption } from './dropdown.interface';
+import { FileData } from '../../components';
 export interface notionPopup<T = any> extends PlanObjectType {
     actionButtons: TemplateRef<T> | null;
 }
@@ -14,9 +15,9 @@ export interface PlanObjectType extends IDropdownOption {
     supervisor: IDropdownOption;
     backupSupervisor: IDropdownOption;
     progress: number;
-    tasks?: Task[];
+    tasks?: any[];
     isExpanded?: boolean;
-    attachments: IDropdownOption[];
+    attachments: FileData[];
     description: string;
 }
 export declare enum planPriorityEnum {

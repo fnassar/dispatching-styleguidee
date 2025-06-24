@@ -1,22 +1,25 @@
 import { EventEmitter } from '@angular/core';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import * as i0 from "@angular/core";
 export interface FileData {
+    id: string;
     fileName: string;
     mimeType: string;
-    fileSize: string;
-    lastModified: Date;
-    blob?: File;
+    base64Content: string;
+    uploadTime?: string;
 }
 export declare class CustomFileViewerComponent {
+    private sanitizer;
     file: FileData;
     showMenu: boolean;
     menuClick: EventEmitter<FileData>;
     fileClick: EventEmitter<FileData>;
     showTooltip: boolean;
     private mimeTypesMap;
+    constructor(sanitizer: DomSanitizer);
     getFileTypeLabel(): string;
-    getFileIcon(): string;
-    formatDate(date: Date): string;
+    getFileIcon(): SafeHtml;
+    formatDate(date: string | undefined): string;
     onFileClick(): void;
     onMenuClick(event: Event): void;
     static ɵfac: i0.ɵɵFactoryDeclaration<CustomFileViewerComponent, never>;
