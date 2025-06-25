@@ -34,3 +34,6 @@ export * from './custom-time-input-form/custom-time-input-form.component';
 export * from './custom-search-input/custom-search-input.component';
 export * from './custom-confirm-popup/custom-confirm-popup.component';
 export * from './custom-category-table/custom-category-table.component';
+export * from './custom-dynamic-table-with-categories/custom-dynamic-table-with-categories.component';
+export * from './custom-avatars/custom-avatars.component';
+export * from './custom-progress-bar/custom-progress-bar.component';
