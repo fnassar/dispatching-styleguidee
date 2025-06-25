@@ -5,6 +5,7 @@ export interface TableColumn {
     sort?: boolean;
     customClass?: string;
     columnHandler?: (row: any) => void;
+    categoryBg?: string;
 }
 export interface TableAction {
     label: 'edit' | 'delete' | 'view' | 'multi';
@@ -30,6 +31,7 @@ export interface Paginators {
 }
 export interface TableGroup<T = any> {
     title: string;
+    color: string;
     items: T[];
     isCollapsed?: boolean;
 }

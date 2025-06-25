@@ -8,6 +8,7 @@ export declare class CustomAvatarsComponent {
     size: number;
     overlapOffset: number;
     getInitials(name: string): string;
+    getRandomColor(): string;
     static ɵfac: i0.ɵɵFactoryDeclaration<CustomAvatarsComponent, never>;
     static ɵcmp: i0.ɵɵComponentDeclaration<CustomAvatarsComponent, "custom-avatars", never, { "items": { "alias": "items"; "required": false; }; "size": { "alias": "size"; "required": false; }; "overlapOffset": { "alias": "overlapOffset"; "required": false; }; }, {}, never, never, true, never>;
 }
