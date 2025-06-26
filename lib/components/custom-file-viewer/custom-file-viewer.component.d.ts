@@ -7,6 +7,7 @@ export interface FileData {
     mimeType: string;
     base64Content: string;
     uploadTime?: string;
+    fileSize: string;
 }
 export declare class CustomFileViewerComponent {
     private sanitizer;

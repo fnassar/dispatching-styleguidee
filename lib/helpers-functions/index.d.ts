@@ -103,7 +103,15 @@ export declare function isDocumentPath(path: string): boolean;
  * @param {string} dataURI - Base64 encoded data URI
  * @returns {Blob} Blob object representing the image
  */
-export declare function b64toBlob(dataURI: string): Blob;
+export declare function b64toBlob(b64Data: string, contentType?: string, sliceSize?: number): Blob;
+/**
+ * Initiates a download of a given Blob object by creating a temporary anchor element
+ * and triggering a click event on it. The file will be saved with the specified file name.
+ *
+ * @param blob - The Blob object to be downloaded.
+ * @param fileName - The desired name for the downloaded file. Defaults to 'download' if not provided.
+ */
+export declare function downloadBlob(blob: Blob, fileName: string): void;
 /**
  * Converts a Blob object to Base64 data URI
  * @param {Blob} blob - Blob object to convert
