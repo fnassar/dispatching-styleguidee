@@ -37,3 +37,4 @@ export * from './custom-category-table/custom-category-table.component';
 export * from './custom-dynamic-table-with-categories/custom-dynamic-table-with-categories.component';
 export * from './custom-avatars/custom-avatars.component';
 export * from './custom-progress-bar/custom-progress-bar.component';
+export * from './custom-dropdown-button/custom-dropdown-button.component';

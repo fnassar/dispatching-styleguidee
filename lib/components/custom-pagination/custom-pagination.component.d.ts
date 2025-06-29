@@ -8,7 +8,7 @@ export declare class CustomPaginationComponent {
     pageChange: EventEmitter<IPageChangeEvent>;
     baseValue: number;
     pageSizeOptions: number[];
-    totalPages: number[];
+    totalPages: import("@angular/core").WritableSignal<number[]>;
     ngOnInit(): void;
     calculateTotalPages(): void;
     generatePageSizeOptions(): void;
