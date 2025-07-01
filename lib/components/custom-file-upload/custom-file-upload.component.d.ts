@@ -32,7 +32,6 @@ export declare class CustomFileUploadComponent {
     constructor(sanitizer: DomSanitizer);
     fileUrl(file: File): string;
     removeSelectedFile(id: number): void;
-    checkFormInput(): void;
     ngOnDestroy(): void;
     private readFileAsBase64;
     onFileSelected($event: Event): Promise<void>;
