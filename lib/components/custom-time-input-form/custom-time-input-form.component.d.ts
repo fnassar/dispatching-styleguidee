@@ -16,11 +16,12 @@ export declare class CustomTimeInputFormComponent {
     dropdownOpen: import("@angular/core").WritableSignal<boolean>;
     hours: string[];
     minutes: string[];
-    selectedHour: number;
+    selectedHour: number | string;
     selectedMinute: number;
     selectedPeriod: 'AM' | 'PM';
     ngOnInit(): void;
     toggleDropdown(): void;
+    setExcistValue(): void;
     setFormValue(): void;
     confirmTime(): void;
     private setTimeFromString;
