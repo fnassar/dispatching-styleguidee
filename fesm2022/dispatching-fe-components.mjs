@@ -2726,6 +2726,9 @@ class CustomFileUploadComponent {
         });
     }
     async onFileSelected($event) {
+        if (!this.parentForm.get(this.controlName)?.value) {
+            this.parentForm.patchValue({ [this.controlName]: [] });
+        }
         if (this.maxFileCount &&
             this.parentForm.get(this.controlName)?.value &&
             this.parentForm.get(this.controlName)?.value.length >= this.maxFileCount) {
