@@ -38,3 +38,7 @@ export * from './custom-dynamic-table-with-categories/custom-dynamic-table-with-
 export * from './custom-avatars/custom-avatars.component';
 export * from './custom-progress-bar/custom-progress-bar.component';
 export * from './custom-dropdown-button/custom-dropdown-button.component';
+export * from './custom-details-modal/custom-details-modal.component';
+export * from './custom-details-header/custom-details-header.component';
+export * from './custom-details-nav/custom-details-nav.component';
+export * from './custom-title-content/custom-title-content.component';
