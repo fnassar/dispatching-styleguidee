@@ -5,6 +5,7 @@ export declare class CustomModalComponent {
     showDot: boolean;
     headerButton: string;
     overlayClickClose: boolean;
+    hideEvent: EventEmitter<void>;
     headerButtonClick: EventEmitter<void>;
     isVisible: boolean;
     open(): void;
@@ -12,5 +13,5 @@ export declare class CustomModalComponent {
     onHeaderButtonClick(): void;
     onOverlayClick(event: MouseEvent): void;
     static ɵfac: i0.ɵɵFactoryDeclaration<CustomModalComponent, never>;
-    static ɵcmp: i0.ɵɵComponentDeclaration<CustomModalComponent, "modal", never, { "modalTitle": { "alias": "modalTitle"; "required": false; }; "showDot": { "alias": "showDot"; "required": false; }; "headerButton": { "alias": "headerButton"; "required": false; }; "overlayClickClose": { "alias": "overlayClickClose"; "required": false; }; }, { "headerButtonClick": "headerButtonClick"; }, never, ["*"], true, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<CustomModalComponent, "modal", never, { "modalTitle": { "alias": "modalTitle"; "required": false; }; "showDot": { "alias": "showDot"; "required": false; }; "headerButton": { "alias": "headerButton"; "required": false; }; "overlayClickClose": { "alias": "overlayClickClose"; "required": false; }; }, { "hideEvent": "hideEvent"; "headerButtonClick": "headerButtonClick"; }, never, ["*"], true, never>;
 }

@@ -1,7 +1,29 @@
+import { StorageService } from './storage.services';
+import { IUserData } from '../../interfaces';
+import { Permissions, Roles } from '../../enums';
+import { ActivatedRouteSnapshot, Router } from '@angular/router';
+import { AuthBeService } from './auth.be.services';
+import { AuthContextService } from './auth-context.service';
 import * as i0 from "@angular/core";
 export declare class AuthService {
-    constructor();
+    private authContextService;
+    private authBeService;
+    private router;
+    private storageService;
+    Roles: typeof Roles;
+    Permissions: typeof Permissions;
+    constructor(authContextService: AuthContextService, authBeService: AuthBeService, router: Router, storageService: StorageService);
+    login(data: any): void;
+    logout(): void;
+    handleRefreshToken(): void;
+    handlePermissionConfig(): void;
     isLoggedIn(): boolean;
+    getToken(): string;
+    getRefreshToken(): string;
+    getCurrentUser(): IUserData;
+    getCurrentPermissions(): any[];
+    hasCategory(route: ActivatedRouteSnapshot): boolean;
+    canDoAction(action: string[]): boolean;
     static ɵfac: i0.ɵɵFactoryDeclaration<AuthService, never>;
     static ɵprov: i0.ɵɵInjectableDeclaration<AuthService>;
 }
