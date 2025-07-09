@@ -304,7 +304,9 @@ class AuthBeService {
         return this.http.post('https://dispatching-api-gateway-821cc537b8b6.herokuapp.com/api/v1/idm/auth/logout', {});
     }
     refreshToken(refreshToken) {
-        return this.http.post('https://dispatching-api-gateway-821cc537b8b6.herokuapp.com/api/v1/idm/auth/refresh', refreshToken);
+        return this.http.post('https://dispatching-api-gateway-821cc537b8b6.herokuapp.com/api/v1/idm/auth/refresh', refreshToken, {
+            context: new HttpContext().set(SKIP_TOKEN, true),
+        });
     }
     validateToken() {
         return this.http.post('https://dispatching-api-gateway-821cc537b8b6.herokuapp.com/api/v1/idm/auth/validate', {});
@@ -322,18 +324,52 @@ i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.14", ngImpo
                 }]
         }], ctorParameters: () => [{ type: i1.HttpClient }] });
 
+class ToastService {
+    message = signal('Default message');
+    type = signal('info');
+    position = signal('top-right');
+    show = signal(false);
+    toast(message, position, ToastType = 'info', duration) {
+        this.message.update(() => message);
+        this.type.update(() => ToastType);
+        this.position.update(() => position);
+        this.showToast();
+        if (duration) {
+            setTimeout(() => {
+                this.hideToast();
+            }, duration);
+        }
+    }
+    showToast() {
+        this.show.update(() => true);
+    }
+    hideToast() {
+        this.show.update(() => false);
+    }
+    static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "19.2.14", ngImport: i0, type: ToastService, deps: [], target: i0.ɵɵFactoryTarget.Injectable });
+    static ɵprov = i0.ɵɵngDeclareInjectable({ minVersion: "12.0.0", version: "19.2.14", ngImport: i0, type: ToastService, providedIn: 'root' });
+}
+i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.14", ngImport: i0, type: ToastService, decorators: [{
+            type: Injectable,
+            args: [{
+                    providedIn: 'root',
+                }]
+        }] });
+
 class AuthService {
     authContextService;
     authBeService;
     router;
     storageService;
+    toastService;
     Roles = Roles;
     Permissions = Permissions;
-    constructor(authContextService, authBeService, router, storageService) {
+    constructor(authContextService, authBeService, router, storageService, toastService) {
         this.authContextService = authContextService;
         this.authBeService = authBeService;
         this.router = router;
         this.storageService = storageService;
+        this.toastService = toastService;
     }
     login(data) {
         this.authBeService.login(data).subscribe({
@@ -370,15 +406,20 @@ class AuthService {
                 if (res.success) {
                     this.authContextService.saveTokens(res.data);
                 }
+                else {
+                    this.logout();
+                }
             },
         });
     }
     handlePermissionConfig() {
         this.authBeService.validateToken().subscribe({
             next: (res) => {
-                console.log('Validate', res);
                 if (res.success) {
                     this.authContextService.savePermissionsAndRoles(res.data);
+                }
+                else {
+                    this.toastService.toast(`Permissions Request Faild`, 'top-center', 'error', 2000);
                 }
             },
         });
@@ -435,7 +476,7 @@ class AuthService {
     }
     // PERMISSION MANAGEMENT
     hasCategory(route) {
-        console.log('route: ', route);
+        // console.log('route: ', route);
         // const user = this.getCurrentUser();
         const requiredPermissions = route.data['permissions'] || [];
         const listOfPermissions = this.getCurrentPermissions() || [];
@@ -453,11 +494,11 @@ class AuthService {
         // console.log('list of roles', permissionsList);
         if (permissionsList && permissionsList.length > 0) {
             const permissionsSet = new Set(permissionsList);
-            return (requiredAction.some((action) => permissionsSet.has(action)));
+            return requiredAction.some((action) => permissionsSet.has(action));
         }
         return false;
     }
-    static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "19.2.14", ngImport: i0, type: AuthService, deps: [{ token: AuthContextService }, { token: AuthBeService }, { token: i3.Router }, { token: StorageService }], target: i0.ɵɵFactoryTarget.Injectable });
+    static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "19.2.14", ngImport: i0, type: AuthService, deps: [{ token: AuthContextService }, { token: AuthBeService }, { token: i3.Router }, { token: StorageService }, { token: ToastService }], target: i0.ɵɵFactoryTarget.Injectable });
     static ɵprov = i0.ɵɵngDeclareInjectable({ minVersion: "12.0.0", version: "19.2.14", ngImport: i0, type: AuthService, providedIn: 'root' });
 }
 i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.14", ngImport: i0, type: AuthService, decorators: [{
@@ -465,7 +506,7 @@ i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.14", ngImpo
             args: [{
                     providedIn: 'root',
                 }]
-        }], ctorParameters: () => [{ type: AuthContextService }, { type: AuthBeService }, { type: i3.Router }, { type: StorageService }] });
+        }], ctorParameters: () => [{ type: AuthContextService }, { type: AuthBeService }, { type: i3.Router }, { type: StorageService }, { type: ToastService }] });
 
 class UserDataService {
     // Private signal for user data
@@ -608,38 +649,6 @@ i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.14", ngImpo
                     type: Inject,
                     args: [API_BASE_URL]
                 }] }] });
-
-class ToastService {
-    message = signal('Default message');
-    type = signal('info');
-    position = signal('top-right');
-    show = signal(false);
-    toast(message, position, ToastType = 'info', duration) {
-        this.message.update(() => message);
-        this.type.update(() => ToastType);
-        this.position.update(() => position);
-        this.showToast();
-        if (duration) {
-            setTimeout(() => {
-                this.hideToast();
-            }, duration);
-        }
-    }
-    showToast() {
-        this.show.update(() => true);
-    }
-    hideToast() {
-        this.show.update(() => false);
-    }
-    static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "19.2.14", ngImport: i0, type: ToastService, deps: [], target: i0.ɵɵFactoryTarget.Injectable });
-    static ɵprov = i0.ɵɵngDeclareInjectable({ minVersion: "12.0.0", version: "19.2.14", ngImport: i0, type: ToastService, providedIn: 'root' });
-}
-i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.14", ngImport: i0, type: ToastService, decorators: [{
-            type: Injectable,
-            args: [{
-                    providedIn: 'root',
-                }]
-        }] });
 
 class LoadingService {
     loading = signal(false);
@@ -1083,7 +1092,9 @@ const AuthInterceptor = (request, next) => {
     return next(clonedRequest).pipe(map((event) => {
         if (event instanceof HttpResponse && isPlatformBrowser(PLATFORM_ID)) {
             const body = event.body;
-            (body.success) ? body['success'] = true : body['success'] = false;
+            if (body.status === 'SUCCESS' || body.success) {
+                body['success'] = true;
+            }
             body['statusCode'] = event.status;
             if (body &&
                 body.success !== undefined &&
@@ -1099,16 +1110,16 @@ const AuthInterceptor = (request, next) => {
                 if (!body.success) {
                     if (body.errors && body.errors.length > 0) {
                         body.errors.forEach((error) => {
-                            toastService.toast(`${error.msg}`, 'top-right', 'error', 2000);
+                            toastService.toast(`${error.msg}`, 'top-center', 'error', 2000);
                         });
                     }
                     else {
-                        toastService.toast(`Unknown Error`, 'top-right', 'error', 2000);
+                        toastService.toast(`Unknown Error`, 'top-center', 'error', 2000);
                     }
                 }
                 else {
                     if (showSuccessToaster) {
-                        toastService.toast(`${body.message}`, 'top-right', 'success', 2000);
+                        toastService.toast(`${body.message}`, 'top-center', 'success', 2000);
                     }
                 }
             }
@@ -1119,34 +1130,42 @@ const AuthInterceptor = (request, next) => {
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const ErrorInterceptor = (req, next) => {
+    let authService = inject(AuthService);
+    let authContextService = inject(AuthContextService);
+    let router = inject(Router);
+    let toastService = inject(ToastService);
     return next(req).pipe(catchError((error) => {
         if (error && isPlatformBrowser(PLATFORM_ID)) {
         }
         else {
         }
         switch (error.status) {
-            case 401:
-                localStorage.clear();
-                // call function
-                console.error('Unauthorized', error); // incorrect access or not logged in
-                break;
-            case 402:
-                // access expired
-                break;
             case 400:
-                console.error('Bad Request'); // has message for user to see
+                toastService.toast(error.error.errorMessage, 'top-center', 'error', 2000);
+                break;
+            case 401:
+                // access token expired / au auth
+                //  authService.handleRefreshToken();
+                authContextService.clearData();
+                window.dispatchEvent(new CustomEvent('auth-logout'));
+                router.navigate(['/auth/login']);
                 break;
             case 403:
-                console.error('No Permission'); // no permission
-                break;
-            case 404:
-                console.error('End Point Not Found'); // no permission
+                // no permission
+                authService.handlePermissionConfig();
+                console.error('No Permission');
                 break;
             case 406:
                 // refresh expired
+                authContextService.clearData();
+                window.dispatchEvent(new CustomEvent('auth-logout'));
+                router.navigate(['/auth/login']);
+                break;
+            case 404:
+                console.error('End Point Not Found');
                 break;
             case 503:
-                // service idle -- error message
+                toastService.toast(`Backend Service Faild`, 'top-center', 'error', 2000);
                 break;
             default:
                 console.error(error);
@@ -1174,7 +1193,7 @@ const ErrorInterceptor = (req, next) => {
 let totalRequests = 0;
 const loadingInterceptor = (req, next) => {
     const loadingService = inject(LoadingService);
-    console.log('loadingService: ', loadingService);
+    // console.log('loadingService: ', loadingService);
     // If the custom header is present, skip the loader
     // by this =>     context: new HttpContext().set(SKIP_LOADER, true),
     const skipLoader = req.context.get(SKIP_LOADER);
@@ -1511,7 +1530,7 @@ class AuthDirective {
     viewContainer;
     authContextService;
     // private action: string = '';
-    actions = input([]);
+    canDoAction = input([]);
     constructor(authService, templateRef, viewContainer, authContextService) {
         this.authService = authService;
         this.templateRef = templateRef;
@@ -1519,10 +1538,10 @@ class AuthDirective {
         this.authContextService = authContextService;
         effect(() => {
             if (this.authContextService.userPermissionsAndRoles$() ||
-                this.actions().length > 0) {
-                const allowed = this.authService.canDoAction(this.actions());
-                console.log('needed action', this.actions());
-                console.log('ALLOWED', allowed);
+                this.canDoAction().length > 0) {
+                const allowed = this.authService.canDoAction(this.canDoAction());
+                // console.log('needed action', this.canDoAction());
+                // console.log('ALLOWED', allowed);
                 if (allowed) {
                     this.viewContainer.createEmbeddedView(this.templateRef);
                 }
@@ -1533,12 +1552,13 @@ class AuthDirective {
         });
     }
     static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "19.2.14", ngImport: i0, type: AuthDirective, deps: [{ token: AuthService }, { token: i0.TemplateRef }, { token: i0.ViewContainerRef }, { token: AuthContextService }], target: i0.ɵɵFactoryTarget.Directive });
-    static ɵdir = i0.ɵɵngDeclareDirective({ minVersion: "17.1.0", version: "19.2.14", type: AuthDirective, isStandalone: true, selector: "[canDoAction]", inputs: { actions: { classPropertyName: "actions", publicName: "actions", isSignal: true, isRequired: false, transformFunction: null } }, ngImport: i0 });
+    static ɵdir = i0.ɵɵngDeclareDirective({ minVersion: "17.1.0", version: "19.2.14", type: AuthDirective, isStandalone: true, selector: "[canDoAction]", inputs: { canDoAction: { classPropertyName: "canDoAction", publicName: "canDoAction", isSignal: true, isRequired: false, transformFunction: null } }, ngImport: i0 });
 }
 i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.14", ngImport: i0, type: AuthDirective, decorators: [{
             type: Directive,
             args: [{
                     selector: '[canDoAction]',
+                    standalone: true
                 }]
         }], ctorParameters: () => [{ type: AuthService }, { type: i0.TemplateRef }, { type: i0.ViewContainerRef }, { type: AuthContextService }] });
 
@@ -2758,7 +2778,7 @@ class CustomBreadcrumbComponent {
     breadcrumbItems = [];
     breadcrumbItemClicked = (item) => {
         // route to url
-        console.log('Breadcrumb item clicked:', item);
+        // console.log('Breadcrumb item clicked:', item);
         this.router.navigate([item.url]);
     };
     constructor(router) {
@@ -4217,16 +4237,20 @@ const noAuthGuard = () => {
     return true;
 };
 
+// permission.guard.fn.ts
 const PermissionGuard = (route, state) => {
     const authService = inject(AuthService);
-    // const router = inject(Router);
+    const router = inject(Router);
     const toastService = inject(ToastService);
     const hasPermission = authService.hasCategory(route);
     if (hasPermission) {
         return true;
     }
     else {
-        toastService.toast(`You don't has permission`, 'top-center', 'error', 2000);
+        router.navigate(['/']);
+        setTimeout(() => {
+            toastService.toast(`You don't have permission`, 'top-center', 'error', 2000);
+        }, 500);
         //router.navigate(['error/403']);
         return false;
     }

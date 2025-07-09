@@ -4,15 +4,17 @@ import { Permissions, Roles } from '../../enums';
 import { ActivatedRouteSnapshot, Router } from '@angular/router';
 import { AuthBeService } from './auth.be.services';
 import { AuthContextService } from './auth-context.service';
+import { ToastService } from '../ui/toast.service';
 import * as i0 from "@angular/core";
 export declare class AuthService {
     private authContextService;
     private authBeService;
     private router;
     private storageService;
+    private toastService;
     Roles: typeof Roles;
     Permissions: typeof Permissions;
-    constructor(authContextService: AuthContextService, authBeService: AuthBeService, router: Router, storageService: StorageService);
+    constructor(authContextService: AuthContextService, authBeService: AuthBeService, router: Router, storageService: StorageService, toastService: ToastService);
     login(data: any): void;
     logout(): void;
     handleRefreshToken(): void;
