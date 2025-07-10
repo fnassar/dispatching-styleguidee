@@ -1,6 +1,6 @@
 import { EventEmitter } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { IComponentFormError, ITimeDetails } from '../../interfaces';
+import { IComponentFormError } from '../../interfaces';
 import * as i0 from "@angular/core";
 export declare class CustomTimeInputFormComponent {
     parentForm: FormGroup;
@@ -11,7 +11,10 @@ export declare class CustomTimeInputFormComponent {
     inputClass: string;
     validation: IComponentFormError[];
     defaultTime: string;
-    timeChange: EventEmitter<ITimeDetails>;
+    timeChange: EventEmitter<{
+        hour: number;
+        minute: number;
+    }>;
     showErrors: import("@angular/core").WritableSignal<boolean>;
     dropdownOpen: import("@angular/core").WritableSignal<boolean>;
     hours: string[];

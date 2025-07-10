@@ -3687,6 +3687,8 @@ class CustomTimeInputFormComponent {
     }
     confirmTime() {
         this.dropdownOpen.set(false);
+        let h = Number(this.selectedHour);
+        const m = Number(this.selectedMinute);
         if (this.selectedPeriod == 'PM' && this.selectedHour != 12) {
             this.selectedHour = Number(this.selectedHour) + 12;
         }
@@ -3700,7 +3702,7 @@ class CustomTimeInputFormComponent {
         //   nano: 0,
         // };
         // console.log('timeDetails: ', timeDetails);
-        // this.timeChange.emit(timeDetails);
+        this.timeChange.emit({ hour: Number(this.selectedHour), minute: m });
         this.setFormValue();
     }
     setTimeFromString(timeStr) {
