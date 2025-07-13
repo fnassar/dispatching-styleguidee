@@ -304,9 +304,7 @@ class AuthBeService {
         return this.http.post('https://dispatching-api-gateway-821cc537b8b6.herokuapp.com/api/v1/idm/auth/logout', {});
     }
     refreshToken(refreshToken) {
-        return this.http.post('https://dispatching-api-gateway-821cc537b8b6.herokuapp.com/api/v1/idm/auth/refresh', refreshToken, {
-            context: new HttpContext().set(SKIP_TOKEN, true),
-        });
+        return this.http.post('https://dispatching-api-gateway-821cc537b8b6.herokuapp.com/api/v1/idm/auth/refresh', refreshToken);
     }
     validateToken() {
         return this.http.post('https://dispatching-api-gateway-821cc537b8b6.herokuapp.com/api/v1/idm/auth/validate', {});
@@ -1145,10 +1143,10 @@ const ErrorInterceptor = (req, next) => {
                 break;
             case 401:
                 // access token expired / au auth
-                //  authService.handleRefreshToken();
-                authContextService.clearData();
-                window.dispatchEvent(new CustomEvent('auth-logout'));
-                router.navigate(['/auth/login']);
+                authService.handleRefreshToken();
+                //  authContextService.clearData();
+                // window.dispatchEvent(new CustomEvent('auth-logout'));
+                // router.navigate(['/auth/login']);
                 break;
             case 403:
                 // no permission
