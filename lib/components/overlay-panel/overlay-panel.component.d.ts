@@ -1,10 +1,13 @@
 import { TemplateRef } from '@angular/core';
+import { OverlayManagerService } from './overlay-panel.service';
 import * as i0 from "@angular/core";
 export declare class OverlayPanelComponent {
+    private overlayManager;
     overlayClass: string;
     targetTemplate: TemplateRef<any>;
     overlayTemplate: TemplateRef<any>;
     isOpen: boolean;
+    constructor(overlayManager: OverlayManagerService);
     ngAfterContentInit(): void;
     toggleDropdown(event: Event): void;
     closeDropdown(): void;

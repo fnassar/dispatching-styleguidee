@@ -8,7 +8,7 @@ export declare class ClickOutsideDirective implements AfterViewInit, OnDestroy {
     clickOutside: HTMLElement;
     clickOutsideEmitter: EventEmitter<void>;
     isFirstTime: boolean;
-    private destroySubscribtion;
+    private destroySubscription;
     ngAfterViewInit(): void;
     ngOnDestroy(): void;
     static ɵfac: i0.ɵɵFactoryDeclaration<ClickOutsideDirective, never>;
