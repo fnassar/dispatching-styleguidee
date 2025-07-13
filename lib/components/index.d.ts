@@ -42,3 +42,4 @@ export * from './custom-details-modal/custom-details-modal.component';
 export * from './custom-details-header/custom-details-header.component';
 export * from './custom-details-nav/custom-details-nav.component';
 export * from './custom-title-content/custom-title-content.component';
+export * from './custom-plate-number-input-form/custom-plate-number-input-form.component';

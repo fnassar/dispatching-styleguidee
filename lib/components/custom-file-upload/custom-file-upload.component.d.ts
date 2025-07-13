@@ -24,6 +24,7 @@ export declare class CustomFileUploadComponent {
     checkedGenAttachmentIcon: SafeHtml;
     checkedPptIcon: SafeHtml;
     checkedXlsIcon: SafeHtml;
+    private _toast;
     private blobUrlCache;
     private mimeTypesMap;
     private fileTypeIcons;
