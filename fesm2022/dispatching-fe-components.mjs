@@ -386,20 +386,20 @@ class AuthService {
             next: (res) => {
                 if (res.success) {
                     this.authContextService.saveTokens(res.data);
-                    window.dispatchEvent(new CustomEvent('auth-login'));
+                    //window.dispatchEvent(new CustomEvent('auth-login'));
                     //           window.history.pushState({}, '', window.location.pathname);
                     // window.dispatchEvent(new PopStateEvent('popstate', {}));
-                    // window.location.reload()
                     this.router.navigate(['/']);
+                    window.location.reload();
                 }
             },
         });
     }
     logOutUser() {
         this.authContextService.clearData();
-        window.dispatchEvent(new CustomEvent('auth-logout'));
-        //  window.location.reload()
+        // window.dispatchEvent(new CustomEvent('auth-logout'));
         this.router.navigate(['/auth/login']);
+        window.location.reload();
     }
     logout() {
         this.authBeService.logout().subscribe({
@@ -418,6 +418,7 @@ class AuthService {
             next: (res) => {
                 if (res.success) {
                     this.authContextService.saveTokens(res.data);
+                    window.location.reload();
                 }
                 else {
                     this.logOutUser();
