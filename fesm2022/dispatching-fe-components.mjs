@@ -1,10 +1,10 @@
 import * as i0 from '@angular/core';
 import { Injectable, signal, computed, InjectionToken, Optional, Inject, inject, PLATFORM_ID, input, Input, Component, EventEmitter, Output, HostListener, Directive, effect, ContentChild, ViewChild, HostBinding } from '@angular/core';
+import { retry, catchError, BehaviorSubject, map, throwError, finalize, tap, Subscription, fromEvent, filter } from 'rxjs';
 import * as i1 from '@angular/common/http';
 import { HttpContextToken, HttpContext, HttpResponse } from '@angular/common/http';
 import * as i3 from '@angular/router';
 import { Router } from '@angular/router';
-import { BehaviorSubject, map, catchError, throwError, finalize, tap, Subscription, fromEvent, filter } from 'rxjs';
 import * as i2$1 from '@ngx-translate/core';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import * as i2 from '@angular/common';
@@ -292,8 +292,12 @@ const SHOW_SUCCESS_TOASTER = new HttpContextToken(() => true);
 
 class AuthBeService {
     http;
-    constructor(http) {
+    authContextService;
+    router;
+    constructor(http, authContextService, router) {
         this.http = http;
+        this.authContextService = authContextService;
+        this.router = router;
     }
     login(data) {
         return this.http.post('https://dispatching-api-gateway-821cc537b8b6.herokuapp.com/api/v1/idm/auth/login', { username: data.username, password: data.password }, {
@@ -307,12 +311,20 @@ class AuthBeService {
         return this.http.post('https://dispatching-api-gateway-821cc537b8b6.herokuapp.com/api/v1/idm/auth/refresh', refreshToken);
     }
     validateToken() {
-        return this.http.post('https://dispatching-api-gateway-821cc537b8b6.herokuapp.com/api/v1/idm/auth/validate', {});
+        return this.http
+            .post('https://dispatching-api-gateway-821cc537b8b6.herokuapp.com/api/v1/idm/auth/validate', {})
+            .pipe(retry(3), catchError((error) => {
+            console.error('Request failed after 3 retries', error);
+            this.authContextService.clearData();
+            window.dispatchEvent(new CustomEvent('auth-logout'));
+            this.router.navigate(['/auth/login']);
+            throw error;
+        }));
     }
     getCurrUser() {
         return this.http.get('https://dispatching-api-gateway-821cc537b8b6.herokuapp.com/api/v1/idm/auth/me');
     }
-    static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "19.2.14", ngImport: i0, type: AuthBeService, deps: [{ token: i1.HttpClient }], target: i0.ɵɵFactoryTarget.Injectable });
+    static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "19.2.14", ngImport: i0, type: AuthBeService, deps: [{ token: i1.HttpClient }, { token: AuthContextService }, { token: i3.Router }], target: i0.ɵɵFactoryTarget.Injectable });
     static ɵprov = i0.ɵɵngDeclareInjectable({ minVersion: "12.0.0", version: "19.2.14", ngImport: i0, type: AuthBeService, providedIn: 'root' });
 }
 i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.14", ngImport: i0, type: AuthBeService, decorators: [{
@@ -320,7 +332,7 @@ i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.14", ngImpo
             args: [{
                     providedIn: 'root',
                 }]
-        }], ctorParameters: () => [{ type: i1.HttpClient }] });
+        }], ctorParameters: () => [{ type: i1.HttpClient }, { type: AuthContextService }, { type: i3.Router }] });
 
 class ToastService {
     message = signal('Default message');
@@ -383,14 +395,17 @@ class AuthService {
             },
         });
     }
+    logOutUser() {
+        this.authContextService.clearData();
+        window.dispatchEvent(new CustomEvent('auth-logout'));
+        //  window.location.reload()
+        this.router.navigate(['/auth/login']);
+    }
     logout() {
         this.authBeService.logout().subscribe({
             next: (res) => {
                 if (res.success) {
-                    this.authContextService.clearData();
-                    window.dispatchEvent(new CustomEvent('auth-logout'));
-                    //  window.location.reload()
-                    this.router.navigate(['/auth/login']);
+                    this.logOutUser();
                 }
             },
         });
@@ -405,8 +420,11 @@ class AuthService {
                     this.authContextService.saveTokens(res.data);
                 }
                 else {
-                    this.logout();
+                    this.logOutUser();
                 }
+            },
+            error: () => {
+                this.logOutUser();
             },
         });
     }
@@ -1093,50 +1111,56 @@ const AuthInterceptor = (request, next) => {
             if (body.status === 'SUCCESS' || body.success) {
                 body['success'] = true;
             }
-            body['statusCode'] = event.status;
+            else {
+                body['success'] = false;
+            }
+            //  body['statusCode'] = event.status;
             if (body &&
-                body.success !== undefined &&
+                body.success &&
                 (request.method === 'POST' ||
                     request.method === 'PUT' ||
                     request.method === 'DELETE')) {
-                /**
-                 * TODO: add refresh logic -- call service that handles logic before showing toaster
-                 * Detect 401 errors in the interceptor.
-                 * Call a refresh token method from a service.
-                 * Retry the failed request with the new token.
-                 */
-                if (!body.success) {
-                    if (body.errors && body.errors.length > 0) {
-                        body.errors.forEach((error) => {
-                            toastService.toast(`${error.msg}`, 'top-center', 'error', 2000);
-                        });
-                    }
-                    else {
-                        toastService.toast(`Unknown Error`, 'top-center', 'error', 2000);
-                    }
+                if (showSuccessToaster) {
+                    toastService.toast(`${body.message}`, 'top-center', 'success', 4000);
                 }
-                else {
-                    if (showSuccessToaster) {
-                        toastService.toast(`${body.message}`, 'top-center', 'success', 2000);
-                    }
-                }
+                // if (!body.success) {
+                //   if (body.errors && body.errors.length > 0) {
+                //     body.errors.forEach((error) => {
+                //       toastService.toast(`${error.msg}`, 'top-center', 'error', 2000);
+                //     });
+                //   } else {
+                //     toastService.toast(`Unknown Error`, 'top-center', 'error', 2000);
+                //   }
+                // }
             }
         }
         return event;
     }));
 };
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
 const ErrorInterceptor = (req, next) => {
     let authService = inject(AuthService);
     let authContextService = inject(AuthContextService);
     let router = inject(Router);
     let toastService = inject(ToastService);
-    return next(req).pipe(catchError((error) => {
-        if (error && isPlatformBrowser(PLATFORM_ID)) {
-        }
-        else {
-        }
+    return next(req).pipe(
+    // retry({
+    //   count: 3,
+    //   delay: (error) => {
+    //     if (error.status === 503) {
+    //       // Retry logic for 503 errors
+    //       return timer(1000); // Retry after 1 second
+    //     }
+    //     return throwError(() => error);
+    //   },
+    // }),
+    catchError((error) => {
+        // if (error && isPlatformBrowser(PLATFORM_ID)) {
+        // } else {
+        // }
+        //      if (error.status === 503) {
+        //   toastService.toast('Service unavailable. Please try again later.', 'top-center', 'error', 2000);
+        // }
         switch (error.status) {
             case 400:
                 toastService.toast(error.error.errorMessage, 'top-center', 'error', 2000);
@@ -1163,10 +1187,10 @@ const ErrorInterceptor = (req, next) => {
                 console.error('End Point Not Found');
                 break;
             case 503:
-                toastService.toast(`Backend Service Faild`, 'top-center', 'error', 2000);
+                toastService.toast(`Please Contact Support Team`, 'top-center', 'error', 2000);
                 break;
             default:
-                console.error(error);
+                toastService.toast(`Please Contact Support Team`, 'top-center', 'error', 2000);
         }
         // refresh token + code
         // access token
@@ -4020,11 +4044,11 @@ class CustomDynamicTableWithCategoriesComponent {
         return parts.reduce((acc, key) => acc?.[key], obj);
     }
     static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "19.2.14", ngImport: i0, type: CustomDynamicTableWithCategoriesComponent, deps: [{ token: i1$2.DomSanitizer }], target: i0.ɵɵFactoryTarget.Component });
-    static ɵcmp = i0.ɵɵngDeclareComponent({ minVersion: "17.0.0", version: "19.2.14", type: CustomDynamicTableWithCategoriesComponent, isStandalone: true, selector: "custom-dynamic-table-with-categories", inputs: { config: "config", hasCheckBox: "hasCheckBox", cellTemplates: "cellTemplates", actionTemplates: "actionTemplates" }, outputs: { sortColumn: "sortColumn", nameClick: "nameClick" }, ngImport: i0, template: "<table class=\"striped-table\">\n  <thead>\n    <tr>\n      @if(hasCheckBox){\n      <th>\n        <div class=\"check-box-container\">\n          <input id=\"checkbox\" class=\"custom-checkbox\" type=\"checkbox\" />\n        </div>\n      </th>\n\n      } @for(column of config.columns; track $index) {\n      <th>\n        <div class=\"table-header-cell\">\n          {{ column.label | translate }}\n          @if(column.sort){\n          <div\n            [innerHTML]=\"checkedSortIcon\"\n            class=\"sort-icon\"\n            (click)=\"sortColumn.emit(column)\"\n          ></div>\n          }\n        </div>\n      </th>\n\n      } @if(config.actions?.length) {\n\n      <th class=\"actions-width\">\n        <div class=\"table-header-cell\">\n          {{ \"Actions\" | translate }}\n        </div>\n      </th>\n      }\n    </tr>\n  </thead>\n  <tbody>\n    @if(config.groupedData?.length) { @for(group of config.groupedData; track\n    $index) {\n    <!-- Group Header -->\n    <tr (click)=\"group.isCollapsed = !group.isCollapsed\">\n      <td\n        class=\"group-header__wrapper\"\n        [attr.colspan]=\"\n          config.columns.length + (config.actions?.length ? 1 : 0)\n        \"\n      >\n        <div class=\"group-header__title-container\">\n          <div\n            [ngClass]=\"{ rotated: group.isCollapsed }\"\n            [innerHTML]=\"expandSvg\"\n            class=\"group-header__expand-icon\"\n          ></div>\n          <p class=\"group-header__title\">\n            {{ group.title }} ({{ group.items.length }})\n          </p>\n        </div>\n      </td>\n    </tr>\n    <!-- Group Rows -->\n    @if(!group.isCollapsed) { @for(row of group.items; track $index) {\n    <tr>\n      <!-- Columns -->\n      <td>\n        <div class=\"check-box-container\">\n          <input id=\"checkbox\" class=\"custom-checkbox\" type=\"checkbox\" />\n        </div>\n      </td>\n      @for(col of config.columns; track $index) { @if(col.key === 'nameEn' ||\n      col.key === 'nameAr') {\n      <td\n        [style.background-color]=\"group.color\"\n        (click)=\"nameClick.emit(row)\"\n        [style.cursor]=\"'pointer'\"\n      >\n        <span style=\"font-size: 1em\">\n          {{ getNestedValue(row, col.key) }}\n        </span>\n      </td>\n\n      }@else {\n\n      <td [class]=\"col.customClass\">\n        @if(cellTemplates[col.key]) {\n        <ng-template\n          *ngTemplateOutlet=\"\n            cellTemplates[col.key];\n            context: { $implicit: row }\n          \"\n        >\n        </ng-template>\n        } @else {\n        <span style=\"font-size: 1em\">\n          {{ getNestedValue(row, col.key) }}\n        </span>\n        }\n      </td>\n      } }\n\n      <!-- Actions Column -->\n\n      <td>\n        <div class=\"action-buttons\">\n          @for ( action of config.actions; track $index) {\n          <!-- @if (actionTemplates[action.label]) {\n            <ng-template\n              *ngTemplateOutlet=\"\n                actionTemplates[action.label];\n                context: { $implicit: row }\n              \"\n            >\n            </ng-template>\n            } @else {} -->\n\n          <button\n            style=\"padding: 0.5em\"\n            [disabled]=\"action.isDisabled?.(row)\"\n            (click)=\"onAction(row, action.handler)\"\n          >\n            <img [src]=\"action.iconPath\" alt=\"\" />\n          </button>\n\n          }\n        </div>\n      </td>\n    </tr>\n    } } } }\n  </tbody>\n</table>\n", styles: [".striped-table{margin:.5em;overflow:hidden;background-color:#fff}.striped-table thead{color:#4b4b4b;text-align:left;border-bottom:2px solid #eeeeee;font-size:1.1em}.striped-table th{padding:.6em .8em;border:1px solid #eeeeee}.striped-table tbody tr{font-weight:500;font-size:1em}.striped-table td{padding:.3em .5em;color:#4b4b4b;border:1px solid #eeeeee}.table-header-cell{display:flex;flex-direction:row;justify-content:flex-start;gap:.5em;align-items:center;font-size:.9em;color:#4b4b4b}.sort-icon{height:1.5em;display:flex;align-items:center;justify-content:center;overflow:auto;cursor:pointer}.group-header__wrapper{border:none!important}.group-header__title-container{display:flex;align-items:center}.group-header__expand-icon{cursor:pointer;transition:transform .3s}.rotated{transform:rotate(-180deg)}.group-header__title{margin-top:.8em;margin-bottom:.8em;font-size:1.1em;font-weight:900;margin-inline-start:.5em;color:#000}th:first-child,td:first-child{width:1%}.check-box-container{display:flex;justify-content:center}.custom-checkbox{appearance:none;width:1.2em;height:1.2em;border:1px solid #ccc;border-radius:.1em;position:relative;outline:none;cursor:pointer;transition:border-color .3s ease-in,background-color .3s ease-in}.custom-checkbox:focus{border-color:#25c7bc}.custom-checkbox:checked{background-color:#25c7bc;border-color:#25c7bc}.custom-checkbox:checked:after{content:\"\";position:absolute;top:10%;inset-inline-start:50%;transform:translate(-50%,-10%) rotate(45deg);width:.4em;height:.9em;border:solid white;border-width:0 .2em .2em 0}.custom-checkbox:disabled{cursor:not-allowed}.action-buttons{display:flex;gap:.5em}.bg-titles{background-color:#fcfbfb!important}\n"], dependencies: [{ kind: "ngmodule", type: TranslateModule }, { kind: "pipe", type: i2$1.TranslatePipe, name: "translate" }, { kind: "directive", type: NgClass, selector: "[ngClass]", inputs: ["class", "ngClass"] }, { kind: "directive", type: NgTemplateOutlet, selector: "[ngTemplateOutlet]", inputs: ["ngTemplateOutletContext", "ngTemplateOutlet", "ngTemplateOutletInjector"] }] });
+    static ɵcmp = i0.ɵɵngDeclareComponent({ minVersion: "17.0.0", version: "19.2.14", type: CustomDynamicTableWithCategoriesComponent, isStandalone: true, selector: "custom-dynamic-table-with-categories", inputs: { config: "config", hasCheckBox: "hasCheckBox", cellTemplates: "cellTemplates", actionTemplates: "actionTemplates" }, outputs: { sortColumn: "sortColumn", nameClick: "nameClick" }, ngImport: i0, template: "<table class=\"striped-table\">\n  <thead>\n    <tr>\n      @if(hasCheckBox){\n      <th>\n        <div class=\"check-box-container\">\n          <input id=\"checkbox\" class=\"custom-checkbox\" type=\"checkbox\" />\n        </div>\n      </th>\n\n      } @for(column of config.columns; track $index) {\n      <th>\n        <div class=\"table-header-cell\">\n          {{ column.label | translate }}\n          @if(column.sort){\n          <div\n            [innerHTML]=\"checkedSortIcon\"\n            class=\"sort-icon\"\n            (click)=\"sortColumn.emit(column)\"\n          ></div>\n          }\n        </div>\n      </th>\n\n      } @if(config.actions?.length) {\n\n      <th class=\"actions-width\">\n        <div class=\"table-header-cell\">\n          {{ \"Actions\" | translate }}\n        </div>\n      </th>\n      }\n    </tr>\n  </thead>\n  <tbody>\n    @if(config.groupedData?.length) { @for(group of config.groupedData; track\n    $index) {\n    <!-- Group Header -->\n    <tr (click)=\"group.isCollapsed = !group.isCollapsed\">\n      <td\n        class=\"group-header__wrapper\"\n        [attr.colspan]=\"\n          config.columns.length + (config.actions?.length ? 1 : 0)\n        \"\n      >\n        <div class=\"group-header__title-container\">\n          <div\n            [ngClass]=\"{ rotated: group.isCollapsed }\"\n            [innerHTML]=\"expandSvg\"\n            class=\"group-header__expand-icon\"\n          ></div>\n          <p class=\"group-header__title\">\n            {{ group.title }} ({{ group.items.length }})\n          </p>\n        </div>\n      </td>\n    </tr>\n    <!-- Group Rows -->\n    @if(!group.isCollapsed) { @for(row of group.items; track $index) {\n    <tr>\n      <!-- Columns -->\n      <td>\n        <div class=\"check-box-container\">\n          <input id=\"checkbox\" class=\"custom-checkbox\" type=\"checkbox\" />\n        </div>\n      </td>\n      @for(col of config.columns; track $index) {\n\n        @if(col.key === 'nameEn' ||\n      col.key === 'nameAr') {\n      <td\n        [style.background-color]=\"group.color\"\n        (click)=\"nameClick.emit(row)\"\n        [style.cursor]=\"'pointer'\"\n      >\n        <span style=\"font-size: 1em\">\n          {{ getNestedValue(row, col.key) }}\n        </span>\n      </td>\n\n      }@else {\n\n      <td [class]=\"col.customClass\">\n        @if(cellTemplates[col.key]) {\n        <ng-template\n          *ngTemplateOutlet=\"\n            cellTemplates[col.key];\n            context: { $implicit: row }\n          \"\n        >\n        </ng-template>\n        } @else {\n        <span style=\"font-size: 1em\"\n              [ngClass]=\"{'no-wrap': col.key.toLowerCase().includes('date')}\">\n          {{ getNestedValue(row, col.key) }}\n        </span>\n        }\n      </td>\n      } }\n\n      <!-- Actions Column -->\n\n      <td>\n        <div class=\"action-buttons\">\n          @for ( action of config.actions; track $index) {\n          <!-- @if (actionTemplates[action.label]) {\n            <ng-template\n              *ngTemplateOutlet=\"\n                actionTemplates[action.label];\n                context: { $implicit: row }\n              \"\n            >\n            </ng-template>\n            } @else {} -->\n\n          <button\n            style=\"padding: 0.5em\"\n            [disabled]=\"action.isDisabled?.(row)\"\n            (click)=\"onAction(row, action.handler)\"\n          >\n            <img [src]=\"action.iconPath\" alt=\"\" />\n          </button>\n\n          }\n        </div>\n      </td>\n    </tr>\n    } } } }\n  </tbody>\n</table>\n", styles: [".striped-table{margin:.5em;overflow:hidden;background-color:#fff}.striped-table thead{color:#4b4b4b;text-align:left;border-bottom:2px solid #eeeeee;font-size:1.1em}.striped-table th{padding:.6em .8em;border:1px solid #eeeeee}.striped-table tbody tr{font-weight:500;font-size:1em}.striped-table td{padding:.3em .5em;color:#4b4b4b;border:1px solid #eeeeee}.table-header-cell{display:flex;flex-direction:row;justify-content:flex-start;gap:.5em;align-items:center;font-size:.9em;color:#4b4b4b}.sort-icon{height:1.5em;display:flex;align-items:center;justify-content:center;overflow:auto;cursor:pointer}.group-header__wrapper{border:none!important}.group-header__title-container{display:flex;align-items:center}.group-header__expand-icon{cursor:pointer;transition:transform .3s}.rotated{transform:rotate(-180deg)}.group-header__title{margin-top:.8em;margin-bottom:.8em;font-size:1.1em;font-weight:900;margin-inline-start:.5em;color:#000}th:first-child,td:first-child{width:1%}.check-box-container{display:flex;justify-content:center}.custom-checkbox{appearance:none;width:1.2em;height:1.2em;border:1px solid #ccc;border-radius:.1em;position:relative;outline:none;cursor:pointer;transition:border-color .3s ease-in,background-color .3s ease-in}.custom-checkbox:focus{border-color:#25c7bc}.custom-checkbox:checked{background-color:#25c7bc;border-color:#25c7bc}.custom-checkbox:checked:after{content:\"\";position:absolute;top:10%;inset-inline-start:50%;transform:translate(-50%,-10%) rotate(45deg);width:.4em;height:.9em;border:solid white;border-width:0 .2em .2em 0}.custom-checkbox:disabled{cursor:not-allowed}.action-buttons{display:flex;gap:.5em}.bg-titles{background-color:#fcfbfb!important}.no-wrap{white-space:nowrap}\n"], dependencies: [{ kind: "ngmodule", type: TranslateModule }, { kind: "pipe", type: i2$1.TranslatePipe, name: "translate" }, { kind: "directive", type: NgClass, selector: "[ngClass]", inputs: ["class", "ngClass"] }, { kind: "directive", type: NgTemplateOutlet, selector: "[ngTemplateOutlet]", inputs: ["ngTemplateOutletContext", "ngTemplateOutlet", "ngTemplateOutletInjector"] }] });
 }
 i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.14", ngImport: i0, type: CustomDynamicTableWithCategoriesComponent, decorators: [{
             type: Component,
-            args: [{ selector: 'custom-dynamic-table-with-categories', imports: [TranslateModule, NgClass, NgTemplateOutlet], template: "<table class=\"striped-table\">\n  <thead>\n    <tr>\n      @if(hasCheckBox){\n      <th>\n        <div class=\"check-box-container\">\n          <input id=\"checkbox\" class=\"custom-checkbox\" type=\"checkbox\" />\n        </div>\n      </th>\n\n      } @for(column of config.columns; track $index) {\n      <th>\n        <div class=\"table-header-cell\">\n          {{ column.label | translate }}\n          @if(column.sort){\n          <div\n            [innerHTML]=\"checkedSortIcon\"\n            class=\"sort-icon\"\n            (click)=\"sortColumn.emit(column)\"\n          ></div>\n          }\n        </div>\n      </th>\n\n      } @if(config.actions?.length) {\n\n      <th class=\"actions-width\">\n        <div class=\"table-header-cell\">\n          {{ \"Actions\" | translate }}\n        </div>\n      </th>\n      }\n    </tr>\n  </thead>\n  <tbody>\n    @if(config.groupedData?.length) { @for(group of config.groupedData; track\n    $index) {\n    <!-- Group Header -->\n    <tr (click)=\"group.isCollapsed = !group.isCollapsed\">\n      <td\n        class=\"group-header__wrapper\"\n        [attr.colspan]=\"\n          config.columns.length + (config.actions?.length ? 1 : 0)\n        \"\n      >\n        <div class=\"group-header__title-container\">\n          <div\n            [ngClass]=\"{ rotated: group.isCollapsed }\"\n            [innerHTML]=\"expandSvg\"\n            class=\"group-header__expand-icon\"\n          ></div>\n          <p class=\"group-header__title\">\n            {{ group.title }} ({{ group.items.length }})\n          </p>\n        </div>\n      </td>\n    </tr>\n    <!-- Group Rows -->\n    @if(!group.isCollapsed) { @for(row of group.items; track $index) {\n    <tr>\n      <!-- Columns -->\n      <td>\n        <div class=\"check-box-container\">\n          <input id=\"checkbox\" class=\"custom-checkbox\" type=\"checkbox\" />\n        </div>\n      </td>\n      @for(col of config.columns; track $index) { @if(col.key === 'nameEn' ||\n      col.key === 'nameAr') {\n      <td\n        [style.background-color]=\"group.color\"\n        (click)=\"nameClick.emit(row)\"\n        [style.cursor]=\"'pointer'\"\n      >\n        <span style=\"font-size: 1em\">\n          {{ getNestedValue(row, col.key) }}\n        </span>\n      </td>\n\n      }@else {\n\n      <td [class]=\"col.customClass\">\n        @if(cellTemplates[col.key]) {\n        <ng-template\n          *ngTemplateOutlet=\"\n            cellTemplates[col.key];\n            context: { $implicit: row }\n          \"\n        >\n        </ng-template>\n        } @else {\n        <span style=\"font-size: 1em\">\n          {{ getNestedValue(row, col.key) }}\n        </span>\n        }\n      </td>\n      } }\n\n      <!-- Actions Column -->\n\n      <td>\n        <div class=\"action-buttons\">\n          @for ( action of config.actions; track $index) {\n          <!-- @if (actionTemplates[action.label]) {\n            <ng-template\n              *ngTemplateOutlet=\"\n                actionTemplates[action.label];\n                context: { $implicit: row }\n              \"\n            >\n            </ng-template>\n            } @else {} -->\n\n          <button\n            style=\"padding: 0.5em\"\n            [disabled]=\"action.isDisabled?.(row)\"\n            (click)=\"onAction(row, action.handler)\"\n          >\n            <img [src]=\"action.iconPath\" alt=\"\" />\n          </button>\n\n          }\n        </div>\n      </td>\n    </tr>\n    } } } }\n  </tbody>\n</table>\n", styles: [".striped-table{margin:.5em;overflow:hidden;background-color:#fff}.striped-table thead{color:#4b4b4b;text-align:left;border-bottom:2px solid #eeeeee;font-size:1.1em}.striped-table th{padding:.6em .8em;border:1px solid #eeeeee}.striped-table tbody tr{font-weight:500;font-size:1em}.striped-table td{padding:.3em .5em;color:#4b4b4b;border:1px solid #eeeeee}.table-header-cell{display:flex;flex-direction:row;justify-content:flex-start;gap:.5em;align-items:center;font-size:.9em;color:#4b4b4b}.sort-icon{height:1.5em;display:flex;align-items:center;justify-content:center;overflow:auto;cursor:pointer}.group-header__wrapper{border:none!important}.group-header__title-container{display:flex;align-items:center}.group-header__expand-icon{cursor:pointer;transition:transform .3s}.rotated{transform:rotate(-180deg)}.group-header__title{margin-top:.8em;margin-bottom:.8em;font-size:1.1em;font-weight:900;margin-inline-start:.5em;color:#000}th:first-child,td:first-child{width:1%}.check-box-container{display:flex;justify-content:center}.custom-checkbox{appearance:none;width:1.2em;height:1.2em;border:1px solid #ccc;border-radius:.1em;position:relative;outline:none;cursor:pointer;transition:border-color .3s ease-in,background-color .3s ease-in}.custom-checkbox:focus{border-color:#25c7bc}.custom-checkbox:checked{background-color:#25c7bc;border-color:#25c7bc}.custom-checkbox:checked:after{content:\"\";position:absolute;top:10%;inset-inline-start:50%;transform:translate(-50%,-10%) rotate(45deg);width:.4em;height:.9em;border:solid white;border-width:0 .2em .2em 0}.custom-checkbox:disabled{cursor:not-allowed}.action-buttons{display:flex;gap:.5em}.bg-titles{background-color:#fcfbfb!important}\n"] }]
+            args: [{ selector: 'custom-dynamic-table-with-categories', imports: [TranslateModule, NgClass, NgTemplateOutlet], template: "<table class=\"striped-table\">\n  <thead>\n    <tr>\n      @if(hasCheckBox){\n      <th>\n        <div class=\"check-box-container\">\n          <input id=\"checkbox\" class=\"custom-checkbox\" type=\"checkbox\" />\n        </div>\n      </th>\n\n      } @for(column of config.columns; track $index) {\n      <th>\n        <div class=\"table-header-cell\">\n          {{ column.label | translate }}\n          @if(column.sort){\n          <div\n            [innerHTML]=\"checkedSortIcon\"\n            class=\"sort-icon\"\n            (click)=\"sortColumn.emit(column)\"\n          ></div>\n          }\n        </div>\n      </th>\n\n      } @if(config.actions?.length) {\n\n      <th class=\"actions-width\">\n        <div class=\"table-header-cell\">\n          {{ \"Actions\" | translate }}\n        </div>\n      </th>\n      }\n    </tr>\n  </thead>\n  <tbody>\n    @if(config.groupedData?.length) { @for(group of config.groupedData; track\n    $index) {\n    <!-- Group Header -->\n    <tr (click)=\"group.isCollapsed = !group.isCollapsed\">\n      <td\n        class=\"group-header__wrapper\"\n        [attr.colspan]=\"\n          config.columns.length + (config.actions?.length ? 1 : 0)\n        \"\n      >\n        <div class=\"group-header__title-container\">\n          <div\n            [ngClass]=\"{ rotated: group.isCollapsed }\"\n            [innerHTML]=\"expandSvg\"\n            class=\"group-header__expand-icon\"\n          ></div>\n          <p class=\"group-header__title\">\n            {{ group.title }} ({{ group.items.length }})\n          </p>\n        </div>\n      </td>\n    </tr>\n    <!-- Group Rows -->\n    @if(!group.isCollapsed) { @for(row of group.items; track $index) {\n    <tr>\n      <!-- Columns -->\n      <td>\n        <div class=\"check-box-container\">\n          <input id=\"checkbox\" class=\"custom-checkbox\" type=\"checkbox\" />\n        </div>\n      </td>\n      @for(col of config.columns; track $index) {\n\n        @if(col.key === 'nameEn' ||\n      col.key === 'nameAr') {\n      <td\n        [style.background-color]=\"group.color\"\n        (click)=\"nameClick.emit(row)\"\n        [style.cursor]=\"'pointer'\"\n      >\n        <span style=\"font-size: 1em\">\n          {{ getNestedValue(row, col.key) }}\n        </span>\n      </td>\n\n      }@else {\n\n      <td [class]=\"col.customClass\">\n        @if(cellTemplates[col.key]) {\n        <ng-template\n          *ngTemplateOutlet=\"\n            cellTemplates[col.key];\n            context: { $implicit: row }\n          \"\n        >\n        </ng-template>\n        } @else {\n        <span style=\"font-size: 1em\"\n              [ngClass]=\"{'no-wrap': col.key.toLowerCase().includes('date')}\">\n          {{ getNestedValue(row, col.key) }}\n        </span>\n        }\n      </td>\n      } }\n\n      <!-- Actions Column -->\n\n      <td>\n        <div class=\"action-buttons\">\n          @for ( action of config.actions; track $index) {\n          <!-- @if (actionTemplates[action.label]) {\n            <ng-template\n              *ngTemplateOutlet=\"\n                actionTemplates[action.label];\n                context: { $implicit: row }\n              \"\n            >\n            </ng-template>\n            } @else {} -->\n\n          <button\n            style=\"padding: 0.5em\"\n            [disabled]=\"action.isDisabled?.(row)\"\n            (click)=\"onAction(row, action.handler)\"\n          >\n            <img [src]=\"action.iconPath\" alt=\"\" />\n          </button>\n\n          }\n        </div>\n      </td>\n    </tr>\n    } } } }\n  </tbody>\n</table>\n", styles: [".striped-table{margin:.5em;overflow:hidden;background-color:#fff}.striped-table thead{color:#4b4b4b;text-align:left;border-bottom:2px solid #eeeeee;font-size:1.1em}.striped-table th{padding:.6em .8em;border:1px solid #eeeeee}.striped-table tbody tr{font-weight:500;font-size:1em}.striped-table td{padding:.3em .5em;color:#4b4b4b;border:1px solid #eeeeee}.table-header-cell{display:flex;flex-direction:row;justify-content:flex-start;gap:.5em;align-items:center;font-size:.9em;color:#4b4b4b}.sort-icon{height:1.5em;display:flex;align-items:center;justify-content:center;overflow:auto;cursor:pointer}.group-header__wrapper{border:none!important}.group-header__title-container{display:flex;align-items:center}.group-header__expand-icon{cursor:pointer;transition:transform .3s}.rotated{transform:rotate(-180deg)}.group-header__title{margin-top:.8em;margin-bottom:.8em;font-size:1.1em;font-weight:900;margin-inline-start:.5em;color:#000}th:first-child,td:first-child{width:1%}.check-box-container{display:flex;justify-content:center}.custom-checkbox{appearance:none;width:1.2em;height:1.2em;border:1px solid #ccc;border-radius:.1em;position:relative;outline:none;cursor:pointer;transition:border-color .3s ease-in,background-color .3s ease-in}.custom-checkbox:focus{border-color:#25c7bc}.custom-checkbox:checked{background-color:#25c7bc;border-color:#25c7bc}.custom-checkbox:checked:after{content:\"\";position:absolute;top:10%;inset-inline-start:50%;transform:translate(-50%,-10%) rotate(45deg);width:.4em;height:.9em;border:solid white;border-width:0 .2em .2em 0}.custom-checkbox:disabled{cursor:not-allowed}.action-buttons{display:flex;gap:.5em}.bg-titles{background-color:#fcfbfb!important}.no-wrap{white-space:nowrap}\n"] }]
         }], ctorParameters: () => [{ type: i1$2.DomSanitizer }], propDecorators: { config: [{
                 type: Input
             }], hasCheckBox: [{

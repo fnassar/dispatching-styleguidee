@@ -2,10 +2,14 @@ import { Observable } from 'rxjs';
 import { ILoginData, IUserData } from '../../interfaces';
 import { HttpClient } from '@angular/common/http';
 import { IGlobalResponse } from '../../interfaces/auth/gloal-res.interface';
+import { AuthContextService } from './auth-context.service';
+import { Router } from '@angular/router';
 import * as i0 from "@angular/core";
 export declare class AuthBeService {
     private http;
-    constructor(http: HttpClient);
+    private authContextService;
+    private router;
+    constructor(http: HttpClient, authContextService: AuthContextService, router: Router);
     login(data: {
         username: string;
         password: string;
