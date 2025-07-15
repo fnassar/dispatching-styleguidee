@@ -1797,14 +1797,19 @@ class CustomCalenderFormComponent {
     }
     // Date selection
     selectDate(date) {
-        if (!this.isDisabled(date)) {
-            this.value = date;
-            this.showCalendarForm = false;
-            if (this.parentForm && this.controlName) {
-                this.parentForm.get(this.controlName)?.setValue(date);
-                this.parentForm.get(this.controlName)?.markAsTouched();
-            }
-        }
+        const normalized = this.normalizeToMidnightUTC(date);
+        this.applyDate(normalized);
+    }
+    normalizeToMidnightUTC(date) {
+        // Create a UTC-based date at 00:00:00 of the selected local date
+        const utcTimestamp = Date.UTC(date.getFullYear(), date.getMonth(), date.getDate());
+        return new Date(utcTimestamp);
+    }
+    applyDate(date) {
+        this._value = date;
+        this.showCalendarForm = false;
+        this.parentForm.get(this.controlName)?.setValue(date);
+        this.parentForm.get(this.controlName)?.markAsTouched();
         this.valueChange.emit(date);
     }
     // Utility methods

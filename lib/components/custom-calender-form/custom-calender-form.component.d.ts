@@ -37,6 +37,8 @@ export declare class CustomCalenderFormComponent {
     nextMonth(): void;
     generateCalendar(): void;
     selectDate(date: Date): void;
+    private normalizeToMidnightUTC;
+    private applyDate;
     isSelected(date: Date): boolean;
     isCurrentMonth(date: Date): boolean;
     isDisabled(date: Date): boolean;
