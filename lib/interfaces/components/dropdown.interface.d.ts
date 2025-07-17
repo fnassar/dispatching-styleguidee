@@ -4,6 +4,9 @@ export interface IDropdownOption {
     nameEn: string;
     enumValue?: string;
 }
+export interface ITabDropdownOption extends IDropdownOption {
+    disabled: boolean;
+}
 export interface ListData {
     content: any;
     pageable: Pageable;
