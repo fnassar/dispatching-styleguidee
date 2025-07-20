@@ -33,6 +33,7 @@ export declare class CustomCalenderFormComponent {
     registerOnChange(fn: any): void;
     registerOnTouched(fn: any): void;
     toggleCalendar(): void;
+    closeCalendar(): void;
     prevMonth(): void;
     nextMonth(): void;
     generateCalendar(): void;

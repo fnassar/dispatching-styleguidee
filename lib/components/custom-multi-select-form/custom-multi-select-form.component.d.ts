@@ -23,6 +23,7 @@ export declare class CustomMultiSelectFormComponent {
     getSelectedLabels(): string[];
     isSelected(id: any): boolean;
     toggleDropdown(): void;
+    closeDropdown(): void;
     toggleOptionSelection(option: IDropdownOption): void;
     clearSelection(event: Event): void;
     filterOptions(): void;
