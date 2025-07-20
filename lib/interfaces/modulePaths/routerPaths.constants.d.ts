@@ -1,8 +1,7 @@
-export declare const ModuleRoutes: {
-    AUTH: string;
-    USER_PROFILE: string;
-    MAIN_PAGE: string;
-    PLAN_MANAGEMENT_HOME: string;
-    ASSET_MANAGEMENT_HOME: string;
-    USER_MANAGEMENT_HOME: string;
-};
+export declare class ModuleRoutes {
+    static AUTH: string;
+    static USER_PROFILE: string;
+    static MAIN_PAGE: string;
+    static PLAN_MANAGEMENT_HOME: string;
+    static ASSET_MANAGEMENT_HOME: string;
+}

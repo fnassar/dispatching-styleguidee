@@ -13,14 +13,13 @@ import * as i1$2 from '@angular/forms';
 import { FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import * as i1$3 from '@angular/platform-browser';
 
-const ModuleRoutes = {
-    AUTH: 'auth',
-    USER_PROFILE: `profile`,
-    MAIN_PAGE: `main`, // overview
-    PLAN_MANAGEMENT_HOME: `plan-management`,
-    ASSET_MANAGEMENT_HOME: `asset-management`,
-    USER_MANAGEMENT_HOME: `user-management`,
-};
+class ModuleRoutes {
+    static AUTH = 'auth';
+    static USER_PROFILE = `profile`;
+    static MAIN_PAGE = `main`; // overview
+    static PLAN_MANAGEMENT_HOME = `plan-management`;
+    static ASSET_MANAGEMENT_HOME = `asset-management`;
+}
 
 var AuthConstant;
 (function (AuthConstant) {
@@ -81,7 +80,7 @@ var Permissions;
     // all user access
     Permissions["all"] = "all";
     // User
-    Permissions["UserViewProfileSelf"] = "user:view-profile:self";
+    Permissions["UserReadSelf"] = "user:read:self";
     // Task
     Permissions["TaskCreateTeam"] = "task:create:team";
     Permissions["TaskViewListSelf"] = "task:view-list:self";
