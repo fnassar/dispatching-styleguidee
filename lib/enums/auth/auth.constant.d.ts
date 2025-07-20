@@ -47,7 +47,7 @@ export declare enum actionPermission {
 }
 export declare enum Permissions {
     all = "all",
-    UserReadSelf = "user:read:self",
+    UserViewProfileSelf = "user:view-profile:self",
     TaskCreateTeam = "task:create:team",
     TaskViewListSelf = "task:view-list:self",
     TaskViewDetailsSelf = "task:view-details:self",
