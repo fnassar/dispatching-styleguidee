@@ -22,6 +22,23 @@ const ModuleRoutes = {
     USER_MANAGEMENT_HOME: `user-management`,
 };
 
+// export interface IGlobalPaginatedRes<T> {
+//   timestamp: string;
+//   status: string;
+//   message: string;
+//   data: T[];
+// }
+// export interface IErrorResponse {
+//   errorCode: "BAD_REQUEST" | string;
+//   errorMessage: string;
+//   errorTime: string;
+//   customErrorCode: "EQUIPMENT_ALREADY_ASSIGNED" | string;
+//   extraData: {
+//     date: string;
+//     equipmentId: string;
+//   };
+// }
+
 var AuthConstant;
 (function (AuthConstant) {
     AuthConstant["TOKEN"] = "accessToken";

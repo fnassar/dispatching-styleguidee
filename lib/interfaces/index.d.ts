@@ -8,3 +8,5 @@ export * from './components/radioInuptOption.interface';
 export * from './components/time-input.interface';
 export * from './components/attachments.interface';
 export * from './components/dynamic-table.interface';
+export * from './auth/gloal-res.interface';
+export * from './auth/user.data.interface';
