@@ -1,9 +1,8 @@
-import { TemplateRef } from '@angular/core';
 export interface ITableHeader<T> {
     header: string;
     body?: keyof T;
     clickFn?: (value: T) => void;
-    htmlRef?: TemplateRef<any>;
+    htmlRef?: string;
     sort: boolean;
     type?: 'Status' | 'Actions' | undefined;
     inputTransform?: (item: any) => any;
