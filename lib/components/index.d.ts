@@ -44,3 +44,6 @@ export * from './custom-details-nav/custom-details-nav.component';
 export * from './custom-title-content/custom-title-content.component';
 export * from './custom-plate-number-input-form/custom-plate-number-input-form.component';
 export * from './custom-tabs/custom-tabs.component';
+export * from './custom-color/custom-color.component';
+export * from './custom-tooltip/custom-tooltip.component';
+export * from './custom-radio-component/custom-radio-component.component';

@@ -10,3 +10,4 @@ export * from './ui/stepper.service';
 export * from './ui/loading.service';
 export * from './translate/translation.service';
 export * from './sideNav/side-nav-collapse.service';
+export * from './geo-location.service';
