@@ -759,15 +759,28 @@ i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.14", ngImpo
 
 class SidenavService {
     _isCollapsed = signal(false);
-    isCollapsed = this._isCollapsed.asReadonly();
+    constructor() {
+        // Initialize from sessionStorage on service creation
+        const storedState = sessionStorage.getItem('isCollapsed');
+        if (storedState === 'true') {
+            this._isCollapsed.set(true);
+        }
+    }
+    get isCollapsed() {
+        return this._isCollapsed();
+    }
     toggle() {
-        this._isCollapsed.update((value) => !value);
+        const newVal = !this._isCollapsed();
+        sessionStorage.setItem('isCollapsed', newVal.toString());
+        this._isCollapsed.set(newVal);
     }
     collapse() {
         this._isCollapsed.set(true);
+        sessionStorage.setItem('isCollapsed', 'true');
     }
     expand() {
         this._isCollapsed.set(false);
+        sessionStorage.setItem('isCollapsed', 'false');
     }
     static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "19.2.14", ngImport: i0, type: SidenavService, deps: [], target: i0.ɵɵFactoryTarget.Injectable });
     static ɵprov = i0.ɵɵngDeclareInjectable({ minVersion: "12.0.0", version: "19.2.14", ngImport: i0, type: SidenavService, providedIn: 'root' });
@@ -775,7 +788,7 @@ class SidenavService {
 i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.14", ngImport: i0, type: SidenavService, decorators: [{
             type: Injectable,
             args: [{ providedIn: 'root' }]
-        }] });
+        }], ctorParameters: () => [] });
 
 class GeoLocationService {
     getCurrentPosition() {
