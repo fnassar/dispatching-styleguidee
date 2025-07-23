@@ -10,6 +10,7 @@ export declare class CustomModalComponent {
     isVisible: boolean;
     open(): void;
     close(): void;
+    closeInternal(): void;
     onHeaderButtonClick(): void;
     onOverlayClick(event: MouseEvent): void;
     static ɵfac: i0.ɵɵFactoryDeclaration<CustomModalComponent, never>;
