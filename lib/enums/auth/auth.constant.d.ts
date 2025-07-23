@@ -8,10 +8,12 @@ export declare enum AuthConstant {
 }
 export declare enum UserStatus {
     ACTIVE = "ACTIVE",
-    INACTIVE = "INACTIVE"
+    INACTIVE = "INACTIVE",
+    SUSPENDED = "SUSPENDED"
 }
 export declare enum Roles {
     ADMIN = "ADMIN",
+    SUPER_ADMIN = "SUPER_ADMIN",
     PLANNER = "PLANNER",
     SUPERVISOR = "SUPERVISOR",
     OPERATOR = "OPERATOR"
@@ -48,6 +50,14 @@ export declare enum actionPermission {
 export declare enum Permissions {
     all = "all",
     UserReadSelf = "user:read:self",
+    UserViewProfileSelf = "user:view-profile:self",
+    UserViewListOrganization = "user:view-list:ORGANIZATION",
+    UserCreateOrganization = "user:create:ORGANIZATION",
+    teamViewListORGANIZATION = "team:view-list:ORGANIZATION",
+    teamCreateORGANIZATION = "team:create:ORGANIZATION",
+    zoneCreateTeam = "zone:create:team",
+    zoneViewListTeam = "zone:view-list:team",
+    zoneCreateBulkTeam = "zone:create-bulk:team",
     TaskCreateTeam = "task:create:team",
     TaskViewListSelf = "task:view-list:self",
     TaskViewDetailsSelf = "task:view-details:self",
