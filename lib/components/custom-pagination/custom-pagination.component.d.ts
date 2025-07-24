@@ -9,6 +9,7 @@ export declare class CustomPaginationComponent {
     baseValue: number;
     pageSizeOptions: number[];
     totalPages: import("@angular/core").WritableSignal<number[]>;
+    hideTotalCount: import("@angular/core").InputSignal<boolean>;
     ngOnInit(): void;
     calculateTotalPages(): void;
     generatePageSizeOptions(): void;
@@ -18,5 +19,5 @@ export declare class CustomPaginationComponent {
     lastPage(): void;
     onPageSizeChange(event: Event): void;
     static ɵfac: i0.ɵɵFactoryDeclaration<CustomPaginationComponent, never>;
-    static ɵcmp: i0.ɵɵComponentDeclaration<CustomPaginationComponent, "custom-pagination", never, { "page": { "alias": "page"; "required": true; }; "pageSize": { "alias": "pageSize"; "required": false; }; "totalCount": { "alias": "totalCount"; "required": true; }; "baseValue": { "alias": "baseValue"; "required": false; }; }, { "pageChange": "pageChange"; }, never, never, true, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<CustomPaginationComponent, "custom-pagination", never, { "page": { "alias": "page"; "required": true; }; "pageSize": { "alias": "pageSize"; "required": false; }; "totalCount": { "alias": "totalCount"; "required": true; }; "baseValue": { "alias": "baseValue"; "required": false; }; "hideTotalCount": { "alias": "hideTotalCount"; "required": false; "isSignal": true; }; }, { "pageChange": "pageChange"; }, never, never, true, never>;
 }
