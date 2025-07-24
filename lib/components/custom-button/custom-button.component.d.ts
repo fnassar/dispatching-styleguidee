@@ -4,7 +4,7 @@ export declare class CustomButtonComponent {
     disabled: boolean;
     type: 'button' | 'submit' | 'reset';
     buttonClick: EventEmitter<void>;
-    class: string;
+    customClass: string;
     static ɵfac: i0.ɵɵFactoryDeclaration<CustomButtonComponent, never>;
-    static ɵcmp: i0.ɵɵComponentDeclaration<CustomButtonComponent, "custom-button", never, { "disabled": { "alias": "disabled"; "required": false; }; "type": { "alias": "type"; "required": false; }; "class": { "alias": "class"; "required": true; }; }, { "buttonClick": "buttonClick"; }, never, ["*"], true, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<CustomButtonComponent, "custom-button", never, { "disabled": { "alias": "disabled"; "required": false; }; "type": { "alias": "type"; "required": false; }; "customClass": { "alias": "customClass"; "required": true; }; }, { "buttonClick": "buttonClick"; }, never, ["*"], true, never>;
 }

@@ -1,7 +1,8 @@
 import * as i0 from "@angular/core";
 export declare class SidenavService {
     private _isCollapsed;
-    readonly isCollapsed: import("@angular/core").Signal<boolean>;
+    constructor();
+    get isCollapsed(): boolean;
     toggle(): void;
     collapse(): void;
     expand(): void;

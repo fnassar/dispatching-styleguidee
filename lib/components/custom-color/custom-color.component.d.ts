@@ -6,6 +6,7 @@ export declare class CustomColorComponent {
     positionClass: string;
     title: string;
     name: string;
+    hideNameInput: boolean;
     color: string;
     enableColors: boolean;
     onSaveColor: EventEmitter<{
@@ -16,5 +17,5 @@ export declare class CustomColorComponent {
     onCancel(): void;
     onSave(): void;
     static ɵfac: i0.ɵɵFactoryDeclaration<CustomColorComponent, never>;
-    static ɵcmp: i0.ɵɵComponentDeclaration<CustomColorComponent, "custom-color", never, { "positionClass": { "alias": "positionClass"; "required": true; }; "title": { "alias": "title"; "required": true; }; "name": { "alias": "name"; "required": false; }; "color": { "alias": "color"; "required": false; }; "enableColors": { "alias": "enableColors"; "required": false; }; }, { "onSaveColor": "onSaveColor"; }, never, ["*"], true, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<CustomColorComponent, "custom-color", never, { "positionClass": { "alias": "positionClass"; "required": true; }; "title": { "alias": "title"; "required": true; }; "name": { "alias": "name"; "required": false; }; "hideNameInput": { "alias": "hideNameInput"; "required": false; }; "color": { "alias": "color"; "required": false; }; "enableColors": { "alias": "enableColors"; "required": false; }; }, { "onSaveColor": "onSaveColor"; }, never, ["*"], true, never>;
 }
