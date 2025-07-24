@@ -4,12 +4,15 @@ import * as i0 from "@angular/core";
 export declare class CustomPaginationComponent {
     page: number;
     pageSize: number;
-    totalCount: number;
+    private _totalCount;
+    set totalCount(value: number);
+    get totalCount(): number;
     pageChange: EventEmitter<IPageChangeEvent>;
     baseValue: number;
-    pageSizeOptions: number[];
+    pageSizeOptions: import("@angular/core").WritableSignal<number[]>;
     totalPages: import("@angular/core").WritableSignal<number[]>;
     hideTotalCount: import("@angular/core").InputSignal<boolean>;
+    constructor();
     ngOnInit(): void;
     calculateTotalPages(): void;
     generatePageSizeOptions(): void;
