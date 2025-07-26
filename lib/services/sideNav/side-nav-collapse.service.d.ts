@@ -6,6 +6,7 @@ export declare class SidenavService {
     toggle(): void;
     collapse(): void;
     expand(): void;
+    private listenToWindowResize;
     static ɵfac: i0.ɵɵFactoryDeclaration<SidenavService, never>;
     static ɵprov: i0.ɵɵInjectableDeclaration<SidenavService>;
 }
