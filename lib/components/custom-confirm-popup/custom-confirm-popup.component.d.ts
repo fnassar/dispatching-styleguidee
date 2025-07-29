@@ -16,12 +16,21 @@ export declare class CustomConfirmPopupComponent {
     successMsg: import("@angular/core").InputSignal<string>;
     checkedInfoSvg: SafeHtml;
     checkIcon: SafeHtml;
-    constructor(sanitizer: DomSanitizer);
+    currentView: 'confirmation' | 'success';
+    successAnimationState: 'hidden' | 'visible';
     isVisible: boolean;
     eventVal: any;
+    constructor(sanitizer: DomSanitizer);
+    ngOnInit(): void;
+    private watchSuccessScreen;
+    ngOnChanges(): void;
     open(event?: any): void;
     close(): void;
+    checkSuccess(): void;
+    private transitionToSuccess;
     onOverlayClick(event: MouseEvent): void;
+    startAnimation(event: any): void;
+    doneAnimation(event: any): void;
     static ɵfac: i0.ɵɵFactoryDeclaration<CustomConfirmPopupComponent, never>;
     static ɵcmp: i0.ɵɵComponentDeclaration<CustomConfirmPopupComponent, "custom-confirm-popup", never, { "message": { "alias": "message"; "required": true; }; "type": { "alias": "type"; "required": true; }; "confirmButtonText": { "alias": "confirmButtonText"; "required": false; }; "cancelButtonText": { "alias": "cancelButtonText"; "required": false; }; "extraButton": { "alias": "extraButton"; "required": false; }; "showSuccessScreen": { "alias": "showSuccessScreen"; "required": false; "isSignal": true; }; "successMsg": { "alias": "successMsg"; "required": false; "isSignal": true; }; }, { "confirmEvent": "confirmEvent"; "cancelEvent": "cancelEvent"; "extraEvent": "extraEvent"; "overlayClicked": "overlayClicked"; }, never, never, true, never>;
 }
