@@ -12,6 +12,7 @@ import { FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import * as i2 from '@angular/common';
 import { isPlatformBrowser, CommonModule, NgStyle, NgClass, NgComponentOutlet, NgTemplateOutlet } from '@angular/common';
 import * as i1$3 from '@angular/platform-browser';
+import { state, transition, style, animate, keyframes, group, query, trigger } from '@angular/animations';
 
 const ModuleRoutes = {
     AUTH: 'auth',
@@ -331,21 +332,21 @@ class AuthBeService {
         this.router = router;
     }
     login(data) {
-        return this.http.post('https://dispatching-api-gateway-821cc537b8b6.herokuapp.com/api/v1/idm/auth/login', { username: data.username, password: data.password }, {
+        return this.http.post('http://k8s-disbacke-apigatew-e17f595d6c-1283670367.us-east-1.elb.amazonaws.com/api/v1/idm/auth/login', { username: data.username, password: data.password }, {
             context: new HttpContext().set(SKIP_TOKEN, true),
         });
     }
     logout() {
-        return this.http.post('https://dispatching-api-gateway-821cc537b8b6.herokuapp.com/api/v1/idm/auth/logout', {});
+        return this.http.post('http://k8s-disbacke-apigatew-e17f595d6c-1283670367.us-east-1.elb.amazonaws.com/api/v1/idm/auth/logout', {});
     }
     refreshToken(refreshToken) {
-        return this.http.post('https://dispatching-api-gateway-821cc537b8b6.herokuapp.com/api/v1/idm/auth/refresh', refreshToken, {
+        return this.http.post('http://k8s-disbacke-apigatew-e17f595d6c-1283670367.us-east-1.elb.amazonaws.com/api/v1/idm/auth/refresh', refreshToken, {
             context: new HttpContext().set(SKIP_TOKEN, true),
         });
     }
     validateToken() {
         return this.http
-            .post('https://dispatching-api-gateway-821cc537b8b6.herokuapp.com/api/v1/idm/auth/validate', {})
+            .post('http://k8s-disbacke-apigatew-e17f595d6c-1283670367.us-east-1.elb.amazonaws.com/api/v1/idm/auth/validate', {})
             .pipe(retry(3), catchError((error) => {
             console.error('Request failed after 3 retries', error);
             this.authContextService.clearData();
@@ -355,7 +356,7 @@ class AuthBeService {
         }));
     }
     getCurrUser() {
-        return this.http.get('https://dispatching-api-gateway-821cc537b8b6.herokuapp.com/api/v1/idm/auth/me');
+        return this.http.get('http://k8s-disbacke-apigatew-e17f595d6c-1283670367.us-east-1.elb.amazonaws.com/api/v1/idm/auth/me');
     }
     static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "19.2.14", ngImport: i0, type: AuthBeService, deps: [{ token: i1.HttpClient }, { token: AuthContextService }, { token: i3.Router }], target: i0.ɵɵFactoryTarget.Injectable });
     static ɵprov = i0.ɵɵngDeclareInjectable({ minVersion: "12.0.0", version: "19.2.14", ngImport: i0, type: AuthBeService, providedIn: 'root' });
@@ -4077,12 +4078,50 @@ i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.14", ngImpo
                 type: Output
             }] } });
 
-const infoSvg = '<svg width="170" height="169" viewBox="0 0 150 149" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M75.2708 136.357C41.0382 136.357 13.2873 108.606 13.2873 74.3741C13.2873 40.1415 41.0382 12.3906 75.2708 12.3906C109.503 12.3906 137.254 40.1415 137.254 74.3741C137.254 108.606 109.503 136.357 75.2708 136.357ZM75.2708 123.961C102.657 123.961 124.857 101.76 124.857 74.3741C124.857 46.988 102.657 24.7873 75.2708 24.7873C47.8847 24.7873 25.684 46.988 25.684 74.3741C25.684 101.76 47.8847 123.961 75.2708 123.961ZM69.0724 43.3823H81.4691V55.779H69.0724V43.3823ZM69.0724 68.1757H81.4691V105.366H69.0724V68.1757Z" fill="white"/></svg>';
-const checkIcon = `<svg width="130" height="130" viewBox="0 0 130 130" fill="none" xmlns="http://www.w3.org/2000/svg">
+const infoSvg = '<svg width="170" height="inherit" viewBox="0 0 150 149" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M75.2708 136.357C41.0382 136.357 13.2873 108.606 13.2873 74.3741C13.2873 40.1415 41.0382 12.3906 75.2708 12.3906C109.503 12.3906 137.254 40.1415 137.254 74.3741C137.254 108.606 109.503 136.357 75.2708 136.357ZM75.2708 123.961C102.657 123.961 124.857 101.76 124.857 74.3741C124.857 46.988 102.657 24.7873 75.2708 24.7873C47.8847 24.7873 25.684 46.988 25.684 74.3741C25.684 101.76 47.8847 123.961 75.2708 123.961ZM69.0724 43.3823H81.4691V55.779H69.0724V43.3823ZM69.0724 68.1757H81.4691V105.366H69.0724V68.1757Z" fill="white"/></svg>';
+const checkIcon = `<svg width="inherit" height="inherit" viewBox="0 0 130 130" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path d="M13 65C13 36.2812 36.2812 13 65 13C93.7189 13 117 36.2812 117 65C117 93.7189 93.7189 117 65 117C36.2812 117 13 93.7189 13 65ZM65 0C29.1015 0 0 29.1015 0 65C0 100.898 29.1015 130 65 130C100.898 130 130 100.898 130 65C130 29.1015 100.898 0 65 0ZM100.471 48.4712L91.2789 39.2788L58.5 72.0577L40.3462 53.9039L31.1538 63.0961L58.5 90.4423L100.471 48.4712Z" fill="white"/>
 </svg>
 `;
 
+const showSuccess = [
+    state('void', style({
+        opacity: 0,
+        height: '9.56em',
+    })),
+    state('visible', style({
+        opacity: 1,
+        height: '26.7em',
+    })),
+    transition('void => visible', [
+        animate('2s ease-in-out', keyframes([
+            style({ opacity: 0, height: '9.56em', offset: 0 }),
+            style({ opacity: 0, height: '5em', offset: 0.5 }),
+            style({ opacity: 1, height: '26.7em', offset: 1 }),
+        ])),
+    ]),
+];
+const hideConfirm = [
+    state('void', style({})), // Parent state
+    state('visible', style({})), // Parent state
+    transition('visible => void', [
+        group([
+            // Use group to run animations simultaneously
+            query('.fade-element', [
+                animate('1s ease-in-out', style({
+                    opacity: 0,
+                })),
+            ], { optional: true }),
+            query('.slide-element', [
+                animate('2s ease-in-out', keyframes([
+                    style({ opacity: 1, height: '9.56em', offset: 0 }),
+                    style({ opacity: 1, height: '5em', offset: 0.5 }),
+                    style({ opacity: 1, height: '26.7em', offset: 1 }),
+                ])),
+            ], { optional: true }),
+        ]),
+    ]),
+];
 class CustomConfirmPopupComponent {
     sanitizer;
     message = '';
@@ -4098,21 +4137,56 @@ class CustomConfirmPopupComponent {
     successMsg = input('');
     checkedInfoSvg;
     checkIcon;
+    // Animation states
+    currentView = 'confirmation';
+    successAnimationState = 'hidden';
+    isVisible = false;
+    eventVal;
     constructor(sanitizer) {
         this.sanitizer = sanitizer;
         const infoSvgIcon = infoSvg;
         this.checkedInfoSvg = this.sanitizer.bypassSecurityTrustHtml(infoSvgIcon);
         this.checkIcon = this.sanitizer.bypassSecurityTrustHtml(checkIcon);
     }
-    isVisible = false;
-    eventVal;
+    ngOnInit() {
+        // Watch for showSuccessScreen signal changes
+        this.watchSuccessScreen();
+    }
+    watchSuccessScreen() {
+        // Since you're using signals, you can use effect or watch the signal
+        // This will trigger whenever showSuccessScreen changes
+        if (this.showSuccessScreen()) {
+            this.transitionToSuccess();
+        }
+    }
+    ngOnChanges() {
+        // Alternative: watch input changes if using traditional inputs
+        if (this.showSuccessScreen()) {
+            this.transitionToSuccess();
+        }
+    }
     open(event) {
         this.isVisible = true;
         this.eventVal = event;
+        this.currentView = 'confirmation';
+        this.successAnimationState = 'hidden';
     }
     close() {
-        if (!this.showSuccessScreen())
+        if (!this.showSuccessScreen()) {
             this.isVisible = false;
+            this.currentView = 'confirmation';
+            this.successAnimationState = 'hidden';
+        }
+    }
+    checkSuccess() {
+        this.confirmEvent.emit();
+        // Don't manually trigger transition here - let the signal change handle it
+    }
+    transitionToSuccess() {
+        if (this.isVisible) {
+            this.currentView = 'success';
+            this.successAnimationState = 'visible';
+        }
     }
     onOverlayClick(event) {
         this.overlayClicked.emit(true);
@@ -4120,12 +4194,24 @@ class CustomConfirmPopupComponent {
             this.isVisible = false;
         }
     }
+    startAnimation(event) {
+        console.log('START', event);
+    }
+    doneAnimation(event) {
+        console.log('DONE', event);
+    }
     static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "19.2.14", ngImport: i0, type: CustomConfirmPopupComponent, deps: [{ token: i1$3.DomSanitizer }], target: i0.ɵɵFactoryTarget.Component });
-    static ɵcmp = i0.ɵɵngDeclareComponent({ minVersion: "17.0.0", version: "19.2.14", type: CustomConfirmPopupComponent, isStandalone: true, selector: "custom-confirm-popup", inputs: { message: { classPropertyName: "message", publicName: "message", isSignal: false, isRequired: true, transformFunction: null }, type: { classPropertyName: "type", publicName: "type", isSignal: false, isRequired: true, transformFunction: null }, confirmButtonText: { classPropertyName: "confirmButtonText", publicName: "confirmButtonText", isSignal: false, isRequired: false, transformFunction: null }, cancelButtonText: { classPropertyName: "cancelButtonText", publicName: "cancelButtonText", isSignal: false, isRequired: false, transformFunction: null }, extraButton: { classPropertyName: "extraButton", publicName: "extraButton", isSignal: false, isRequired: false, transformFunction: null }, showSuccessScreen: { classPropertyName: "showSuccessScreen", publicName: "showSuccessScreen", isSignal: true, isRequired: false, transformFunction: null }, successMsg: { classPropertyName: "successMsg", publicName: "successMsg", isSignal: true, isRequired: false, transformFunction: null } }, outputs: { confirmEvent: "confirmEvent", cancelEvent: "cancelEvent", extraEvent: "extraEvent", overlayClicked: "overlayClicked" }, ngImport: i0, template: "<div class=\"popup-overlay\" *ngIf=\"isVisible\" (click)=\"onOverlayClick($event)\">\r\n  @if(showSuccessScreen()){\r\n  <div class=\"success-container\">\r\n    <div class=\"check-popup-icon\" [innerHTML]=\"checkIcon\"></div>\r\n    <p class=\"sucess-msg\">\r\n      {{ successMsg() }}\r\n    </p>\r\n  </div>\r\n\r\n  } @else {\r\n  <div class=\"popup-container\" [ngClass]=\"type\">\r\n    <div class=\"popup-header\">\r\n      <div class=\"popup-icon\" [innerHTML]=\"checkedInfoSvg\"></div>\r\n    </div>\r\n    <div class=\"popup-message\">\r\n      <p>{{ message }}</p>\r\n    </div>\r\n    <div\r\n      class=\"popup-actions\"\r\n      [ngClass]=\"{ 'three-buttons': extraButton, 'two-buttons': !extraButton }\"\r\n    >\r\n      <button\r\n        class=\"btn yes-btn\"\r\n        [ngClass]=\"type\"\r\n        (click)=\"confirmEvent.emit(); close()\"\r\n      >\r\n        {{ confirmButtonText }}\r\n      </button>\r\n      @if(extraButton) {\r\n      <button class=\"btn extra-btn\" (click)=\"extraEvent.emit(); close()\">\r\n        {{ extraButton }}\r\n      </button>\r\n      }\r\n      <button class=\"btn no-btn\" (click)=\"cancelEvent.emit(); close()\">\r\n        {{ cancelButtonText }}\r\n      </button>\r\n    </div>\r\n  </div>\r\n  }\r\n</div>\r\n", styles: [".popup-overlay{position:fixed;inset:0;background:#0000001a;display:flex;align-items:center;justify-content:center;z-index:1000}.popup-container{background:#fff;border-radius:.9em;min-width:33em;max-width:95vw;box-shadow:0 4px 24px #0000001a;overflow:hidden;text-align:center}.popup-container.info .popup-header{background:#3b80aa}.popup-container.delete .popup-header{background:#f43f5e}.popup-header{padding:2em 0 1em}.popup-icon{width:110px;height:110px;margin:0 auto;display:flex;align-items:center;justify-content:center}.popup-message{padding:3em 2em 0}.popup-message p{font-size:1.3em;color:#707070;font-weight:600;margin:auto}.popup-actions{display:flex;justify-content:center;gap:24px;padding:3em 4em 4em}.popup-actions.three-buttons{gap:18px}.btn{min-width:5.5em;padding:1em 1.5em;border:none;border-radius:.7em;font-size:1.1em;font-weight:500;cursor:pointer;transition:background .2s;color:#fff}.popup-actions .btn{margin:0}@media (max-width: 600px){.popup-container{min-width:90vw;font-size:.95em}.btn{min-width:90px;font-size:1em;padding:12px 0}}.three-buttons .no-btn{background-color:#ff4c4c}.three-buttons .yes-btn{background-color:#25c7bc}.three-buttons .extra-btn{background-color:#06213d}.two-buttons .yes-btn.info{background:#25c7bc}.two-buttons .yes-btn.delete{background:#ff4c4c}.two-buttons .no-btn{background:#06213d}.success-container{display:flex;flex-direction:column;justify-content:center;align-items:center;background-color:#25c7bc;color:#fff;padding:3em;opacity:0;border-radius:.9em;transform:translateY(20px);animation:slideDown .3s ease-in forwards}.check-popup-icon{width:11em;height:11em;margin:2em auto;display:flex;align-items:center;justify-content:center}.sucess-msg{font-size:1.3em}@keyframes slideDown{0%{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}\n"], dependencies: [{ kind: "ngmodule", type: CommonModule }, { kind: "directive", type: i2.NgClass, selector: "[ngClass]", inputs: ["class", "ngClass"] }, { kind: "directive", type: i2.NgIf, selector: "[ngIf]", inputs: ["ngIf", "ngIfThen", "ngIfElse"] }] });
+    static ɵcmp = i0.ɵɵngDeclareComponent({ minVersion: "17.0.0", version: "19.2.14", type: CustomConfirmPopupComponent, isStandalone: true, selector: "custom-confirm-popup", inputs: { message: { classPropertyName: "message", publicName: "message", isSignal: false, isRequired: true, transformFunction: null }, type: { classPropertyName: "type", publicName: "type", isSignal: false, isRequired: true, transformFunction: null }, confirmButtonText: { classPropertyName: "confirmButtonText", publicName: "confirmButtonText", isSignal: false, isRequired: false, transformFunction: null }, cancelButtonText: { classPropertyName: "cancelButtonText", publicName: "cancelButtonText", isSignal: false, isRequired: false, transformFunction: null }, extraButton: { classPropertyName: "extraButton", publicName: "extraButton", isSignal: false, isRequired: false, transformFunction: null }, showSuccessScreen: { classPropertyName: "showSuccessScreen", publicName: "showSuccessScreen", isSignal: true, isRequired: false, transformFunction: null }, successMsg: { classPropertyName: "successMsg", publicName: "successMsg", isSignal: true, isRequired: false, transformFunction: null } }, outputs: { confirmEvent: "confirmEvent", cancelEvent: "cancelEvent", extraEvent: "extraEvent", overlayClicked: "overlayClicked" }, usesOnChanges: true, ngImport: i0, template: "<div class=\"popup-overlay\" *ngIf=\"isVisible\" (click)=\"onOverlayClick($event)\">\r\n  <div\r\n    *ngIf=\"!showSuccessScreen()\"\r\n    style=\"\r\n      overflow: hidden;\r\n      width: 37.7em;\r\n      height: 25.375em;\r\n      position: absolute;\r\n    \"\r\n    [@slideAndFade]=\"currentView === 'confirmation' ? 'visible' : 'hidden'\"\r\n    (@slideAndFade.start)=\"startAnimation($event)\"\r\n    (@slideAndFade.done)=\"doneAnimation($event)\"\r\n  >\r\n    <div class=\"popup-container\" [ngClass]=\"type\">\r\n      <div class=\"popup-header slide-element\">\r\n        <div class=\"popup-icon fade-element\" [innerHTML]=\"checkedInfoSvg\"></div>\r\n      </div>\r\n      <div class=\"popup-message\">\r\n        <p>{{ message }}</p>\r\n      </div>\r\n      <div\r\n        class=\"popup-actions\"\r\n        [ngClass]=\"{\r\n          'three-buttons': extraButton,\r\n          'two-buttons': !extraButton\r\n        }\"\r\n      >\r\n        <button class=\"btn yes-btn\" [ngClass]=\"type\" (click)=\"checkSuccess()\">\r\n          {{ confirmButtonText }}\r\n        </button>\r\n        @if(extraButton) {\r\n        <button class=\"btn extra-btn\" (click)=\"extraEvent.emit(); close()\">\r\n          {{ extraButton }}\r\n        </button>\r\n        }\r\n        <button class=\"btn no-btn\" (click)=\"cancelEvent.emit(); close()\">\r\n          {{ cancelButtonText }}\r\n        </button>\r\n      </div>\r\n    </div>\r\n  </div>\r\n\r\n  <!-- <div style=\"position: relative; width: 37.7em; height: 26.7em\"> -->\r\n  <div\r\n    *ngIf=\"showSuccessScreen()\"\r\n    class=\"success-container\"\r\n    [@showSuccess]=\"currentView === 'success' ? 'visible' : 'hidden'\"\r\n  >\r\n    <!--     \r\n -->\r\n    <div class=\"check-popup-icon\" [innerHTML]=\"checkIcon\"></div>\r\n    <p class=\"sucess-msg\">\r\n      {{ successMsg() }}\r\n    </p>\r\n  </div>\r\n  <!-- </div> -->\r\n</div>\r\n", styles: [".popup-overlay{position:fixed;inset:0;background:#0000001a;display:flex;align-items:center;justify-content:center;z-index:1000}.popup-container{background:#fff;border-radius:.9em;min-width:33em;max-width:95vw;box-shadow:0 4px 24px #0000001a;overflow:hidden;text-align:center;width:37.7em;height:25.375em;position:absolute}.popup-container.info .popup-header{background:#3b80aa}.popup-container.delete .popup-header{background:#f43f5e}.popup-header{padding:2em 0 1em}.popup-icon{width:110px;height:110px;margin:0 auto;display:flex;align-items:center;justify-content:center}.popup-message{padding:3em 2em 0}.popup-message p{font-size:1.3em;color:#707070;font-weight:600;margin:auto}.popup-actions{display:flex;justify-content:center;gap:24px;padding:3em 4em 4em}.popup-actions.three-buttons{gap:18px}.btn{min-width:5.5em;padding:1em 1.5em;border:none;border-radius:.7em;font-size:1.1em;font-weight:500;cursor:pointer;transition:background .2s;color:#fff}.popup-actions .btn{margin:0}.three-buttons .no-btn{background-color:#ff4c4c}.three-buttons .yes-btn{background-color:#25c7bc}.three-buttons .extra-btn{background-color:#06213d}.two-buttons .yes-btn.info{background:#25c7bc}.two-buttons .yes-btn.delete{background:#ff4c4c}.two-buttons .no-btn{background:#06213d}.success-container{display:flex;flex-direction:column;justify-content:center;align-items:center;background-color:#25c7bc;color:#fff;padding:1.5em 3em;border-radius:.9em;width:37.7em;height:26.7em;position:absolute;top:calc(-12.6em + 50%)}.check-popup-icon{width:11em;max-height:11em;height:80%;margin:2em auto;display:flex;align-items:center;justify-content:center}.sucess-msg{font-size:1.3em;text-align:center}\n"], dependencies: [{ kind: "ngmodule", type: CommonModule }, { kind: "directive", type: i2.NgClass, selector: "[ngClass]", inputs: ["class", "ngClass"] }, { kind: "directive", type: i2.NgIf, selector: "[ngIf]", inputs: ["ngIf", "ngIfThen", "ngIfElse"] }], animations: [
+            trigger('slideAndFade', hideConfirm),
+            trigger('showSuccess', showSuccess),
+        ] });
 }
 i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.14", ngImport: i0, type: CustomConfirmPopupComponent, decorators: [{
             type: Component,
-            args: [{ selector: 'custom-confirm-popup', imports: [CommonModule], template: "<div class=\"popup-overlay\" *ngIf=\"isVisible\" (click)=\"onOverlayClick($event)\">\r\n  @if(showSuccessScreen()){\r\n  <div class=\"success-container\">\r\n    <div class=\"check-popup-icon\" [innerHTML]=\"checkIcon\"></div>\r\n    <p class=\"sucess-msg\">\r\n      {{ successMsg() }}\r\n    </p>\r\n  </div>\r\n\r\n  } @else {\r\n  <div class=\"popup-container\" [ngClass]=\"type\">\r\n    <div class=\"popup-header\">\r\n      <div class=\"popup-icon\" [innerHTML]=\"checkedInfoSvg\"></div>\r\n    </div>\r\n    <div class=\"popup-message\">\r\n      <p>{{ message }}</p>\r\n    </div>\r\n    <div\r\n      class=\"popup-actions\"\r\n      [ngClass]=\"{ 'three-buttons': extraButton, 'two-buttons': !extraButton }\"\r\n    >\r\n      <button\r\n        class=\"btn yes-btn\"\r\n        [ngClass]=\"type\"\r\n        (click)=\"confirmEvent.emit(); close()\"\r\n      >\r\n        {{ confirmButtonText }}\r\n      </button>\r\n      @if(extraButton) {\r\n      <button class=\"btn extra-btn\" (click)=\"extraEvent.emit(); close()\">\r\n        {{ extraButton }}\r\n      </button>\r\n      }\r\n      <button class=\"btn no-btn\" (click)=\"cancelEvent.emit(); close()\">\r\n        {{ cancelButtonText }}\r\n      </button>\r\n    </div>\r\n  </div>\r\n  }\r\n</div>\r\n", styles: [".popup-overlay{position:fixed;inset:0;background:#0000001a;display:flex;align-items:center;justify-content:center;z-index:1000}.popup-container{background:#fff;border-radius:.9em;min-width:33em;max-width:95vw;box-shadow:0 4px 24px #0000001a;overflow:hidden;text-align:center}.popup-container.info .popup-header{background:#3b80aa}.popup-container.delete .popup-header{background:#f43f5e}.popup-header{padding:2em 0 1em}.popup-icon{width:110px;height:110px;margin:0 auto;display:flex;align-items:center;justify-content:center}.popup-message{padding:3em 2em 0}.popup-message p{font-size:1.3em;color:#707070;font-weight:600;margin:auto}.popup-actions{display:flex;justify-content:center;gap:24px;padding:3em 4em 4em}.popup-actions.three-buttons{gap:18px}.btn{min-width:5.5em;padding:1em 1.5em;border:none;border-radius:.7em;font-size:1.1em;font-weight:500;cursor:pointer;transition:background .2s;color:#fff}.popup-actions .btn{margin:0}@media (max-width: 600px){.popup-container{min-width:90vw;font-size:.95em}.btn{min-width:90px;font-size:1em;padding:12px 0}}.three-buttons .no-btn{background-color:#ff4c4c}.three-buttons .yes-btn{background-color:#25c7bc}.three-buttons .extra-btn{background-color:#06213d}.two-buttons .yes-btn.info{background:#25c7bc}.two-buttons .yes-btn.delete{background:#ff4c4c}.two-buttons .no-btn{background:#06213d}.success-container{display:flex;flex-direction:column;justify-content:center;align-items:center;background-color:#25c7bc;color:#fff;padding:3em;opacity:0;border-radius:.9em;transform:translateY(20px);animation:slideDown .3s ease-in forwards}.check-popup-icon{width:11em;height:11em;margin:2em auto;display:flex;align-items:center;justify-content:center}.sucess-msg{font-size:1.3em}@keyframes slideDown{0%{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}\n"] }]
+            args: [{ selector: 'custom-confirm-popup', imports: [CommonModule], animations: [
+                        trigger('slideAndFade', hideConfirm),
+                        trigger('showSuccess', showSuccess),
+                    ], template: "<div class=\"popup-overlay\" *ngIf=\"isVisible\" (click)=\"onOverlayClick($event)\">\r\n  <div\r\n    *ngIf=\"!showSuccessScreen()\"\r\n    style=\"\r\n      overflow: hidden;\r\n      width: 37.7em;\r\n      height: 25.375em;\r\n      position: absolute;\r\n    \"\r\n    [@slideAndFade]=\"currentView === 'confirmation' ? 'visible' : 'hidden'\"\r\n    (@slideAndFade.start)=\"startAnimation($event)\"\r\n    (@slideAndFade.done)=\"doneAnimation($event)\"\r\n  >\r\n    <div class=\"popup-container\" [ngClass]=\"type\">\r\n      <div class=\"popup-header slide-element\">\r\n        <div class=\"popup-icon fade-element\" [innerHTML]=\"checkedInfoSvg\"></div>\r\n      </div>\r\n      <div class=\"popup-message\">\r\n        <p>{{ message }}</p>\r\n      </div>\r\n      <div\r\n        class=\"popup-actions\"\r\n        [ngClass]=\"{\r\n          'three-buttons': extraButton,\r\n          'two-buttons': !extraButton\r\n        }\"\r\n      >\r\n        <button class=\"btn yes-btn\" [ngClass]=\"type\" (click)=\"checkSuccess()\">\r\n          {{ confirmButtonText }}\r\n        </button>\r\n        @if(extraButton) {\r\n        <button class=\"btn extra-btn\" (click)=\"extraEvent.emit(); close()\">\r\n          {{ extraButton }}\r\n        </button>\r\n        }\r\n        <button class=\"btn no-btn\" (click)=\"cancelEvent.emit(); close()\">\r\n          {{ cancelButtonText }}\r\n        </button>\r\n      </div>\r\n    </div>\r\n  </div>\r\n\r\n  <!-- <div style=\"position: relative; width: 37.7em; height: 26.7em\"> -->\r\n  <div\r\n    *ngIf=\"showSuccessScreen()\"\r\n    class=\"success-container\"\r\n    [@showSuccess]=\"currentView === 'success' ? 'visible' : 'hidden'\"\r\n  >\r\n    <!--     \r\n -->\r\n    <div class=\"check-popup-icon\" [innerHTML]=\"checkIcon\"></div>\r\n    <p class=\"sucess-msg\">\r\n      {{ successMsg() }}\r\n    </p>\r\n  </div>\r\n  <!-- </div> -->\r\n</div>\r\n", styles: [".popup-overlay{position:fixed;inset:0;background:#0000001a;display:flex;align-items:center;justify-content:center;z-index:1000}.popup-container{background:#fff;border-radius:.9em;min-width:33em;max-width:95vw;box-shadow:0 4px 24px #0000001a;overflow:hidden;text-align:center;width:37.7em;height:25.375em;position:absolute}.popup-container.info .popup-header{background:#3b80aa}.popup-container.delete .popup-header{background:#f43f5e}.popup-header{padding:2em 0 1em}.popup-icon{width:110px;height:110px;margin:0 auto;display:flex;align-items:center;justify-content:center}.popup-message{padding:3em 2em 0}.popup-message p{font-size:1.3em;color:#707070;font-weight:600;margin:auto}.popup-actions{display:flex;justify-content:center;gap:24px;padding:3em 4em 4em}.popup-actions.three-buttons{gap:18px}.btn{min-width:5.5em;padding:1em 1.5em;border:none;border-radius:.7em;font-size:1.1em;font-weight:500;cursor:pointer;transition:background .2s;color:#fff}.popup-actions .btn{margin:0}.three-buttons .no-btn{background-color:#ff4c4c}.three-buttons .yes-btn{background-color:#25c7bc}.three-buttons .extra-btn{background-color:#06213d}.two-buttons .yes-btn.info{background:#25c7bc}.two-buttons .yes-btn.delete{background:#ff4c4c}.two-buttons .no-btn{background:#06213d}.success-container{display:flex;flex-direction:column;justify-content:center;align-items:center;background-color:#25c7bc;color:#fff;padding:1.5em 3em;border-radius:.9em;width:37.7em;height:26.7em;position:absolute;top:calc(-12.6em + 50%)}.check-popup-icon{width:11em;max-height:11em;height:80%;margin:2em auto;display:flex;align-items:center;justify-content:center}.sucess-msg{font-size:1.3em;text-align:center}\n"] }]
         }], ctorParameters: () => [{ type: i1$3.DomSanitizer }], propDecorators: { message: [{
                 type: Input,
                 args: [{ required: true }]
@@ -4467,11 +4553,11 @@ class CustomDetailsModalComponent {
         }
     }
     static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "19.2.14", ngImport: i0, type: CustomDetailsModalComponent, deps: [], target: i0.ɵɵFactoryTarget.Component });
-    static ɵcmp = i0.ɵɵngDeclareComponent({ minVersion: "17.0.0", version: "19.2.14", type: CustomDetailsModalComponent, isStandalone: true, selector: "custom-details-modal", inputs: { modalTitle: "modalTitle", overlayClickClose: "overlayClickClose", BreadCrumbs: "BreadCrumbs" }, outputs: { headerButtonClick: "headerButtonClick" }, ngImport: i0, template: "@if(isVisible){\r\n<div\r\n  class=\"details-modal-overlay flex flex-row justify-start align-start\"\r\n  (click)=\"onOverlayClick($event)\"\r\n>\r\n  <!-- X button outside details-modal-content -->\r\n\r\n  <div class=\"flex flex-row\">\r\n    <div class=\"details-modal-body\">\r\n      <div class=\"details-modal-header\">\r\n        <custom-details-header\r\n          [BreadCrumbs]=\"BreadCrumbs\"\r\n          (closeContainer)=\"close()\"\r\n        >\r\n        </custom-details-header>\r\n      </div>\r\n      <div class=\"details-modal-content\">\r\n        <div class=\"details-modal-section\">\r\n          <ng-content select=\"[mainContent]\"></ng-content>\r\n        </div>\r\n        <div\r\n          class=\"details-modal-section\"\r\n          [ngStyle]=\"{ borderLeft: '1px #00000026 solid' }\"\r\n        >\r\n          <ng-content select=\"[sideContent]\"></ng-content>\r\n        </div>\r\n      </div>\r\n    </div>\r\n  </div>\r\n</div>\r\n}\r\n", styles: [".details-modal-overlay{font-size:1em;position:fixed;top:0;left:0;width:100vw;height:100vh;background:#000000b3;display:flex;align-items:center;justify-content:center;z-index:1000;overflow-y:none}.details-modal-body{position:relative;background:#fff;border-radius:10px;min-width:600px;max-width:95vw;display:flex;align-items:center;flex-direction:column;height:max-content;max-height:80vh;overflow-y:none;overflow-x:none}.details-modal-header{display:block;width:100%;align-items:center;justify-content:start;position:relative;height:100%}.details-modal-content{width:100%;display:grid;grid-template-columns:10fr 5fr;overflow:auto;height:100%}.details-modal-section{overflow-y:auto;height:100%}.border-content{border-right:1px #00000026 solid}\n"], dependencies: [{ kind: "ngmodule", type: CommonModule }, { kind: "directive", type: i2.NgStyle, selector: "[ngStyle]", inputs: ["ngStyle"] }, { kind: "component", type: CustomDetailsHeaderComponent, selector: "custom-details-header", inputs: ["showX", "BreadCrumbs"], outputs: ["closeContainer", "dropdownSelectAction"] }] });
+    static ɵcmp = i0.ɵɵngDeclareComponent({ minVersion: "17.0.0", version: "19.2.14", type: CustomDetailsModalComponent, isStandalone: true, selector: "custom-details-modal", inputs: { modalTitle: "modalTitle", overlayClickClose: "overlayClickClose", BreadCrumbs: "BreadCrumbs" }, outputs: { headerButtonClick: "headerButtonClick" }, ngImport: i0, template: "@if(isVisible){\r\n<div\r\n  class=\"details-modal-overlay flex flex-row justify-start align-start\"\r\n  (click)=\"onOverlayClick($event)\"\r\n>\r\n  <!-- X button outside details-modal-content -->\r\n\r\n  <div class=\"flex flex-row\">\r\n    <div class=\"details-modal-body\">\r\n      <div class=\"details-modal-header\">\r\n        <custom-details-header\r\n          [BreadCrumbs]=\"BreadCrumbs\"\r\n          (closeContainer)=\"close()\"\r\n        >\r\n        </custom-details-header>\r\n      </div>\r\n      <div class=\"details-modal-content\">\r\n        <div class=\"details-modal-section\">\r\n          <ng-content select=\"[mainContent]\"></ng-content>\r\n        </div>\r\n        <div\r\n          class=\"details-modal-section\"\r\n          [ngStyle]=\"{ borderLeft: '1px #00000026 solid' }\"\r\n        >\r\n          <ng-content select=\"[sideContent]\"></ng-content>\r\n        </div>\r\n      </div>\r\n    </div>\r\n  </div>\r\n</div>\r\n}\r\n", styles: [".details-modal-overlay{font-size:1em;position:fixed;top:0;left:0;width:100vw;height:100vh;background:#000000b3;display:flex;align-items:center;justify-content:center;z-index:1000;overflow-y:none}.details-modal-body{position:relative;background:#fff;border-radius:10px;min-width:600px;max-width:95vw;display:flex;align-items:center;flex-direction:column;height:max-content;max-height:80vh;overflow-y:none;overflow-x:none}.details-modal-header{display:block;width:100%;align-items:center;justify-content:start;position:relative;height:100%}.details-modal-content{width:100%;display:grid;grid-template-columns:10fr 5fr;overflow:auto;height:100%}.details-modal-section{height:100%}.border-content{border-right:1px #00000026 solid}\n"], dependencies: [{ kind: "ngmodule", type: CommonModule }, { kind: "directive", type: i2.NgStyle, selector: "[ngStyle]", inputs: ["ngStyle"] }, { kind: "component", type: CustomDetailsHeaderComponent, selector: "custom-details-header", inputs: ["showX", "BreadCrumbs"], outputs: ["closeContainer", "dropdownSelectAction"] }] });
 }
 i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.14", ngImport: i0, type: CustomDetailsModalComponent, decorators: [{
             type: Component,
-            args: [{ selector: 'custom-details-modal', imports: [CommonModule, CustomDetailsHeaderComponent], template: "@if(isVisible){\r\n<div\r\n  class=\"details-modal-overlay flex flex-row justify-start align-start\"\r\n  (click)=\"onOverlayClick($event)\"\r\n>\r\n  <!-- X button outside details-modal-content -->\r\n\r\n  <div class=\"flex flex-row\">\r\n    <div class=\"details-modal-body\">\r\n      <div class=\"details-modal-header\">\r\n        <custom-details-header\r\n          [BreadCrumbs]=\"BreadCrumbs\"\r\n          (closeContainer)=\"close()\"\r\n        >\r\n        </custom-details-header>\r\n      </div>\r\n      <div class=\"details-modal-content\">\r\n        <div class=\"details-modal-section\">\r\n          <ng-content select=\"[mainContent]\"></ng-content>\r\n        </div>\r\n        <div\r\n          class=\"details-modal-section\"\r\n          [ngStyle]=\"{ borderLeft: '1px #00000026 solid' }\"\r\n        >\r\n          <ng-content select=\"[sideContent]\"></ng-content>\r\n        </div>\r\n      </div>\r\n    </div>\r\n  </div>\r\n</div>\r\n}\r\n", styles: [".details-modal-overlay{font-size:1em;position:fixed;top:0;left:0;width:100vw;height:100vh;background:#000000b3;display:flex;align-items:center;justify-content:center;z-index:1000;overflow-y:none}.details-modal-body{position:relative;background:#fff;border-radius:10px;min-width:600px;max-width:95vw;display:flex;align-items:center;flex-direction:column;height:max-content;max-height:80vh;overflow-y:none;overflow-x:none}.details-modal-header{display:block;width:100%;align-items:center;justify-content:start;position:relative;height:100%}.details-modal-content{width:100%;display:grid;grid-template-columns:10fr 5fr;overflow:auto;height:100%}.details-modal-section{overflow-y:auto;height:100%}.border-content{border-right:1px #00000026 solid}\n"] }]
+            args: [{ selector: 'custom-details-modal', imports: [CommonModule, CustomDetailsHeaderComponent], template: "@if(isVisible){\r\n<div\r\n  class=\"details-modal-overlay flex flex-row justify-start align-start\"\r\n  (click)=\"onOverlayClick($event)\"\r\n>\r\n  <!-- X button outside details-modal-content -->\r\n\r\n  <div class=\"flex flex-row\">\r\n    <div class=\"details-modal-body\">\r\n      <div class=\"details-modal-header\">\r\n        <custom-details-header\r\n          [BreadCrumbs]=\"BreadCrumbs\"\r\n          (closeContainer)=\"close()\"\r\n        >\r\n        </custom-details-header>\r\n      </div>\r\n      <div class=\"details-modal-content\">\r\n        <div class=\"details-modal-section\">\r\n          <ng-content select=\"[mainContent]\"></ng-content>\r\n        </div>\r\n        <div\r\n          class=\"details-modal-section\"\r\n          [ngStyle]=\"{ borderLeft: '1px #00000026 solid' }\"\r\n        >\r\n          <ng-content select=\"[sideContent]\"></ng-content>\r\n        </div>\r\n      </div>\r\n    </div>\r\n  </div>\r\n</div>\r\n}\r\n", styles: [".details-modal-overlay{font-size:1em;position:fixed;top:0;left:0;width:100vw;height:100vh;background:#000000b3;display:flex;align-items:center;justify-content:center;z-index:1000;overflow-y:none}.details-modal-body{position:relative;background:#fff;border-radius:10px;min-width:600px;max-width:95vw;display:flex;align-items:center;flex-direction:column;height:max-content;max-height:80vh;overflow-y:none;overflow-x:none}.details-modal-header{display:block;width:100%;align-items:center;justify-content:start;position:relative;height:100%}.details-modal-content{width:100%;display:grid;grid-template-columns:10fr 5fr;overflow:auto;height:100%}.details-modal-section{height:100%}.border-content{border-right:1px #00000026 solid}\n"] }]
         }], propDecorators: { modalTitle: [{
                 type: Input
             }], overlayClickClose: [{
