@@ -2684,6 +2684,7 @@ class CustomPaginationComponent {
     pageSizeOptions = signal([]);
     totalPages = signal([]);
     hideTotalCount = input(false);
+    showPageSize = true;
     constructor() {
         // effect(()=>{
         //   if(this.totalPages())
@@ -2783,6 +2784,8 @@ i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.14", ngImpo
             }], pageChange: [{
                 type: Output
             }], baseValue: [{
+                type: Input
+            }], showPageSize: [{
                 type: Input
             }] } });
 
