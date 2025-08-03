@@ -47,3 +47,4 @@ export * from './custom-tabs/custom-tabs.component';
 export * from './custom-color/custom-color.component';
 export * from './custom-tooltip/custom-tooltip.component';
 export * from './custom-radio-component/custom-radio-component.component';
+export * from './custom-actions-dropdown/custom-actions-dropdown.component';
