@@ -7,10 +7,11 @@ export declare class OverlayPanelComponent {
     targetTemplate: TemplateRef<any>;
     overlayTemplate: TemplateRef<any>;
     isOpen: boolean;
+    expandSide: 'LEFT' | 'RIGHT';
     constructor(overlayManager: OverlayManagerService);
     ngAfterContentInit(): void;
     toggleDropdown(event: Event): void;
     closeDropdown(): void;
     static ɵfac: i0.ɵɵFactoryDeclaration<OverlayPanelComponent, never>;
-    static ɵcmp: i0.ɵɵComponentDeclaration<OverlayPanelComponent, "overlay-panel", never, { "overlayClass": { "alias": "overlayClass"; "required": false; }; }, {}, ["targetTemplate", "overlayTemplate"], never, true, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<OverlayPanelComponent, "overlay-panel", never, { "overlayClass": { "alias": "overlayClass"; "required": false; }; "expandSide": { "alias": "expandSide"; "required": false; }; }, {}, ["targetTemplate", "overlayTemplate"], never, true, never>;
 }

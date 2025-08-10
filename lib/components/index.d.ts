@@ -49,3 +49,5 @@ export * from './custom-tooltip/custom-tooltip.component';
 export * from './custom-radio-component/custom-radio-component.component';
 export * from './custom-actions-dropdown/custom-actions-dropdown.component';
 export * from './custom-reactive-search-input/custom-reactive-search-input.component';
+export * from './custom-filter-dropdown/custom-filter-dropdown.component';
+export * from './custom-filter-dynamic-form/custom-filter-dynamic-form.component';
