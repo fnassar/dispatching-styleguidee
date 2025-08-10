@@ -2118,6 +2118,7 @@ class CustomDropdownComponent {
     labelClass = '';
     dropdownOptionsClass = '';
     dropdownHeaderClass = '';
+    selectedClass = '';
     dropdownContainerClass = '';
     placeholder = 'Select an option';
     enableFilter = false;
@@ -2182,6 +2183,8 @@ i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.14", ngImpo
             }], dropdownOptionsClass: [{
                 type: Input
             }], dropdownHeaderClass: [{
+                type: Input
+            }], selectedClass: [{
                 type: Input
             }], dropdownContainerClass: [{
                 type: Input

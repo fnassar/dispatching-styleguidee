@@ -6,6 +6,7 @@ export declare class CustomDropdownComponent {
     labelClass: string;
     dropdownOptionsClass: string;
     dropdownHeaderClass: string;
+    selectedClass: string;
     dropdownContainerClass: string;
     placeholder: string;
     enableFilter: boolean;
