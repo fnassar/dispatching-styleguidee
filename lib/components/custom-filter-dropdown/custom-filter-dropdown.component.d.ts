@@ -46,6 +46,7 @@ export declare class CustomFilterDropdownComponent {
     addFilterRow(): void;
     onFilterDropdownChange(selectedId: IDropdownOption | null, rowIndex: number): void;
     removeFilterRow(rowIndex: number): void;
+    isFilterFormEmpty(): boolean;
     clearAll(): void;
     onDateChange(event: any, name: string): void;
     onMultiSelectChange(event: any, name: string): void;

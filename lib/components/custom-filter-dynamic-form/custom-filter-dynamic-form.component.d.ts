@@ -17,18 +17,24 @@ export interface IDynamicFilterConfig {
 export declare class CustomFilterDynamicFormComponent {
     private fb;
     config: import("@angular/core").InputSignal<IDynamicFilterConfig[]>;
+    values: import("@angular/core").InputSignal<Record<string, any> | null>;
     formChanged: EventEmitter<any>;
+    formReset: EventEmitter<any>;
     filterForm: FormGroup;
     filters: import("@angular/core").WritableSignal<IDynamicFilterConfig[]>;
     private destroy$;
     constructor(fb: FormBuilder);
     ngOnInit(): void;
     private buildForm;
+    private isSame;
+    private buildEmittableValues;
+    private isDateField;
+    private toYyyyMmDd;
     private buildValidators;
     get form(): FormGroup;
     reset(): void;
     control(name: string): AbstractControl | null;
     ngOnDestroy(): void;
     static ɵfac: i0.ɵɵFactoryDeclaration<CustomFilterDynamicFormComponent, never>;
-    static ɵcmp: i0.ɵɵComponentDeclaration<CustomFilterDynamicFormComponent, "custom-filter-dynamic-form", never, { "config": { "alias": "config"; "required": false; "isSignal": true; }; }, { "formChanged": "formChanged"; }, never, never, true, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<CustomFilterDynamicFormComponent, "custom-filter-dynamic-form", never, { "config": { "alias": "config"; "required": false; "isSignal": true; }; "values": { "alias": "values"; "required": false; "isSignal": true; }; }, { "formChanged": "formChanged"; "formReset": "formReset"; }, never, never, true, never>;
 }
