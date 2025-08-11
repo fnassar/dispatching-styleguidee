@@ -3,10 +3,10 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { IComponentFormError, IDropdownOption } from '../../interfaces';
 import { ComponentFormErrorConstant } from '../../enums';
 import * as i0 from "@angular/core";
-export type FilterType = 'multiselect' | 'date' | 'text';
+export type FilterType = 'multiselect' | 'date' | 'text' | 'dateRange';
 export interface FilterConfig extends IDropdownOption {
     type: FilterType;
-    label?: string;
+    label: string;
     options?: IDropdownOption[];
     placeholder?: string;
     constraints?: IPossibleConstrains;
