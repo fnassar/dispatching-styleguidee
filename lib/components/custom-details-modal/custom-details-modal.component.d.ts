@@ -8,10 +8,11 @@ export declare class CustomDetailsModalComponent {
         url: string;
     }[];
     headerButtonClick: EventEmitter<void>;
+    sectionDimensions: string;
     isVisible: boolean;
     open(): void;
     close(): void;
     onOverlayClick(event: MouseEvent): void;
     static ɵfac: i0.ɵɵFactoryDeclaration<CustomDetailsModalComponent, never>;
-    static ɵcmp: i0.ɵɵComponentDeclaration<CustomDetailsModalComponent, "custom-details-modal", never, { "modalTitle": { "alias": "modalTitle"; "required": false; }; "overlayClickClose": { "alias": "overlayClickClose"; "required": false; }; "BreadCrumbs": { "alias": "BreadCrumbs"; "required": false; }; }, { "headerButtonClick": "headerButtonClick"; }, never, ["[mainContent]", "[sideContent]"], true, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<CustomDetailsModalComponent, "custom-details-modal", never, { "modalTitle": { "alias": "modalTitle"; "required": false; }; "overlayClickClose": { "alias": "overlayClickClose"; "required": false; }; "BreadCrumbs": { "alias": "BreadCrumbs"; "required": true; }; "sectionDimensions": { "alias": "sectionDimensions"; "required": false; }; }, { "headerButtonClick": "headerButtonClick"; }, never, ["[mainContent]", "[sideContent]"], true, never>;
 }
