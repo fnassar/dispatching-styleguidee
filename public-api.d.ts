@@ -7,3 +7,4 @@ export * from './lib/components/index';
 export * from './lib/directives/index';
 export * from './lib/guards/index';
 export * from './lib/dispatching-fe-components.service';
+export * from './lib/utilities/http-context';

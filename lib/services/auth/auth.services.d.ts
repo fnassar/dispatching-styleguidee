@@ -25,6 +25,8 @@ export declare class AuthService {
     getRefreshToken(): string;
     getCurrentUser(): IUserData;
     getCurrentPermissions(): any[];
+    getCurrentRoles(): any[];
+    hasAnyCurrentRole(targetRoles: Roles[]): boolean;
     hasCategory(route: ActivatedRouteSnapshot): boolean;
     canDoAction(action: string[]): boolean;
     static ɵfac: i0.ɵɵFactoryDeclaration<AuthService, never>;

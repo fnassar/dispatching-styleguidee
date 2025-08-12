@@ -4,10 +4,11 @@ export declare class CustomActionsDropdownComponent {
     private sanitizer;
     actions: {
         label: string;
-        icon: string;
+        icon?: string;
         callback: (ctx: any) => void;
     }[];
     context: any;
+    horizontalDots: boolean;
     isOpen: boolean;
     constructor(sanitizer: DomSanitizer);
     sanitizeSvg(svg: string): SafeHtml;
@@ -15,7 +16,7 @@ export declare class CustomActionsDropdownComponent {
     closeDropdown(): void;
     onClickAction(action: {
         callback: (ctx: any) => void;
-    }): void;
+    }, event: MouseEvent): void;
     static ɵfac: i0.ɵɵFactoryDeclaration<CustomActionsDropdownComponent, never>;
-    static ɵcmp: i0.ɵɵComponentDeclaration<CustomActionsDropdownComponent, "custom-actions-dropdown", never, { "actions": { "alias": "actions"; "required": false; }; "context": { "alias": "context"; "required": false; }; }, {}, never, never, true, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<CustomActionsDropdownComponent, "custom-actions-dropdown", never, { "actions": { "alias": "actions"; "required": false; }; "context": { "alias": "context"; "required": false; }; "horizontalDots": { "alias": "horizontalDots"; "required": false; }; }, {}, never, never, true, never>;
 }
