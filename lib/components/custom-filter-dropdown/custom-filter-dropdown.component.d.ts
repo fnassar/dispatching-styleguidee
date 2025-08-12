@@ -40,12 +40,13 @@ export declare class CustomFilterDropdownComponent {
     protected readonly errorConstant: typeof ComponentFormErrorConstant;
     constructor(fb: FormBuilder);
     ngOnInit(): void;
-    getDefaultInitialValue(type: FilterType): "" | never[] | null;
+    getDefaultInitialValue(type: FilterType): never[] | "" | null;
     getValidatorsFromConfig(validations?: IComponentFormError[]): (typeof Validators.required)[];
     getAvailableOptions(activeIndex: number): IDropdownOption[];
     addFilterRow(): void;
     onFilterDropdownChange(selectedId: IDropdownOption | null, rowIndex: number): void;
     removeFilterRow(rowIndex: number): void;
+    isFilterFormEmpty(): boolean;
     clearAll(): void;
     onDateChange(event: any, name: string): void;
     onMultiSelectChange(event: any, name: string): void;

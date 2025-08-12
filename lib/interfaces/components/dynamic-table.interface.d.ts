@@ -1,7 +1,7 @@
 export interface TableColumn {
     key: string;
     label: string;
-    type?: 'text' | 'number' | 'date' | 'action' | 'image' | 'progress' | 'periority';
+    type?: 'text' | 'number' | 'date' | 'action' | 'image' | 'progress' | 'periority' | 'actions';
     sort?: boolean;
     customClass?: string;
     columnHandler?: (row: any) => void;
