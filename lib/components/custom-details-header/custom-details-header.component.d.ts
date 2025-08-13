@@ -18,9 +18,9 @@ export declare class CustomDetailsHeaderComponent {
         label: string;
         url: string;
     }[];
-    dropdownOptions: IDropdownOption[];
+    actionsDropdown: import("@angular/core").InputSignal<IDropdownOption[]>;
     constructor(sanitizer: DomSanitizer);
     toggleDropdown(event: MouseEvent): void;
     static ɵfac: i0.ɵɵFactoryDeclaration<CustomDetailsHeaderComponent, never>;
-    static ɵcmp: i0.ɵɵComponentDeclaration<CustomDetailsHeaderComponent, "custom-details-header", never, { "showX": { "alias": "showX"; "required": false; }; "BreadCrumbs": { "alias": "BreadCrumbs"; "required": true; }; }, { "closeContainer": "closeContainer"; "dropdownSelectAction": "dropdownSelectAction"; }, never, never, true, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<CustomDetailsHeaderComponent, "custom-details-header", never, { "showX": { "alias": "showX"; "required": false; }; "BreadCrumbs": { "alias": "BreadCrumbs"; "required": true; }; "actionsDropdown": { "alias": "actionsDropdown"; "required": false; "isSignal": true; }; }, { "closeContainer": "closeContainer"; "dropdownSelectAction": "dropdownSelectAction"; }, never, never, true, never>;
 }
