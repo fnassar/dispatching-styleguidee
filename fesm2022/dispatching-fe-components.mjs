@@ -5143,8 +5143,10 @@ class CustomFilterDropdownComponent {
         this.filterForm.reset();
         this.activeFilters.update((current) => ({
             ...current,
+            filteredValues: this.filterForm.value,
             main: [],
         }));
+        console.log();
         this.filtersChanged.emit(this.activeFilters().filteredValues);
     }
     onDateChange(event, name) {
