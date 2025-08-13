@@ -1723,12 +1723,10 @@ class AuthDirective {
             if (this.authContextService.userPermissionsAndRoles$() ||
                 this.canDoAction().length > 0) {
                 const allowed = this.authService.canDoAction(this.canDoAction());
-                // console.log('needed action', this.canDoAction());
-                // console.log('ALLOWED', allowed);
-                if (allowed) {
+                if (allowed && this.viewContainer.length === 0) {
                     this.viewContainer.createEmbeddedView(this.templateRef);
                 }
-                else {
+                else if (!allowed) {
                     this.viewContainer.clear();
                 }
             }
@@ -1741,7 +1739,7 @@ i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.14", ngImpo
             type: Directive,
             args: [{
                     selector: '[canDoAction]',
-                    standalone: true
+                    standalone: true,
                 }]
         }], ctorParameters: () => [{ type: AuthService }, { type: i0.TemplateRef }, { type: i0.ViewContainerRef }, { type: AuthContextService }] });
 
