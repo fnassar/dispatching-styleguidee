@@ -21,7 +21,7 @@ export declare class CustomTimeInputFormComponent {
     hours: number[];
     minutes: number[];
     selectedHour: number | string;
-    selectedMinute: number;
+    selectedMinute: number | string;
     selectedPeriod: 'AM' | 'PM';
     ngOnInit(): void;
     toggleDropdown(): void;

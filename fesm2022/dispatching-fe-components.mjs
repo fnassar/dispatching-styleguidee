@@ -4047,10 +4047,16 @@ class CustomTimeInputFormComponent {
         this.selectedMinute = Number(minute);
     }
     setFormValue() {
+        let targetHour = this.selectedHour;
+        let taregtMin = this.selectedMinute;
         if (this.selectedHour && this.selectedMinute) {
+            if (Number(this.selectedHour) < 10)
+                targetHour = `0${Number(this.selectedHour)}`;
+            if (Number(this.selectedMinute) < 10)
+                taregtMin = `0${Number(this.selectedMinute)}`;
             this.parentForm
                 .get(this.controlName)
-                ?.setValue(`${this.selectedHour}:${this.selectedMinute}:00`);
+                ?.setValue(`${targetHour}:${taregtMin}:00`);
             //   this.parentForm.get(this.controlName)?.setValue({
             //   hour: Number(this.selectedHour) ?? 0,
             //   minute:Number(this.selectedMinute)  ?? 0,
