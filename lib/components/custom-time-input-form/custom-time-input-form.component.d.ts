@@ -18,8 +18,8 @@ export declare class CustomTimeInputFormComponent {
     height: string;
     showErrors: import("@angular/core").WritableSignal<boolean>;
     dropdownOpen: import("@angular/core").WritableSignal<boolean>;
-    hours: string[];
-    minutes: string[];
+    hours: number[];
+    minutes: number[];
     selectedHour: number | string;
     selectedMinute: number;
     selectedPeriod: 'AM' | 'PM';
