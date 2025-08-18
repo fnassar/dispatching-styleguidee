@@ -2873,17 +2873,15 @@ class CustomPopUpComponent {
     isOpen = false;
     onHide = new EventEmitter();
     static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "19.2.14", ngImport: i0, type: CustomPopUpComponent, deps: [], target: i0.ɵɵFactoryTarget.Component });
-    static ɵcmp = i0.ɵɵngDeclareComponent({ minVersion: "17.0.0", version: "19.2.14", type: CustomPopUpComponent, isStandalone: true, selector: "custom-pop-up", inputs: { popUpClass: "popUpClass", message: "message", icon: "icon", overlayClass: "overlayClass", messageClass: "messageClass", iconClass: "iconClass", isOpen: "isOpen" }, outputs: { onHide: "onHide" }, ngImport: i0, template: "@if(isOpen){\n<div [class]=\"'overlay ' + overlayClass\">\n  <div\n    [class]=\"'custom-pop-up-container ' + popUpClass\"\n    #popUp\n    [clickOutside]=\"popUp\"\n    (clickOutsideEmitter)=\"onHide.emit()\"\n  >\n    <img [src]=\"icon\" [class]=\"iconClass\" alt=\"\" />\n    <p [class]=\"'message ' + messageClass\">{{ message }}</p>\n    <ng-content></ng-content>\n  </div>\n</div>\n}\n", styles: [".overlay{position:fixed;inset:0;background-color:#000000b3;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:50;cursor:pointer}.custom-pop-up-container{width:38rem;border-radius:1rem;padding:5rem;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2rem}.message{font-size:1.2rem;color:#fff;font-weight:500;text-align:center}\n"], dependencies: [{ kind: "directive", type: ClickOutsideDirective, selector: "[clickOutside]", inputs: ["clickOutside"], outputs: ["clickOutsideEmitter"] }] });
+    static ɵcmp = i0.ɵɵngDeclareComponent({ minVersion: "17.0.0", version: "19.2.14", type: CustomPopUpComponent, isStandalone: true, selector: "custom-pop-up", inputs: { popUpClass: "popUpClass", message: "message", icon: "icon", overlayClass: "overlayClass", messageClass: "messageClass", iconClass: "iconClass", isOpen: "isOpen" }, outputs: { onHide: "onHide" }, ngImport: i0, template: "@if(isOpen){\n<div [class]=\"'overlay ' + overlayClass\">\n  <!-- [class]=\"'custom-pop-up-container ' + popUpClass\" -->\n  <div\n  class=\"pop-up-container\"\n    #popUp\n    [clickOutside]=\"popUp\"\n    (clickOutsideEmitter)=\"onHide.emit()\"\n  >\n    <!-- <img [src]=\"icon\" [class]=\"iconClass\" alt=\"\" />\n    <p [class]=\"'message ' + messageClass\">{{ message }}</p> -->\n    <ng-content></ng-content>\n  </div>\n</div>\n}\n", styles: [".overlay{position:fixed;inset:0;background-color:#000000b3;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:50;cursor:pointer}.custom-pop-up-container{width:38rem;border-radius:1rem;padding:5rem;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2rem}.message{font-size:1.2rem;color:#fff;font-weight:500;text-align:center}.pop-up-container{border-radius:.625em;overflow:hidden}\n"], dependencies: [{ kind: "directive", type: ClickOutsideDirective, selector: "[clickOutside]", inputs: ["clickOutside"], outputs: ["clickOutsideEmitter"] }] });
 }
 i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.14", ngImport: i0, type: CustomPopUpComponent, decorators: [{
             type: Component,
-            args: [{ selector: 'custom-pop-up', standalone: true, imports: [ClickOutsideDirective], template: "@if(isOpen){\n<div [class]=\"'overlay ' + overlayClass\">\n  <div\n    [class]=\"'custom-pop-up-container ' + popUpClass\"\n    #popUp\n    [clickOutside]=\"popUp\"\n    (clickOutsideEmitter)=\"onHide.emit()\"\n  >\n    <img [src]=\"icon\" [class]=\"iconClass\" alt=\"\" />\n    <p [class]=\"'message ' + messageClass\">{{ message }}</p>\n    <ng-content></ng-content>\n  </div>\n</div>\n}\n", styles: [".overlay{position:fixed;inset:0;background-color:#000000b3;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:50;cursor:pointer}.custom-pop-up-container{width:38rem;border-radius:1rem;padding:5rem;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2rem}.message{font-size:1.2rem;color:#fff;font-weight:500;text-align:center}\n"] }]
+            args: [{ selector: 'custom-pop-up', standalone: true, imports: [ClickOutsideDirective], template: "@if(isOpen){\n<div [class]=\"'overlay ' + overlayClass\">\n  <!-- [class]=\"'custom-pop-up-container ' + popUpClass\" -->\n  <div\n  class=\"pop-up-container\"\n    #popUp\n    [clickOutside]=\"popUp\"\n    (clickOutsideEmitter)=\"onHide.emit()\"\n  >\n    <!-- <img [src]=\"icon\" [class]=\"iconClass\" alt=\"\" />\n    <p [class]=\"'message ' + messageClass\">{{ message }}</p> -->\n    <ng-content></ng-content>\n  </div>\n</div>\n}\n", styles: [".overlay{position:fixed;inset:0;background-color:#000000b3;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:50;cursor:pointer}.custom-pop-up-container{width:38rem;border-radius:1rem;padding:5rem;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2rem}.message{font-size:1.2rem;color:#fff;font-weight:500;text-align:center}.pop-up-container{border-radius:.625em;overflow:hidden}\n"] }]
         }], propDecorators: { popUpClass: [{
-                type: Input,
-                args: [{ required: true }]
+                type: Input
             }], message: [{
-                type: Input,
-                args: [{ required: true }]
+                type: Input
             }], icon: [{
                 type: Input
             }], overlayClass: [{
@@ -3720,7 +3718,6 @@ class CustomFileViewerComponent {
     }
     getFileIcon() {
         const fileType = this.getFileTypeLabel();
-        console.log(fileType, this.file.mimeType);
         switch (fileType) {
             case 'PPT': //1
                 return this.sanitizer.bypassSecurityTrustHtml(pptSvg);
