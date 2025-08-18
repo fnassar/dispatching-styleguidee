@@ -1,2 +1,2 @@
-export declare const minutes: string[];
-export declare const hours: string[];
+export declare const minutes: number[];
+export declare const hours: number[];
