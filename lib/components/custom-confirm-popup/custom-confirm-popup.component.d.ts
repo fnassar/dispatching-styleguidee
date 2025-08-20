@@ -20,6 +20,7 @@ export declare class CustomConfirmPopupComponent {
     successAnimationState: 'hidden' | 'visible';
     isVisible: boolean;
     eventVal: any;
+    successPressed: boolean;
     constructor(sanitizer: DomSanitizer);
     ngOnInit(): void;
     private watchSuccessScreen;
