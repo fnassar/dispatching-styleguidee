@@ -1,10 +1,8 @@
 import { EventEmitter } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import { LoadingService } from '../../services';
 import * as i0 from "@angular/core";
 export declare class CustomConfirmPopupComponent {
     private sanitizer;
-    loadingService: LoadingService;
     message: string;
     type: 'info' | 'delete';
     confirmButtonText: string;
@@ -20,10 +18,9 @@ export declare class CustomConfirmPopupComponent {
     checkIcon: SafeHtml;
     currentView: 'confirmation' | 'success';
     successAnimationState: 'hidden' | 'visible';
-    successPressed: boolean;
     isVisible: boolean;
     eventVal: any;
-    constructor(sanitizer: DomSanitizer, loadingService: LoadingService);
+    constructor(sanitizer: DomSanitizer);
     ngOnInit(): void;
     private watchSuccessScreen;
     ngOnChanges(): void;

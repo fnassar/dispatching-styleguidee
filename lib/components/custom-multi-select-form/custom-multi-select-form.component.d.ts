@@ -20,6 +20,7 @@ export declare class CustomMultiSelectFormComponent {
     isOpen: boolean;
     filteredOptions: IDropdownOption[];
     filterText: string;
+    disabled: boolean;
     ngOnInit(): void;
     get selectedOptions(): IDropdownOption[];
     getSelectedLabels(): string[];
@@ -32,5 +33,5 @@ export declare class CustomMultiSelectFormComponent {
     set reset(value: boolean);
     containRequiredError(): boolean;
     static ɵfac: i0.ɵɵFactoryDeclaration<CustomMultiSelectFormComponent, never>;
-    static ɵcmp: i0.ɵɵComponentDeclaration<CustomMultiSelectFormComponent, "custom-multi-select-form", never, { "parentForm": { "alias": "parentForm"; "required": true; }; "controlName": { "alias": "controlName"; "required": true; }; "label": { "alias": "label"; "required": false; }; "labelClass": { "alias": "labelClass"; "required": false; }; "dropdownOptionsClass": { "alias": "dropdownOptionsClass"; "required": false; }; "dropdownHeaderClass": { "alias": "dropdownHeaderClass"; "required": false; }; "dropdownContainerClass": { "alias": "dropdownContainerClass"; "required": false; }; "placeholder": { "alias": "placeholder"; "required": false; }; "enableFilter": { "alias": "enableFilter"; "required": false; }; "filterDesign": { "alias": "filterDesign"; "required": false; }; "showClear": { "alias": "showClear"; "required": false; }; "options": { "alias": "options"; "required": true; }; "name": { "alias": "name"; "required": true; }; "validation": { "alias": "validation"; "required": true; }; "height": { "alias": "height"; "required": false; }; "reset": { "alias": "reset"; "required": false; }; }, {}, never, never, true, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<CustomMultiSelectFormComponent, "custom-multi-select-form", never, { "parentForm": { "alias": "parentForm"; "required": true; }; "controlName": { "alias": "controlName"; "required": true; }; "label": { "alias": "label"; "required": false; }; "labelClass": { "alias": "labelClass"; "required": false; }; "dropdownOptionsClass": { "alias": "dropdownOptionsClass"; "required": false; }; "dropdownHeaderClass": { "alias": "dropdownHeaderClass"; "required": false; }; "dropdownContainerClass": { "alias": "dropdownContainerClass"; "required": false; }; "placeholder": { "alias": "placeholder"; "required": false; }; "enableFilter": { "alias": "enableFilter"; "required": false; }; "filterDesign": { "alias": "filterDesign"; "required": false; }; "showClear": { "alias": "showClear"; "required": false; }; "options": { "alias": "options"; "required": true; }; "name": { "alias": "name"; "required": true; }; "validation": { "alias": "validation"; "required": true; }; "height": { "alias": "height"; "required": false; }; "disabled": { "alias": "disabled"; "required": false; }; "reset": { "alias": "reset"; "required": false; }; }, {}, never, never, true, never>;
 }
