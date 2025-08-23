@@ -10,5 +10,5 @@ export declare class CustomPopUpComponent {
     isOpen: boolean;
     onHide: EventEmitter<void>;
     static ɵfac: i0.ɵɵFactoryDeclaration<CustomPopUpComponent, never>;
-    static ɵcmp: i0.ɵɵComponentDeclaration<CustomPopUpComponent, "custom-pop-up", never, { "popUpClass": { "alias": "popUpClass"; "required": true; }; "message": { "alias": "message"; "required": true; }; "icon": { "alias": "icon"; "required": false; }; "overlayClass": { "alias": "overlayClass"; "required": false; }; "messageClass": { "alias": "messageClass"; "required": false; }; "iconClass": { "alias": "iconClass"; "required": false; }; "isOpen": { "alias": "isOpen"; "required": true; }; }, { "onHide": "onHide"; }, never, ["*"], true, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<CustomPopUpComponent, "custom-pop-up", never, { "popUpClass": { "alias": "popUpClass"; "required": false; }; "message": { "alias": "message"; "required": false; }; "icon": { "alias": "icon"; "required": false; }; "overlayClass": { "alias": "overlayClass"; "required": false; }; "messageClass": { "alias": "messageClass"; "required": false; }; "iconClass": { "alias": "iconClass"; "required": false; }; "isOpen": { "alias": "isOpen"; "required": true; }; }, { "onHide": "onHide"; }, never, ["*"], true, never>;
 }
