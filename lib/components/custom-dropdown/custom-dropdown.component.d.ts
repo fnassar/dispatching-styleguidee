@@ -19,6 +19,7 @@ export declare class CustomDropdownComponent {
     isOpen: boolean;
     filteredOptions: IDropdownOption[];
     filterText: string;
+    init: boolean;
     ngOnInit(): void;
     get selectedOption(): IDropdownOption | null;
     toggleDropdown(): void;
