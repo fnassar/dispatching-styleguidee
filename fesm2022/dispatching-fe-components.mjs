@@ -666,6 +666,7 @@ class CommonHttpService {
             throw new Error('API_BASE_URL is not provided!');
         }
         endpoint = endpoint.startsWith('/') ? endpoint.substring(1) : endpoint;
+        console.log('[apiBaseUrl]', `${this.baseUrl}/${endpoint}`);
         return `${this.baseUrl}/${endpoint}`;
     }
     CommonPostRequests(url, body, options) {

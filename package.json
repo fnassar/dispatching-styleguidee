@@ -1,6 +1,6 @@
 {
   "name": "dispatching-fe-components",
-  "version": "0.0.0-watch+1756027127923",
+  "version": "0.0.0-watch+1756189950892",
   "peerDependencies": {
     "@angular/common": "^19.2.0",
     "@angular/core": "^19.2.0",
