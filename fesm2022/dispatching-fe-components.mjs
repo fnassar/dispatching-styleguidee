@@ -341,6 +341,7 @@ class AuthBeService {
         this.baseUrl = baseUrl;
     }
     login(data) {
+        console.log('apiBaseUrl: ', this.baseUrl);
         return this.http.post(`${this.baseUrl}/api/v1/idm/auth/login`, { username: data.username, password: data.password }, {
             context: new HttpContext().set(SKIP_TOKEN, true),
         });
