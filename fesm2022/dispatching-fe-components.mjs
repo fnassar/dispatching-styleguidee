@@ -2008,15 +2008,15 @@ class CustomCalenderFormComponent {
         if (!this.value)
             return '';
         try {
-            console.log(this.value.toLocaleDateString('en-GB', {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric'
-            }));
+            //          console.log(    this.value.toLocaleDateString('en-GB', {
+            //   day: '2-digit',
+            //   month: '2-digit',
+            //   year: 'numeric'
+            // }))
             return this.value.toLocaleDateString('en-GB', {
                 day: '2-digit',
                 month: '2-digit',
-                year: 'numeric'
+                year: 'numeric',
             });
         }
         catch (error) {
@@ -2269,9 +2269,9 @@ class CustomDropdownFormComponent {
     ngOnInit() {
         this.filteredOptions = [...this.options];
         this.setupFormControlSubscription();
-        if (this.disabled) {
-            this.parentForm.controls[this.controlName].disable();
-        }
+        // if (this.disabled) {
+        //   this.parentForm.controls[this.controlName].disable();
+        // }
     }
     ngOnChanges(changes) {
         // This will trigger when options are loaded from the parent
@@ -2467,6 +2467,7 @@ class CustomInputFormComponent {
         return this.validation.some((error) => error.errorType.includes(ComponentFormErrorConstant.REQUIRED));
     }
     ngOnInit() {
+        // TODO: CHECK if should remove
         if (this.disabled) {
             this.parentForm.controls[this.controlName].disable();
         }
@@ -2643,9 +2644,9 @@ class CustomMultiSelectFormComponent {
         else {
             this.parentForm.get(this.controlName)?.setValue([]);
         }
-        if (this.disabled) {
-            this.parentForm.controls[this.controlName].disable();
-        }
+        // if (this.disabled) {
+        //   this.parentForm.controls[this.controlName].disable();
+        // }
     }
     get selectedOptions() {
         const value = this.parentForm.get(this.controlName)?.value || [];
