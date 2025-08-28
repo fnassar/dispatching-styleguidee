@@ -4391,8 +4391,8 @@ class CustomConfirmPopupComponent {
         }
     }
     onOverlayClick(event) {
-        this.overlayClicked.emit(true);
         if (event.target === event.currentTarget) {
+            this.overlayClicked.emit(true);
             this.isVisible = false;
         }
     }
