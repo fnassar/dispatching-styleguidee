@@ -51,3 +51,4 @@ export * from './custom-actions-dropdown/custom-actions-dropdown.component';
 export * from './custom-reactive-search-input/custom-reactive-search-input.component';
 export * from './custom-filter-dropdown/custom-filter-dropdown.component';
 export * from './custom-filter-dynamic-form/custom-filter-dynamic-form.component';
+export * from './custom-place-holder/custom-place-holder.component';
