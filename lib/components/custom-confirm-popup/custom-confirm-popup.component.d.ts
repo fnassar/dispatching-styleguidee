@@ -14,7 +14,6 @@ export declare class CustomConfirmPopupComponent {
     cancelEvent: EventEmitter<void>;
     extraEvent: EventEmitter<void>;
     overlayClicked: EventEmitter<boolean>;
-    showSuccessScreen: import("@angular/core").InputSignal<boolean>;
     successMsg: import("@angular/core").InputSignal<string>;
     checkedInfoSvg: SafeHtml;
     checkIcon: SafeHtml;
@@ -23,6 +22,9 @@ export declare class CustomConfirmPopupComponent {
     successPressed: boolean;
     isVisible: boolean;
     eventVal: any;
+    private _showSuccessScreen;
+    set showSuccessScreen(value: boolean);
+    get showSuccessScreen(): boolean;
     constructor(sanitizer: DomSanitizer, loadingService: LoadingService);
     ngOnInit(): void;
     private watchSuccessScreen;
@@ -35,5 +37,5 @@ export declare class CustomConfirmPopupComponent {
     startAnimation(event: any): void;
     doneAnimation(event: any): void;
     static ɵfac: i0.ɵɵFactoryDeclaration<CustomConfirmPopupComponent, never>;
-    static ɵcmp: i0.ɵɵComponentDeclaration<CustomConfirmPopupComponent, "custom-confirm-popup", never, { "message": { "alias": "message"; "required": true; }; "type": { "alias": "type"; "required": true; }; "confirmButtonText": { "alias": "confirmButtonText"; "required": false; }; "cancelButtonText": { "alias": "cancelButtonText"; "required": false; }; "extraButton": { "alias": "extraButton"; "required": false; }; "showSuccessScreen": { "alias": "showSuccessScreen"; "required": false; "isSignal": true; }; "successMsg": { "alias": "successMsg"; "required": false; "isSignal": true; }; }, { "confirmEvent": "confirmEvent"; "cancelEvent": "cancelEvent"; "extraEvent": "extraEvent"; "overlayClicked": "overlayClicked"; }, never, never, true, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<CustomConfirmPopupComponent, "custom-confirm-popup", never, { "message": { "alias": "message"; "required": true; }; "type": { "alias": "type"; "required": true; }; "confirmButtonText": { "alias": "confirmButtonText"; "required": false; }; "cancelButtonText": { "alias": "cancelButtonText"; "required": false; }; "extraButton": { "alias": "extraButton"; "required": false; }; "successMsg": { "alias": "successMsg"; "required": false; "isSignal": true; }; "showSuccessScreen": { "alias": "showSuccessScreen"; "required": false; }; }, { "confirmEvent": "confirmEvent"; "cancelEvent": "cancelEvent"; "extraEvent": "extraEvent"; "overlayClicked": "overlayClicked"; }, never, never, true, never>;
 }
