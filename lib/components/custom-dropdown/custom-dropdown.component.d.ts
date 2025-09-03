@@ -13,7 +13,7 @@ export declare class CustomDropdownComponent {
     showClear: boolean;
     options: IDropdownOption[];
     name?: string;
-    value: any;
+    value: number | string;
     valueChange: EventEmitter<IDropdownOption | null>;
     height: string;
     isOpen: boolean;
