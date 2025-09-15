@@ -19,6 +19,7 @@ export declare class CustomCalenderFormComponent {
     disabled: boolean;
     valueChange: EventEmitter<Date | null>;
     height: string;
+    viewType: 'base' | 'ai-plan';
     showCalendarForm: boolean;
     currentMonth: Date;
     days: Date[];
@@ -49,5 +50,5 @@ export declare class CustomCalenderFormComponent {
     formatDisplayDate(): string;
     containRequiredError(): boolean;
     static ɵfac: i0.ɵɵFactoryDeclaration<CustomCalenderFormComponent, never>;
-    static ɵcmp: i0.ɵɵComponentDeclaration<CustomCalenderFormComponent, "custom-calender-form", never, { "label": { "alias": "label"; "required": false; }; "placeholder": { "alias": "placeholder"; "required": false; }; "labelClass": { "alias": "labelClass"; "required": false; }; "calendarPopUpClass": { "alias": "calendarPopUpClass"; "required": false; }; "calendarInputClass": { "alias": "calendarInputClass"; "required": false; }; "calendarContainerClass": { "alias": "calendarContainerClass"; "required": false; }; "componentClass": { "alias": "componentClass"; "required": false; }; "minDate": { "alias": "minDate"; "required": false; }; "maxDate": { "alias": "maxDate"; "required": false; }; "controlName": { "alias": "controlName"; "required": true; }; "parentForm": { "alias": "parentForm"; "required": true; }; "validation": { "alias": "validation"; "required": true; }; "name": { "alias": "name"; "required": true; }; "disabled": { "alias": "disabled"; "required": false; }; "height": { "alias": "height"; "required": false; }; }, { "valueChange": "valueChange"; }, never, never, true, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<CustomCalenderFormComponent, "custom-calender-form", never, { "label": { "alias": "label"; "required": false; }; "placeholder": { "alias": "placeholder"; "required": false; }; "labelClass": { "alias": "labelClass"; "required": false; }; "calendarPopUpClass": { "alias": "calendarPopUpClass"; "required": false; }; "calendarInputClass": { "alias": "calendarInputClass"; "required": false; }; "calendarContainerClass": { "alias": "calendarContainerClass"; "required": false; }; "componentClass": { "alias": "componentClass"; "required": false; }; "minDate": { "alias": "minDate"; "required": false; }; "maxDate": { "alias": "maxDate"; "required": false; }; "controlName": { "alias": "controlName"; "required": true; }; "parentForm": { "alias": "parentForm"; "required": true; }; "validation": { "alias": "validation"; "required": true; }; "name": { "alias": "name"; "required": true; }; "disabled": { "alias": "disabled"; "required": false; }; "height": { "alias": "height"; "required": false; }; "viewType": { "alias": "viewType"; "required": false; }; }, { "valueChange": "valueChange"; }, never, never, true, never>;
 }
