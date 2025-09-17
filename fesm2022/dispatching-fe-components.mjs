@@ -4206,9 +4206,8 @@ class CustomTimeInputFormComponent {
         }
     }
     setExcistValue() {
-        console.log('selectedHour: ', this.selectedHour);
         const timeString = this.parentForm.get(this.controlName)?.value; // e.g., "13:45:00"
-        const [hour, minute] = timeString.split(':');
+        const [hour, minute, sec] = timeString.split(':');
         this.selectedHour = Number(hour);
         if (this.selectedHour > 12) {
             this.selectedHour = this.selectedHour - 12;
@@ -4226,7 +4225,8 @@ class CustomTimeInputFormComponent {
     setFormValue() {
         let targetHour = this.selectedHour;
         let taregtMin = this.selectedMinute;
-        if (this.selectedHour && this.selectedMinute) {
+        if ((this.selectedHour !== undefined || this.selectedHour !== null) &&
+            (this.selectedMinute !== undefined || this.selectedMinute !== null)) {
             if (Number(this.selectedHour) < 10)
                 targetHour = `0${Number(this.selectedHour)}`;
             if (Number(this.selectedMinute) < 10)
@@ -4249,8 +4249,13 @@ class CustomTimeInputFormComponent {
         this.dropdownOpen.set(false);
         let h = Number(this.selectedHour);
         const m = Number(this.selectedMinute);
-        if (this.selectedPeriod == 'PM' && this.selectedHour != 12) {
-            this.selectedHour = Number(this.selectedHour) + 12;
+        if (this.selectedPeriod == 'PM' && h != 12) {
+            if (h < 12) {
+                this.selectedHour = h + 12;
+            }
+            else {
+                this.selectedHour = h;
+            }
         }
         if (this.selectedPeriod == 'AM' && this.selectedHour == 12) {
             this.selectedHour = '00';
