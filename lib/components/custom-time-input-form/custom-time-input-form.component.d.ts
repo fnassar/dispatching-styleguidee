@@ -30,6 +30,7 @@ export declare class CustomTimeInputFormComponent {
     confirmTime(): void;
     private setTimeFromString;
     displayTime(): string | null;
+    checkData(): void;
     static ɵfac: i0.ɵɵFactoryDeclaration<CustomTimeInputFormComponent, never>;
     static ɵcmp: i0.ɵɵComponentDeclaration<CustomTimeInputFormComponent, "custom-time-input-form", never, { "parentForm": { "alias": "parentForm"; "required": true; }; "name": { "alias": "name"; "required": true; }; "controlName": { "alias": "controlName"; "required": false; }; "label": { "alias": "label"; "required": false; }; "labelClass": { "alias": "labelClass"; "required": false; }; "inputClass": { "alias": "inputClass"; "required": false; }; "validation": { "alias": "validation"; "required": false; }; "defaultTime": { "alias": "defaultTime"; "required": false; }; "height": { "alias": "height"; "required": false; }; }, { "timeChange": "timeChange"; }, never, never, true, never>;
 }
