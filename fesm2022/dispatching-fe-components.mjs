@@ -2931,7 +2931,13 @@ class CustomPaginationComponent {
         const selectElement = +event.target.value;
         const maxPageNum = Math.ceil(this.totalCount() / selectElement);
         this.pageChange.emit({
-            page: this.page <= maxPageNum ? this.page : maxPageNum >= 1 ? maxPageNum : 1,
+            page: this.page <= maxPageNum
+                ? this.page >= 1
+                    ? this.page
+                    : 1
+                : maxPageNum >= 1
+                    ? maxPageNum
+                    : 1,
             pageSize: selectElement,
         });
     }
