@@ -10,6 +10,7 @@ export declare class CustomConfirmPopupComponent {
     confirmButtonText: string;
     cancelButtonText: string;
     extraButton: string;
+    confirmTitle: string;
     confirmEvent: EventEmitter<any>;
     cancelEvent: EventEmitter<void>;
     extraEvent: EventEmitter<void>;
@@ -17,6 +18,7 @@ export declare class CustomConfirmPopupComponent {
     successMsg: import("@angular/core").InputSignal<string>;
     checkedInfoSvg: SafeHtml;
     checkIcon: SafeHtml;
+    closeSvg: SafeHtml;
     currentView: 'confirmation' | 'success';
     successAnimationState: 'hidden' | 'visible';
     successPressed: boolean;
@@ -37,5 +39,5 @@ export declare class CustomConfirmPopupComponent {
     startAnimation(event: any): void;
     doneAnimation(event: any): void;
     static ɵfac: i0.ɵɵFactoryDeclaration<CustomConfirmPopupComponent, never>;
-    static ɵcmp: i0.ɵɵComponentDeclaration<CustomConfirmPopupComponent, "custom-confirm-popup", never, { "message": { "alias": "message"; "required": true; }; "type": { "alias": "type"; "required": true; }; "confirmButtonText": { "alias": "confirmButtonText"; "required": false; }; "cancelButtonText": { "alias": "cancelButtonText"; "required": false; }; "extraButton": { "alias": "extraButton"; "required": false; }; "successMsg": { "alias": "successMsg"; "required": false; "isSignal": true; }; "showSuccessScreen": { "alias": "showSuccessScreen"; "required": false; }; }, { "confirmEvent": "confirmEvent"; "cancelEvent": "cancelEvent"; "extraEvent": "extraEvent"; "overlayClicked": "overlayClicked"; }, never, never, true, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<CustomConfirmPopupComponent, "custom-confirm-popup", never, { "message": { "alias": "message"; "required": true; }; "type": { "alias": "type"; "required": true; }; "confirmButtonText": { "alias": "confirmButtonText"; "required": false; }; "cancelButtonText": { "alias": "cancelButtonText"; "required": false; }; "extraButton": { "alias": "extraButton"; "required": false; }; "confirmTitle": { "alias": "confirmTitle"; "required": false; }; "successMsg": { "alias": "successMsg"; "required": false; "isSignal": true; }; "showSuccessScreen": { "alias": "showSuccessScreen"; "required": false; }; }, { "confirmEvent": "confirmEvent"; "cancelEvent": "cancelEvent"; "extraEvent": "extraEvent"; "overlayClicked": "overlayClicked"; }, never, never, true, never>;
 }
