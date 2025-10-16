@@ -11,7 +11,7 @@ import * as i1$3 from '@angular/forms';
 import { FormsModule, ReactiveFormsModule, FormArray, FormGroup, Validators, FormControl } from '@angular/forms';
 import * as i1$2 from '@angular/common';
 import { isPlatformBrowser, CommonModule, NgStyle, NgClass, NgComponentOutlet, NgTemplateOutlet } from '@angular/common';
-import { trigger, transition, style, animate, state, keyframes } from '@angular/animations';
+import { trigger, transition, style, animate, state, keyframes, group, query } from '@angular/animations';
 import * as i1$4 from '@angular/platform-browser';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
@@ -4390,27 +4390,26 @@ i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.15", ngImpo
                 type: Output
             }] } });
 
-const infoSvg = '<svg width="170" height="inherit" viewBox="0 0 150 149" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M75.2708 136.357C41.0382 136.357 13.2873 108.606 13.2873 74.3741C13.2873 40.1415 41.0382 12.3906 75.2708 12.3906C109.503 12.3906 137.254 40.1415 137.254 74.3741C137.254 108.606 109.503 136.357 75.2708 136.357ZM75.2708 123.961C102.657 123.961 124.857 101.76 124.857 74.3741C124.857 46.988 102.657 24.7873 75.2708 24.7873C47.8847 24.7873 25.684 46.988 25.684 74.3741C25.684 101.76 47.8847 123.961 75.2708 123.961ZM69.0724 43.3823H81.4691V55.779H69.0724V43.3823ZM69.0724 68.1757H81.4691V105.366H69.0724V68.1757Z" fill="currentColor"/></svg>';
+const infoSvg = '<svg width="170" height="inherit" viewBox="0 0 150 149" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M75.2708 136.357C41.0382 136.357 13.2873 108.606 13.2873 74.3741C13.2873 40.1415 41.0382 12.3906 75.2708 12.3906C109.503 12.3906 137.254 40.1415 137.254 74.3741C137.254 108.606 109.503 136.357 75.2708 136.357ZM75.2708 123.961C102.657 123.961 124.857 101.76 124.857 74.3741C124.857 46.988 102.657 24.7873 75.2708 24.7873C47.8847 24.7873 25.684 46.988 25.684 74.3741C25.684 101.76 47.8847 123.961 75.2708 123.961ZM69.0724 43.3823H81.4691V55.779H69.0724V43.3823ZM69.0724 68.1757H81.4691V105.366H69.0724V68.1757Z" fill="white"/></svg>';
 const checkIcon = `<svg width="inherit" height="inherit" viewBox="0 0 130 130" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path d="M13 65C13 36.2812 36.2812 13 65 13C93.7189 13 117 36.2812 117 65C117 93.7189 93.7189 117 65 117C36.2812 117 13 93.7189 13 65ZM65 0C29.1015 0 0 29.1015 0 65C0 100.898 29.1015 130 65 130C100.898 130 130 100.898 130 65C130 29.1015 100.898 0 65 0ZM100.471 48.4712L91.2789 39.2788L58.5 72.0577L40.3462 53.9039L31.1538 63.0961L58.5 90.4423L100.471 48.4712Z" fill="white"/>
 </svg>
 `;
-const closeSvg = `<svg width="24" height="inherit" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g opacity="0.3" clip-path="url(#clip0_18143_59842)"><path d="M22.2853 1.71436L1.71387 22.2858" stroke="#06213d" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M1.71387 1.71436L22.2853 22.2858" stroke="#06213d" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></g><defs><clipPath id="clip0_18143_59842"><rect width="24" height="24" fill="white"/></clipPath></defs></svg>`;
 
 const showSuccess = [
     state('void', style({
         opacity: 0,
-        height: '0',
+        height: '9.56em',
     })),
     state('visible', style({
         opacity: 1,
-        height: '20em',
+        height: '26.7em',
     })),
     transition('void => visible', [
         animate('2s ease-in-out', keyframes([
-            style({ opacity: 0, height: '0', offset: 0 }),
-            //         style({ opacity: 0.5, height: '5em', offset: 0.5 }),
-            style({ opacity: 1, height: '20em', offset: 1 }),
+            style({ opacity: 0, height: '9.56em', offset: 0 }),
+            style({ opacity: 0, height: '7em', offset: 0.5 }),
+            style({ opacity: 1, height: '26.7em', offset: 1 }),
         ])),
     ]),
 ];
@@ -4418,65 +4417,35 @@ const hideConfirm = [
     state('void', style({})),
     state('visible', style({})),
     transition('visible => void', [
-        animate('2s ease-in-out', keyframes([
-            style({
-                opacity: 1,
-                height: '*',
-                offset: 0,
-                top: 'calc(-12.6em + 50%)',
-            }),
-            style({
-                opacity: 0,
-                height: '0',
-                offset: 1,
-                'min-height': 0,
-                top: 'calc(-12.6em + 50% + 20em)',
-            }),
-        ])),
-        // group([
-        // query(
-        //   '.slide-opposite-element',
-        //   [
-        //     animate(
-        //       '10s ease-in-out',
-        //       keyframes([
-        //         style({ opacity: 1, height: '10em', offset: 0 }),
-        //         style({ opacity: 0.5, height: '5em', offset: 0.5 }),
-        //         style({ opacity: 0, height: '0', offset: 1 }),
-        //       ])
-        //     ),
-        //   ],
-        //   { optional: true }
-        // ),
-        // query(
-        //   '.fade-element',
-        //   [
-        //     animate(
-        //       '1s ease-in-out',
-        //       style({
-        //         opacity: 0,
-        //       })
-        //     ),
-        //   ],
-        //   { optional: true }
-        // ),
-        // query(
-        //   '.slide-element',
-        //   [
-        //     animate(
-        //       '10s ease-in-out',
-        //       keyframes([
-        //         style({ opacity: 1, height: '9.56em', offset: 0 }),
-        //         style({ opacity: 0.5, height: '7em', offset: 0.5 }),
-        //         style({ opacity: 0, height: '26.7em', offset: 1 }),
-        //       ])
-        //     ),
-        //   ],
-        //   { optional: true }
-        // ),
-        // ]),
+        group([
+            query('.fade-element', [
+                animate('1s ease-in-out', style({
+                    opacity: 0,
+                })),
+            ], { optional: true }),
+            query('.slide-element', [
+                animate('2s ease-in-out', keyframes([
+                    style({ opacity: 1, height: '9.56em', offset: 0 }),
+                    style({ opacity: 0.5, height: '7em', offset: 0.5 }),
+                    style({ opacity: 0, height: '26.7em', offset: 1 }),
+                ])),
+            ], { optional: true }),
+        ]),
     ]),
 ];
+// const closePopup = [
+//   transition(':leave', [
+//     style({
+//       opacity: 1,
+//       // overflow: 'hidden',
+//       transform: 'translateY(0)',
+//     }),
+//     animate(
+//       '200ms ease-in',
+//       style({ opacity: 0, transform: 'translateY(-100%)' })
+//     ),
+//   ]),
+// ];
 class CustomConfirmPopupComponent {
     sanitizer;
     loadingService;
@@ -4485,7 +4454,6 @@ class CustomConfirmPopupComponent {
     confirmButtonText = 'YES';
     cancelButtonText = 'NO';
     extraButton;
-    confirmTitle = 'Confirmation';
     confirmEvent = new EventEmitter();
     cancelEvent = new EventEmitter();
     extraEvent = new EventEmitter();
@@ -4493,7 +4461,6 @@ class CustomConfirmPopupComponent {
     successMsg = input('');
     checkedInfoSvg;
     checkIcon;
-    closeSvg;
     // Animation states
     currentView = 'confirmation';
     successAnimationState = 'hidden';
@@ -4519,7 +4486,6 @@ class CustomConfirmPopupComponent {
         const infoSvgIcon = infoSvg;
         this.checkedInfoSvg = this.sanitizer.bypassSecurityTrustHtml(infoSvgIcon);
         this.checkIcon = this.sanitizer.bypassSecurityTrustHtml(checkIcon);
-        this.closeSvg = this.sanitizer.bypassSecurityTrustHtml(closeSvg);
     }
     ngOnInit() {
         this.watchSuccessScreen();
@@ -4570,7 +4536,7 @@ class CustomConfirmPopupComponent {
         // console.log('DONE', event);
     }
     static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "19.2.15", ngImport: i0, type: CustomConfirmPopupComponent, deps: [{ token: i1$4.DomSanitizer }, { token: LoadingService }], target: i0.ɵɵFactoryTarget.Component });
-    static ɵcmp = i0.ɵɵngDeclareComponent({ minVersion: "17.0.0", version: "19.2.15", type: CustomConfirmPopupComponent, isStandalone: true, selector: "custom-confirm-popup", inputs: { message: { classPropertyName: "message", publicName: "message", isSignal: false, isRequired: true, transformFunction: null }, type: { classPropertyName: "type", publicName: "type", isSignal: false, isRequired: true, transformFunction: null }, confirmButtonText: { classPropertyName: "confirmButtonText", publicName: "confirmButtonText", isSignal: false, isRequired: false, transformFunction: null }, cancelButtonText: { classPropertyName: "cancelButtonText", publicName: "cancelButtonText", isSignal: false, isRequired: false, transformFunction: null }, extraButton: { classPropertyName: "extraButton", publicName: "extraButton", isSignal: false, isRequired: false, transformFunction: null }, confirmTitle: { classPropertyName: "confirmTitle", publicName: "confirmTitle", isSignal: false, isRequired: false, transformFunction: null }, successMsg: { classPropertyName: "successMsg", publicName: "successMsg", isSignal: true, isRequired: false, transformFunction: null }, showSuccessScreen: { classPropertyName: "showSuccessScreen", publicName: "showSuccessScreen", isSignal: false, isRequired: false, transformFunction: null } }, outputs: { confirmEvent: "confirmEvent", cancelEvent: "cancelEvent", extraEvent: "extraEvent", overlayClicked: "overlayClicked" }, usesOnChanges: true, ngImport: i0, template: "<div class=\"popup-overlay\" *ngIf=\"isVisible\" (click)=\"onOverlayClick($event)\">\n  @if(!showSuccessScreen){\n  <div\n    style=\"\n      overflow: hidden;\n      width: 25em;\n      height: min-content;\n      min-width: 21vw;\n      min-height: 15em;\n      position: absolute;\n      top: calc(-12.6em + 50%);\n      border-radius: 0.9em;\n    \"\n    [@slideAndFade]=\"currentView === 'confirmation' ? 'visible' : 'hidden'\"\n    (@slideAndFade.start)=\"startAnimation($event)\"\n    (@slideAndFade.done)=\"doneAnimation($event)\"\n  >\n    <div class=\"popup-container\" [ngClass]=\"type\">\n      <div class=\"popup-header slide-element\">\n        <div class=\"header-main fade-element\">\n          <div class=\"popup-icon\" [innerHTML]=\"checkedInfoSvg\"></div>\n          <h2 class=\"popup-title\">{{ confirmTitle }}</h2>\n        </div>\n        <div\n          class=\"popup-close\"\n          [innerHTML]=\"closeSvg\"\n          (click)=\"close(); cancelEvent.emit()\"\n        ></div>\n      </div>\n      <div class=\"popup-message slide-opposite-element\">\n        <p>{{ message }}</p>\n      </div>\n      <div\n        class=\"popup-actions\"\n        [ngClass]=\"{\n          'three-buttons': extraButton,\n          'two-buttons': !extraButton\n        }\"\n      >\n        <button class=\"btn no-btn\" (click)=\"close(); cancelEvent.emit()\">\n          {{ cancelButtonText }}\n        </button>\n        @if(extraButton) {\n        <button class=\"btn extra-btn\" (click)=\"extraEvent.emit(); close()\">\n          {{ extraButton }}\n        </button>\n        }\n\n        <button\n          class=\"btn yes-btn\"\n          [ngClass]=\"type\"\n          (click)=\"checkSuccess()\"\n          [disabled]=\"this.loadingService.loading() && successPressed\"\n        >\n          {{ confirmButtonText }}\n        </button>\n      </div>\n    </div>\n  </div>\n  }\n\n  <!-- <div style=\"position: relative; width: 37.7em; height: 26.7em\"> -->\n  @if(showSuccessScreen){\n  <div\n    class=\"success-container\"\n    [@showSuccess]=\"currentView === 'success' ? 'visible' : 'hidden'\"\n  >\n    <!-- [@closePopup]=\"isVisible\" -->\n    <div class=\"check-popup-icon\" [innerHTML]=\"checkIcon\"></div>\n    <p class=\"sucess-msg\">\n      {{ successMsg() }}\n    </p>\n  </div>\n  }\n  <!-- </div> -->\n</div>\n", styles: [".popup-overlay{position:fixed;inset:0;background:#0000001a;display:flex;align-items:center;justify-content:center;z-index:1000}.popup-container{background:#fff;border-radius:.9em;position:relative;box-shadow:0 4px 24px #0000001a;overflow:hidden;text-align:center;width:100%;height:100%;display:flex;flex-direction:column;justify-content:space-between}.popup-container.info .popup-header{color:#06213d80}.popup-container.delete .popup-header{color:#f43f5e}.popup-header{padding:.9em 1em .7em;border-bottom:1px solid #e8e8e8;display:flex;align-items:center;justify-content:space-between;flex-direction:row}.header-main{display:flex;align-items:center;justify-content:start;flex-direction:row;gap:1em}.popup-close{height:1em;cursor:pointer}.popup-icon{width:2em;height:2em;margin:0 0 0 .5em;display:flex;align-items:center;justify-content:center}.popup-title{font-family:var(--FM-Medium);font-size:1.3em}.popup-message{padding:1.5em 1em 0;min-height:5em;display:flex;justify-content:center;align-items:center}.popup-message p{font-size:1.3em;color:#06213db3;font-weight:600;margin:auto}.popup-actions{display:flex;justify-content:center;gap:24px;padding:1.5em 2em}.popup-actions.three-buttons{gap:18px}.btn{min-width:5.5em;height:2.8125em;border:none;border-radius:.7em;font-size:1.1em;font-weight:500;cursor:pointer;transition:background .2s;color:#fff}.btn:hover{box-shadow:inset 0 0 0 1000px #fff5}.btn:disabled{position:relative;opacity:.5!important;cursor:not-allowed!important;color:transparent}.btn:disabled:after{content:\"\";position:absolute;top:50%;left:50%;width:16px;height:16px;margin:-8px 0 0 -8px;border:2px solid rgba(0,0,0,.2);border-top-color:#0009;border-radius:50%;animation:spin 1s linear infinite;pointer-events:none}@keyframes spin{0%{transform:rotate(0)}to{transform:rotate(360deg)}}.popup-actions .btn{margin:0}.three-buttons .no-btn{background-color:#ff4c4c}.three-buttons .yes-btn{background-color:#25c7bc}.three-buttons .extra-btn{background-color:#06213d}.two-buttons .yes-btn.info{background:#25c7bc}.two-buttons .yes-btn.delete{background:#ff4c4c}.two-buttons .no-btn{background:#06213d}.success-container{display:flex;flex-direction:column;justify-content:center;align-items:center;background-color:#25c7bc;color:#fff;padding:1.5em 3em;border-radius:.9em;width:30em;height:20em;position:absolute;top:calc(-12.6em + 50%)}.check-popup-icon{width:11em;max-height:11em;height:80%;margin:1.5em auto;display:flex;align-items:center;justify-content:center}.sucess-msg{font-size:1.3em;text-align:center}\n"], dependencies: [{ kind: "ngmodule", type: CommonModule }, { kind: "directive", type: i1$2.NgClass, selector: "[ngClass]", inputs: ["class", "ngClass"] }, { kind: "directive", type: i1$2.NgIf, selector: "[ngIf]", inputs: ["ngIf", "ngIfThen", "ngIfElse"] }], animations: [
+    static ɵcmp = i0.ɵɵngDeclareComponent({ minVersion: "17.0.0", version: "19.2.15", type: CustomConfirmPopupComponent, isStandalone: true, selector: "custom-confirm-popup", inputs: { message: { classPropertyName: "message", publicName: "message", isSignal: false, isRequired: true, transformFunction: null }, type: { classPropertyName: "type", publicName: "type", isSignal: false, isRequired: true, transformFunction: null }, confirmButtonText: { classPropertyName: "confirmButtonText", publicName: "confirmButtonText", isSignal: false, isRequired: false, transformFunction: null }, cancelButtonText: { classPropertyName: "cancelButtonText", publicName: "cancelButtonText", isSignal: false, isRequired: false, transformFunction: null }, extraButton: { classPropertyName: "extraButton", publicName: "extraButton", isSignal: false, isRequired: false, transformFunction: null }, successMsg: { classPropertyName: "successMsg", publicName: "successMsg", isSignal: true, isRequired: false, transformFunction: null }, showSuccessScreen: { classPropertyName: "showSuccessScreen", publicName: "showSuccessScreen", isSignal: false, isRequired: false, transformFunction: null } }, outputs: { confirmEvent: "confirmEvent", cancelEvent: "cancelEvent", extraEvent: "extraEvent", overlayClicked: "overlayClicked" }, usesOnChanges: true, ngImport: i0, template: "<div class=\"popup-overlay\" *ngIf=\"isVisible\" (click)=\"onOverlayClick($event)\">\n  @if(!showSuccessScreen){\n  <div\n    style=\"\n      overflow: hidden;\n      width: 37.7em;\n      height: 25.375em;\n      position: absolute;\n      top: calc(-12.6em + 50%);\n    \"\n    [@slideAndFade]=\"currentView === 'confirmation' ? 'visible' : 'hidden'\"\n    (@slideAndFade.start)=\"startAnimation($event)\"\n    (@slideAndFade.done)=\"doneAnimation($event)\"\n  >\n    <div class=\"popup-container\" [ngClass]=\"type\">\n      <div class=\"popup-header slide-element\">\n        <div class=\"popup-icon fade-element\" [innerHTML]=\"checkedInfoSvg\"></div>\n      </div>\n      <div class=\"popup-message\">\n        <p>{{ message }}</p>\n      </div>\n      <div\n        class=\"popup-actions\"\n        [ngClass]=\"{\n          'three-buttons': extraButton,\n          'two-buttons': !extraButton\n        }\"\n      >\n        <button\n          class=\"btn no-btn\"\n          (click)=\"close(); cancelEvent.emit(); close()\"\n        >\n          {{ cancelButtonText }}\n        </button>\n        @if(extraButton) {\n        <button class=\"btn extra-btn\" (click)=\"extraEvent.emit(); close()\">\n          {{ extraButton }}\n        </button>\n        }\n\n        <button\n          class=\"btn yes-btn\"\n          [ngClass]=\"type\"\n          (click)=\"checkSuccess()\"\n          [disabled]=\"this.loadingService.loading() && successPressed\"\n        >\n          {{ confirmButtonText }}\n        </button>\n      </div>\n    </div>\n  </div>\n  }\n\n  <!-- <div style=\"position: relative; width: 37.7em; height: 26.7em\"> -->\n  @if(showSuccessScreen){\n  <div\n    class=\"success-container\"\n    [@showSuccess]=\"currentView === 'success' ? 'visible' : 'hidden'\"\n  >\n    <!-- [@closePopup]=\"isVisible\" -->\n    <div class=\"check-popup-icon\" [innerHTML]=\"checkIcon\"></div>\n    <p class=\"sucess-msg\">\n      {{ successMsg() }}\n    </p>\n  </div>\n  }\n  <!-- </div> -->\n</div>\n", styles: [".popup-overlay{position:fixed;inset:0;background:#0000001a;display:flex;align-items:center;justify-content:center;z-index:1000}.popup-container{background:#fff;border-radius:.9em;min-width:33em;max-width:95vw;box-shadow:0 4px 24px #0000001a;overflow:hidden;text-align:center;width:37.7em;height:25.375em;position:absolute}.popup-container.info .popup-header{background:#3b80aa}.popup-container.delete .popup-header{background:#f43f5e}.popup-header{padding:2em 0 1em}.popup-icon{width:110px;height:110px;margin:0 auto;display:flex;align-items:center;justify-content:center}.popup-message{padding:3em 2em 0}.popup-message p{font-size:1.3em;color:#707070;font-weight:600;margin:auto}.popup-actions{display:flex;justify-content:center;gap:24px;padding:3em 4em 4em}.popup-actions.three-buttons{gap:18px}.btn{min-width:5.5em;padding:1em 1.5em;border:none;border-radius:.7em;font-size:1.1em;font-weight:500;cursor:pointer;transition:background .2s;color:#fff}.btn:disabled{position:relative;opacity:.5!important;cursor:not-allowed!important;color:transparent}.btn:disabled:after{content:\"\";position:absolute;top:50%;left:50%;width:16px;height:16px;margin:-8px 0 0 -8px;border:2px solid rgba(0,0,0,.2);border-top-color:#0009;border-radius:50%;animation:spin 1s linear infinite;pointer-events:none}@keyframes spin{0%{transform:rotate(0)}to{transform:rotate(360deg)}}.popup-actions .btn{margin:0}.three-buttons .no-btn{background-color:#ff4c4c}.three-buttons .yes-btn{background-color:#25c7bc}.three-buttons .extra-btn{background-color:#06213d}.two-buttons .yes-btn.info{background:#25c7bc}.two-buttons .yes-btn.delete{background:#ff4c4c}.two-buttons .no-btn{background:#06213d}.success-container{display:flex;flex-direction:column;justify-content:center;align-items:center;background-color:#25c7bc;color:#fff;padding:1.5em 3em;border-radius:.9em;width:37.7em;height:26.7em;position:absolute;top:calc(-12.6em + 50%)}.check-popup-icon{width:11em;max-height:11em;height:80%;margin:2em auto;display:flex;align-items:center;justify-content:center}.sucess-msg{font-size:1.3em;text-align:center}\n"], dependencies: [{ kind: "ngmodule", type: CommonModule }, { kind: "directive", type: i1$2.NgClass, selector: "[ngClass]", inputs: ["class", "ngClass"] }, { kind: "directive", type: i1$2.NgIf, selector: "[ngIf]", inputs: ["ngIf", "ngIfThen", "ngIfElse"] }], animations: [
             trigger('slideAndFade', hideConfirm),
             trigger('showSuccess', showSuccess),
             // trigger('closePopup', closePopup),
@@ -4582,7 +4548,7 @@ i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.15", ngImpo
                         trigger('slideAndFade', hideConfirm),
                         trigger('showSuccess', showSuccess),
                         // trigger('closePopup', closePopup),
-                    ], template: "<div class=\"popup-overlay\" *ngIf=\"isVisible\" (click)=\"onOverlayClick($event)\">\n  @if(!showSuccessScreen){\n  <div\n    style=\"\n      overflow: hidden;\n      width: 25em;\n      height: min-content;\n      min-width: 21vw;\n      min-height: 15em;\n      position: absolute;\n      top: calc(-12.6em + 50%);\n      border-radius: 0.9em;\n    \"\n    [@slideAndFade]=\"currentView === 'confirmation' ? 'visible' : 'hidden'\"\n    (@slideAndFade.start)=\"startAnimation($event)\"\n    (@slideAndFade.done)=\"doneAnimation($event)\"\n  >\n    <div class=\"popup-container\" [ngClass]=\"type\">\n      <div class=\"popup-header slide-element\">\n        <div class=\"header-main fade-element\">\n          <div class=\"popup-icon\" [innerHTML]=\"checkedInfoSvg\"></div>\n          <h2 class=\"popup-title\">{{ confirmTitle }}</h2>\n        </div>\n        <div\n          class=\"popup-close\"\n          [innerHTML]=\"closeSvg\"\n          (click)=\"close(); cancelEvent.emit()\"\n        ></div>\n      </div>\n      <div class=\"popup-message slide-opposite-element\">\n        <p>{{ message }}</p>\n      </div>\n      <div\n        class=\"popup-actions\"\n        [ngClass]=\"{\n          'three-buttons': extraButton,\n          'two-buttons': !extraButton\n        }\"\n      >\n        <button class=\"btn no-btn\" (click)=\"close(); cancelEvent.emit()\">\n          {{ cancelButtonText }}\n        </button>\n        @if(extraButton) {\n        <button class=\"btn extra-btn\" (click)=\"extraEvent.emit(); close()\">\n          {{ extraButton }}\n        </button>\n        }\n\n        <button\n          class=\"btn yes-btn\"\n          [ngClass]=\"type\"\n          (click)=\"checkSuccess()\"\n          [disabled]=\"this.loadingService.loading() && successPressed\"\n        >\n          {{ confirmButtonText }}\n        </button>\n      </div>\n    </div>\n  </div>\n  }\n\n  <!-- <div style=\"position: relative; width: 37.7em; height: 26.7em\"> -->\n  @if(showSuccessScreen){\n  <div\n    class=\"success-container\"\n    [@showSuccess]=\"currentView === 'success' ? 'visible' : 'hidden'\"\n  >\n    <!-- [@closePopup]=\"isVisible\" -->\n    <div class=\"check-popup-icon\" [innerHTML]=\"checkIcon\"></div>\n    <p class=\"sucess-msg\">\n      {{ successMsg() }}\n    </p>\n  </div>\n  }\n  <!-- </div> -->\n</div>\n", styles: [".popup-overlay{position:fixed;inset:0;background:#0000001a;display:flex;align-items:center;justify-content:center;z-index:1000}.popup-container{background:#fff;border-radius:.9em;position:relative;box-shadow:0 4px 24px #0000001a;overflow:hidden;text-align:center;width:100%;height:100%;display:flex;flex-direction:column;justify-content:space-between}.popup-container.info .popup-header{color:#06213d80}.popup-container.delete .popup-header{color:#f43f5e}.popup-header{padding:.9em 1em .7em;border-bottom:1px solid #e8e8e8;display:flex;align-items:center;justify-content:space-between;flex-direction:row}.header-main{display:flex;align-items:center;justify-content:start;flex-direction:row;gap:1em}.popup-close{height:1em;cursor:pointer}.popup-icon{width:2em;height:2em;margin:0 0 0 .5em;display:flex;align-items:center;justify-content:center}.popup-title{font-family:var(--FM-Medium);font-size:1.3em}.popup-message{padding:1.5em 1em 0;min-height:5em;display:flex;justify-content:center;align-items:center}.popup-message p{font-size:1.3em;color:#06213db3;font-weight:600;margin:auto}.popup-actions{display:flex;justify-content:center;gap:24px;padding:1.5em 2em}.popup-actions.three-buttons{gap:18px}.btn{min-width:5.5em;height:2.8125em;border:none;border-radius:.7em;font-size:1.1em;font-weight:500;cursor:pointer;transition:background .2s;color:#fff}.btn:hover{box-shadow:inset 0 0 0 1000px #fff5}.btn:disabled{position:relative;opacity:.5!important;cursor:not-allowed!important;color:transparent}.btn:disabled:after{content:\"\";position:absolute;top:50%;left:50%;width:16px;height:16px;margin:-8px 0 0 -8px;border:2px solid rgba(0,0,0,.2);border-top-color:#0009;border-radius:50%;animation:spin 1s linear infinite;pointer-events:none}@keyframes spin{0%{transform:rotate(0)}to{transform:rotate(360deg)}}.popup-actions .btn{margin:0}.three-buttons .no-btn{background-color:#ff4c4c}.three-buttons .yes-btn{background-color:#25c7bc}.three-buttons .extra-btn{background-color:#06213d}.two-buttons .yes-btn.info{background:#25c7bc}.two-buttons .yes-btn.delete{background:#ff4c4c}.two-buttons .no-btn{background:#06213d}.success-container{display:flex;flex-direction:column;justify-content:center;align-items:center;background-color:#25c7bc;color:#fff;padding:1.5em 3em;border-radius:.9em;width:30em;height:20em;position:absolute;top:calc(-12.6em + 50%)}.check-popup-icon{width:11em;max-height:11em;height:80%;margin:1.5em auto;display:flex;align-items:center;justify-content:center}.sucess-msg{font-size:1.3em;text-align:center}\n"] }]
+                    ], template: "<div class=\"popup-overlay\" *ngIf=\"isVisible\" (click)=\"onOverlayClick($event)\">\n  @if(!showSuccessScreen){\n  <div\n    style=\"\n      overflow: hidden;\n      width: 37.7em;\n      height: 25.375em;\n      position: absolute;\n      top: calc(-12.6em + 50%);\n    \"\n    [@slideAndFade]=\"currentView === 'confirmation' ? 'visible' : 'hidden'\"\n    (@slideAndFade.start)=\"startAnimation($event)\"\n    (@slideAndFade.done)=\"doneAnimation($event)\"\n  >\n    <div class=\"popup-container\" [ngClass]=\"type\">\n      <div class=\"popup-header slide-element\">\n        <div class=\"popup-icon fade-element\" [innerHTML]=\"checkedInfoSvg\"></div>\n      </div>\n      <div class=\"popup-message\">\n        <p>{{ message }}</p>\n      </div>\n      <div\n        class=\"popup-actions\"\n        [ngClass]=\"{\n          'three-buttons': extraButton,\n          'two-buttons': !extraButton\n        }\"\n      >\n        <button\n          class=\"btn no-btn\"\n          (click)=\"close(); cancelEvent.emit(); close()\"\n        >\n          {{ cancelButtonText }}\n        </button>\n        @if(extraButton) {\n        <button class=\"btn extra-btn\" (click)=\"extraEvent.emit(); close()\">\n          {{ extraButton }}\n        </button>\n        }\n\n        <button\n          class=\"btn yes-btn\"\n          [ngClass]=\"type\"\n          (click)=\"checkSuccess()\"\n          [disabled]=\"this.loadingService.loading() && successPressed\"\n        >\n          {{ confirmButtonText }}\n        </button>\n      </div>\n    </div>\n  </div>\n  }\n\n  <!-- <div style=\"position: relative; width: 37.7em; height: 26.7em\"> -->\n  @if(showSuccessScreen){\n  <div\n    class=\"success-container\"\n    [@showSuccess]=\"currentView === 'success' ? 'visible' : 'hidden'\"\n  >\n    <!-- [@closePopup]=\"isVisible\" -->\n    <div class=\"check-popup-icon\" [innerHTML]=\"checkIcon\"></div>\n    <p class=\"sucess-msg\">\n      {{ successMsg() }}\n    </p>\n  </div>\n  }\n  <!-- </div> -->\n</div>\n", styles: [".popup-overlay{position:fixed;inset:0;background:#0000001a;display:flex;align-items:center;justify-content:center;z-index:1000}.popup-container{background:#fff;border-radius:.9em;min-width:33em;max-width:95vw;box-shadow:0 4px 24px #0000001a;overflow:hidden;text-align:center;width:37.7em;height:25.375em;position:absolute}.popup-container.info .popup-header{background:#3b80aa}.popup-container.delete .popup-header{background:#f43f5e}.popup-header{padding:2em 0 1em}.popup-icon{width:110px;height:110px;margin:0 auto;display:flex;align-items:center;justify-content:center}.popup-message{padding:3em 2em 0}.popup-message p{font-size:1.3em;color:#707070;font-weight:600;margin:auto}.popup-actions{display:flex;justify-content:center;gap:24px;padding:3em 4em 4em}.popup-actions.three-buttons{gap:18px}.btn{min-width:5.5em;padding:1em 1.5em;border:none;border-radius:.7em;font-size:1.1em;font-weight:500;cursor:pointer;transition:background .2s;color:#fff}.btn:disabled{position:relative;opacity:.5!important;cursor:not-allowed!important;color:transparent}.btn:disabled:after{content:\"\";position:absolute;top:50%;left:50%;width:16px;height:16px;margin:-8px 0 0 -8px;border:2px solid rgba(0,0,0,.2);border-top-color:#0009;border-radius:50%;animation:spin 1s linear infinite;pointer-events:none}@keyframes spin{0%{transform:rotate(0)}to{transform:rotate(360deg)}}.popup-actions .btn{margin:0}.three-buttons .no-btn{background-color:#ff4c4c}.three-buttons .yes-btn{background-color:#25c7bc}.three-buttons .extra-btn{background-color:#06213d}.two-buttons .yes-btn.info{background:#25c7bc}.two-buttons .yes-btn.delete{background:#ff4c4c}.two-buttons .no-btn{background:#06213d}.success-container{display:flex;flex-direction:column;justify-content:center;align-items:center;background-color:#25c7bc;color:#fff;padding:1.5em 3em;border-radius:.9em;width:37.7em;height:26.7em;position:absolute;top:calc(-12.6em + 50%)}.check-popup-icon{width:11em;max-height:11em;height:80%;margin:2em auto;display:flex;align-items:center;justify-content:center}.sucess-msg{font-size:1.3em;text-align:center}\n"] }]
         }], ctorParameters: () => [{ type: i1$4.DomSanitizer }, { type: LoadingService }], propDecorators: { message: [{
                 type: Input,
                 args: [{ required: true }]
@@ -4594,8 +4560,6 @@ i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.15", ngImpo
             }], cancelButtonText: [{
                 type: Input
             }], extraButton: [{
-                type: Input
-            }], confirmTitle: [{
                 type: Input
             }], confirmEvent: [{
                 type: Output
