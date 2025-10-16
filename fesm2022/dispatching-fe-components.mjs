@@ -4409,7 +4409,7 @@ const showSuccess = [
     transition('void => visible', [
         animate('2s ease-in-out', keyframes([
             style({ opacity: 0, height: '0', offset: 0 }),
-            // style({ opacity: 0, height: '9.56em', offset: 0.5 }),
+            //         style({ opacity: 0.5, height: '5em', offset: 0.5 }),
             style({ opacity: 1, height: '20em', offset: 1 }),
         ])),
     ]),
@@ -4418,9 +4418,21 @@ const hideConfirm = [
     state('void', style({})),
     state('visible', style({})),
     transition('visible => void', [
-        animate('2s ease-in-out', style({
-            opacity: 0,
-        })),
+        animate('2s ease-in-out', keyframes([
+            style({
+                opacity: 1,
+                height: '*',
+                offset: 0,
+                top: 'calc(-12.6em + 50%)',
+            }),
+            style({
+                opacity: 0,
+                height: '0',
+                offset: 1,
+                'min-height': 0,
+                top: 'calc(-12.6em + 50% + 20em)',
+            }),
+        ])),
         // group([
         // query(
         //   '.slide-opposite-element',
