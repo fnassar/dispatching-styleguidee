@@ -7,13 +7,19 @@ export declare class CustomPlateNumberInputFormComponent {
     labelClass: string;
     label: string;
     parentForm: FormGroup;
-    numberControlName: string;
-    lettersControlName: string;
+    controlName: string;
     validation: IComponentFormError[];
+    mainValidation: IComponentFormError[];
     maxNumberLength: number;
     maxLetterLength: number;
     valueChange: EventEmitter<string>;
+    PlateInputForm: FormGroup;
+    ngOnInit(): void;
     containRequiredError(): boolean;
+    updateParentForm(event?: Event | any): void;
+    getCombinedPlateNumber(): string;
+    patchValuesToForm(plateNumber: string): void;
+    resetForm(): void;
     static ɵfac: i0.ɵɵFactoryDeclaration<CustomPlateNumberInputFormComponent, never>;
-    static ɵcmp: i0.ɵɵComponentDeclaration<CustomPlateNumberInputFormComponent, "custom-plate-input-form", never, { "class": { "alias": "class"; "required": false; }; "labelClass": { "alias": "labelClass"; "required": false; }; "label": { "alias": "label"; "required": false; }; "parentForm": { "alias": "parentForm"; "required": true; }; "numberControlName": { "alias": "numberControlName"; "required": true; }; "lettersControlName": { "alias": "lettersControlName"; "required": true; }; "validation": { "alias": "validation"; "required": true; }; "maxNumberLength": { "alias": "maxNumberLength"; "required": false; }; "maxLetterLength": { "alias": "maxLetterLength"; "required": false; }; }, { "valueChange": "valueChange"; }, never, never, true, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<CustomPlateNumberInputFormComponent, "custom-plate-input-form", never, { "class": { "alias": "class"; "required": false; }; "labelClass": { "alias": "labelClass"; "required": false; }; "label": { "alias": "label"; "required": false; }; "parentForm": { "alias": "parentForm"; "required": true; }; "controlName": { "alias": "controlName"; "required": true; }; "validation": { "alias": "validation"; "required": true; }; "mainValidation": { "alias": "mainValidation"; "required": false; }; "maxNumberLength": { "alias": "maxNumberLength"; "required": false; }; "maxLetterLength": { "alias": "maxLetterLength"; "required": false; }; }, { "valueChange": "valueChange"; }, never, never, true, never>;
 }
