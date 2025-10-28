@@ -2523,8 +2523,12 @@ class CustomInputFormComponent {
         return this.validation.some((error) => error.errorType.includes(ComponentFormErrorConstant.REQUIRED));
     }
     onValueChange() {
-        if (!this.disabled) {
+        if (!this.disabled &&
+            this.parentForm.controls[this.controlName].value.length > 0) {
             this.parentForm.controls[this.controlName].markAsTouched();
+        }
+        else if (!this.disabled) {
+            this.parentForm.controls[this.controlName].markAsUntouched();
         }
     }
     ngOnInit() {
@@ -3198,8 +3202,12 @@ class CustomTextareaFormComponent {
         return this.validation.some((error) => error.errorType.includes(ComponentFormErrorConstant.REQUIRED));
     }
     onValueChange() {
-        if (!this.disabled) {
+        if (!this.disabled &&
+            this.parentForm.controls[this.controlName].value.length > 0) {
             this.parentForm.controls[this.controlName].markAsTouched();
+        }
+        else if (!this.disabled) {
+            this.parentForm.controls[this.controlName].markAsUntouched();
         }
     }
     getMaxLength() {
