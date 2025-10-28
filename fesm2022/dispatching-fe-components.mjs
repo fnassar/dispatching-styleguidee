@@ -2527,9 +2527,6 @@ class CustomInputFormComponent {
             this.parentForm.controls[this.controlName].value.length > 0) {
             this.parentForm.controls[this.controlName].markAsTouched();
         }
-        else if (!this.disabled) {
-            this.parentForm.controls[this.controlName].markAsUntouched();
-        }
     }
     ngOnInit() {
         // TODO: CHECK if should remove
@@ -3205,9 +3202,6 @@ class CustomTextareaFormComponent {
         if (!this.disabled &&
             this.parentForm.controls[this.controlName].value.length > 0) {
             this.parentForm.controls[this.controlName].markAsTouched();
-        }
-        else if (!this.disabled) {
-            this.parentForm.controls[this.controlName].markAsUntouched();
         }
     }
     getMaxLength() {
