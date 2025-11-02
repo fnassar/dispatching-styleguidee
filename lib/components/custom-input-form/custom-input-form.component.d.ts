@@ -16,6 +16,9 @@ export declare class CustomInputFormComponent {
     valueChange: EventEmitter<string>;
     height: string;
     disabled: boolean;
+    isFocused: boolean;
+    onFocus(): void;
+    onBlur(): void;
     containRequiredError(): boolean;
     onValueChange(): void;
     ngOnInit(): void;

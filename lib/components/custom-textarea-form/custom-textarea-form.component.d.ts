@@ -17,6 +17,9 @@ export declare class CustomTextareaFormComponent {
     row: string;
     disabled: boolean;
     valueChange: EventEmitter<string>;
+    isFocused: boolean;
+    onFocus(): void;
+    onBlur(): void;
     containRequiredError(): boolean;
     onValueChange(): void;
     getMaxLength(): number | null;
