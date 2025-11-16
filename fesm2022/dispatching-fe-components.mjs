@@ -2036,8 +2036,12 @@ class CustomCalenderFormComponent {
         return date.getMonth() === this.currentMonth.getMonth();
     }
     isDisabled(date) {
-        const isBeforeMin = this.minDate ? date < this.minDate : false;
-        const isAfterMax = this.maxDate ? date > this.maxDate : false;
+        const isBeforeMin = this.minDate
+            ? date.getDate() < this.minDate.getDate()
+            : false;
+        const isAfterMax = this.maxDate
+            ? date.getDate() > this.maxDate.getDate()
+            : false;
         return isBeforeMin || isAfterMax;
     }
     getMonthName() {
@@ -2050,7 +2054,7 @@ class CustomCalenderFormComponent {
         if (!this.value)
             return '';
         try {
-            //          console.log(    this.value.toLocaleDateString('en-GB', {
+            //   console.log(    this.value.toLocaleDateString('en-GB', {
             //   day: '2-digit',
             //   month: '2-digit',
             //   year: 'numeric'
