@@ -2569,7 +2569,6 @@ class CustomInputFormComponent {
         const validatorResult = control.validator({
             value: { length: Infinity },
         });
-        console.log('validatorResult: ', validatorResult);
         // If minLength validator exists, it will return an error with requiredLength
         if (validatorResult && validatorResult['minlength']) {
             return validatorResult['minlength'].requiredLength;
