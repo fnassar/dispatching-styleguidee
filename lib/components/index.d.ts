@@ -8,7 +8,7 @@ export * from './custom-dropdown/custom-dropdown.component';
 export * from './custom-dropdown-form/custom-dropdown-form.component';
 export * from './custom-input/custom-input.component';
 export * from './custom-input-form/custom-input-form.component';
-export * from './custom-multi-select/custom-multi-select.component';
+export * from './custom-multi-select-dropdown/custom-multi-select-dropdown.component';
 export * from './custom-multi-select-form/custom-multi-select-form.component';
 export * from './custom-pagination/custom-pagination.component';
 export * from './custom-pop-up/custom-pop-up.component';
