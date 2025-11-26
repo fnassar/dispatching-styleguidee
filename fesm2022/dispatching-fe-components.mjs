@@ -2036,11 +2036,14 @@ class CustomCalenderFormComponent {
         return date.getMonth() === this.currentMonth.getMonth();
     }
     isDisabled(date) {
+        console.log('minDate', this.minDate?.getDate());
+        console.log('maxDate', this.maxDate?.getDate());
+        console.log('date', date.getDate());
         const isBeforeMin = this.minDate
-            ? date.getDate() < this.minDate.getDate()
+            ? date.setHours(0, 0, 0, 0) < this.minDate.setHours(0, 0, 0, 0)
             : false;
         const isAfterMax = this.maxDate
-            ? date.getDate() > this.maxDate.getDate()
+            ? date.setHours(0, 0, 0, 0) > this.maxDate.setHours(0, 0, 0, 0)
             : false;
         return isBeforeMin || isAfterMax;
     }
