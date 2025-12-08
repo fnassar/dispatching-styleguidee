@@ -3,6 +3,7 @@ export interface ITableHeader<T> {
     body?: keyof T;
     clickFn?: (value: T) => void;
     htmlRef?: string;
+    expandedHtmlRef?: string;
     sort: boolean;
     type?: 'Status' | 'Actions' | undefined;
     inputTransform?: (item: any) => any;

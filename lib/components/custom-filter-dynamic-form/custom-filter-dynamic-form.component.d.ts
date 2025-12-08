@@ -5,9 +5,11 @@ import * as i0 from "@angular/core";
 export interface IDynamicFilterConfig {
     id: string;
     label: string;
-    type: 'text' | 'date' | 'multiselect';
+    type: 'text' | 'date' | 'multiselect' | 'singleselect';
     placeholder?: string;
     options?: IDropdownOption[];
+    collapsed?: boolean;
+    icon?: string;
     validation?: {
         required?: boolean;
         minDate?: Date;
@@ -20,11 +22,13 @@ export declare class CustomFilterDynamicFormComponent {
     values: import("@angular/core").InputSignal<Record<string, any> | null>;
     formChanged: EventEmitter<any>;
     formReset: EventEmitter<any>;
+    collapseState: import("@angular/core").WritableSignal<Record<string, boolean>>;
     filterForm: FormGroup;
     filters: import("@angular/core").WritableSignal<IDynamicFilterConfig[]>;
     private destroy$;
     constructor(fb: FormBuilder);
     ngOnInit(): void;
+    toggleCollapse(id: string): void;
     private buildForm;
     private isSame;
     private buildEmittableValues;
