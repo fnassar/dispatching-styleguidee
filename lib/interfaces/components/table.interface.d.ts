@@ -7,6 +7,8 @@ export interface ITableHeader<T> {
     sort: boolean;
     type?: 'Status' | 'Actions' | undefined;
     inputTransform?: (item: any) => any;
+    width?: string;
+    align?: 'left' | 'right' | 'center' | undefined;
 }
 export interface ITableCategory<T> {
     category: string;
