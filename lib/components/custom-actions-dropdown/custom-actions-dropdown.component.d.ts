@@ -5,6 +5,7 @@ export declare class CustomActionsDropdownComponent {
     actions: {
         label: string;
         icon?: string;
+        class?: string;
         callback: (ctx: any) => void;
     }[];
     context: any;

@@ -10,6 +10,11 @@ export declare class CustomTableComponent<T> {
         [key: string]: TemplateRef<any>;
     };
     expandedChildAccessor: ((row: T) => any[]) | null;
+    actions?: {
+        label: string;
+        icon?: string;
+        callback: (ctx: any) => void;
+    }[];
     expandable: boolean;
     showStatusColumn: boolean;
     showActionColumn: boolean;
@@ -41,5 +46,5 @@ export declare class CustomTableComponent<T> {
     isRowExpanded(i: number): boolean;
     getCellValue(row: any, col: ITableHeader<T>): any;
     static ɵfac: i0.ɵɵFactoryDeclaration<CustomTableComponent<any>, never>;
-    static ɵcmp: i0.ɵɵComponentDeclaration<CustomTableComponent<any>, "custom-table", never, { "tableData": { "alias": "tableData"; "required": false; }; "tableHeader": { "alias": "tableHeader"; "required": false; }; "cellTemplates": { "alias": "cellTemplates"; "required": false; }; "expandedChildAccessor": { "alias": "expandedChildAccessor"; "required": false; }; "expandable": { "alias": "expandable"; "required": false; }; "showStatusColumn": { "alias": "showStatusColumn"; "required": false; }; "showActionColumn": { "alias": "showActionColumn"; "required": false; }; "showNumberCol": { "alias": "showNumberCol"; "required": false; }; "sortedKey": { "alias": "sortedKey"; "required": false; }; "pagination": { "alias": "pagination"; "required": false; }; "enableEdit": { "alias": "enableEdit"; "required": false; }; "enableDelete": { "alias": "enableDelete"; "required": false; }; "enableView": { "alias": "enableView"; "required": false; }; "rowClass": { "alias": "rowClass"; "required": false; }; "headerClass": { "alias": "headerClass"; "required": false; }; "expandedCellTemplates": { "alias": "expandedCellTemplates"; "required": false; }; "statusCol": { "alias": "statusCol"; "required": false; }; }, { "onEdit": "onEdit"; "onView": "onView"; "onDelete": "onDelete"; "onRowClick": "onRowClick"; "sortColumn": "sortColumn"; }, never, never, true, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<CustomTableComponent<any>, "custom-table", never, { "tableData": { "alias": "tableData"; "required": false; }; "tableHeader": { "alias": "tableHeader"; "required": false; }; "cellTemplates": { "alias": "cellTemplates"; "required": false; }; "expandedChildAccessor": { "alias": "expandedChildAccessor"; "required": false; }; "actions": { "alias": "actions"; "required": false; }; "expandable": { "alias": "expandable"; "required": false; }; "showStatusColumn": { "alias": "showStatusColumn"; "required": false; }; "showActionColumn": { "alias": "showActionColumn"; "required": false; }; "showNumberCol": { "alias": "showNumberCol"; "required": false; }; "sortedKey": { "alias": "sortedKey"; "required": false; }; "pagination": { "alias": "pagination"; "required": false; }; "enableEdit": { "alias": "enableEdit"; "required": false; }; "enableDelete": { "alias": "enableDelete"; "required": false; }; "enableView": { "alias": "enableView"; "required": false; }; "rowClass": { "alias": "rowClass"; "required": false; }; "headerClass": { "alias": "headerClass"; "required": false; }; "expandedCellTemplates": { "alias": "expandedCellTemplates"; "required": false; }; "statusCol": { "alias": "statusCol"; "required": false; }; }, { "onEdit": "onEdit"; "onView": "onView"; "onDelete": "onDelete"; "onRowClick": "onRowClick"; "sortColumn": "sortColumn"; }, never, never, true, never>;
 }
