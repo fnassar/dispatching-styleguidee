@@ -1,15 +1,3 @@
-export interface ITableHeader<T> {
-    header: string;
-    body?: keyof T;
-    clickFn?: (value: T) => void;
-    htmlRef?: string;
-    expandedHtmlRef?: string;
-    sort: boolean;
-    type?: 'Status' | 'Actions' | undefined;
-    inputTransform?: (item: any) => any;
-    width?: string;
-    align?: 'left' | 'right' | 'center' | undefined;
-}
 export interface ITableCategory<T> {
     category: string;
     rows: T[];
@@ -26,3 +14,21 @@ export interface IStatusCol<T> {
     falseText: string;
     sort?: boolean;
 }
+export interface ITableHeader<T> {
+    header: string;
+    body: keyof T | string;
+    sort?: boolean;
+    align?: 'left' | 'center' | 'right';
+    width?: string;
+    htmlRef?: string;
+    expandedHtmlRef?: string;
+    inputTransform?: (row: T) => string;
+    isEditable?: boolean;
+    canEdit?: (row: T) => boolean;
+}
+export type EditingCell = {
+    rowKey: string;
+    colKey: string;
+    isChild: boolean;
+    parentKey?: string;
+} | null;

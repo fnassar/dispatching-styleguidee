@@ -2,6 +2,10 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import * as i0 from "@angular/core";
 export declare class CustomActionsDropdownComponent {
     private sanitizer;
+    menuPosition: {
+        top: number;
+        left: number;
+    };
     actions: {
         label: string;
         icon?: string;
@@ -13,7 +17,7 @@ export declare class CustomActionsDropdownComponent {
     isOpen: boolean;
     constructor(sanitizer: DomSanitizer);
     sanitizeSvg(svg: string): SafeHtml;
-    openDropdown(): void;
+    openDropdown(triggerEl: HTMLElement): void;
     closeDropdown(): void;
     onClickAction(action: {
         callback: (ctx: any) => void;

@@ -4,14 +4,16 @@ import * as i0 from "@angular/core";
 export declare class OverlayPanelComponent {
     private overlayManager;
     overlayClass: string;
+    expandSide: 'LEFT' | 'RIGHT';
     targetTemplate: TemplateRef<any>;
     overlayTemplate: TemplateRef<any>;
     isOpen: boolean;
-    expandSide: 'LEFT' | 'RIGHT';
+    isNearTop: boolean;
+    isNearBottom: boolean;
     constructor(overlayManager: OverlayManagerService);
-    ngAfterContentInit(): void;
-    toggleDropdown(event: Event): void;
+    toggleDropdown(event: Event, triggerEl: HTMLElement): void;
     closeDropdown(): void;
+    private detectVerticalPosition;
     static ɵfac: i0.ɵɵFactoryDeclaration<OverlayPanelComponent, never>;
     static ɵcmp: i0.ɵɵComponentDeclaration<OverlayPanelComponent, "overlay-panel", never, { "overlayClass": { "alias": "overlayClass"; "required": false; }; "expandSide": { "alias": "expandSide"; "required": false; }; }, {}, ["targetTemplate", "overlayTemplate"], never, true, never>;
 }

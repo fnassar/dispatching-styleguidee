@@ -10,9 +10,11 @@ export declare class CommonHttpService {
     CommonPutRequests(url: string, body: any, options?: any): Observable<any>;
     CommonGetRequests(url: string, options?: any): Observable<any>;
     CommonDeleteRequest(url: string, options?: any): Observable<any>;
+    CommonPatchRequests(url: string, body: any, options?: any): Observable<any>;
     CommonGetRequestsWithQuery(url: string, Model: any, options?: any): Observable<any>;
     CommonPostRequestsWithQuery(url: string, Model: any, body: any, options?: any): Observable<any>;
     CommonPutRequestsWithQuery(url: string, Model: any, body: any, options?: any): Observable<any>;
+    CommonPatchRequestsWithQuery(url: string, Model: any, body: any, options?: any): Observable<any>;
     static ɵfac: i0.ɵɵFactoryDeclaration<CommonHttpService, [null, { optional: true; }]>;
     static ɵprov: i0.ɵɵInjectableDeclaration<CommonHttpService>;
 }

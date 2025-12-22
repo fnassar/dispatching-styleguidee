@@ -1,7 +1,8 @@
+import { EventEmitter, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { IComponentFormError, IDropdownOption } from '../../interfaces';
 import * as i0 from "@angular/core";
-export declare class CustomMultiSelectFormComponent {
+export declare class CustomMultiSelectFormComponent implements OnInit {
     parentForm: FormGroup;
     controlName: string;
     label?: string;
@@ -13,19 +14,21 @@ export declare class CustomMultiSelectFormComponent {
     enableFilter: boolean;
     filterDesign: boolean;
     showClear: boolean;
+    height: string;
+    viewType: 'base' | 'ai-plan';
+    disabled: boolean;
     options: IDropdownOption[];
     name: string;
     validation: IComponentFormError[];
-    height: string;
-    viewType: 'base' | 'ai-plan';
+    valueChange: EventEmitter<(string | number)[]>;
     isOpen: boolean;
     filteredOptions: IDropdownOption[];
     filterText: string;
-    disabled: boolean;
     ngOnInit(): void;
+    private get selectedIds();
     get selectedOptions(): IDropdownOption[];
     getSelectedLabels(): string[];
-    isSelected(id: any): boolean;
+    isSelected(id: string | number): boolean;
     toggleDropdown(): void;
     closeDropdown(): void;
     toggleOptionSelection(option: IDropdownOption): void;
@@ -34,5 +37,5 @@ export declare class CustomMultiSelectFormComponent {
     set reset(value: boolean);
     containRequiredError(): boolean;
     static ɵfac: i0.ɵɵFactoryDeclaration<CustomMultiSelectFormComponent, never>;
-    static ɵcmp: i0.ɵɵComponentDeclaration<CustomMultiSelectFormComponent, "custom-multi-select-form", never, { "parentForm": { "alias": "parentForm"; "required": true; }; "controlName": { "alias": "controlName"; "required": true; }; "label": { "alias": "label"; "required": false; }; "labelClass": { "alias": "labelClass"; "required": false; }; "dropdownOptionsClass": { "alias": "dropdownOptionsClass"; "required": false; }; "dropdownHeaderClass": { "alias": "dropdownHeaderClass"; "required": false; }; "dropdownContainerClass": { "alias": "dropdownContainerClass"; "required": false; }; "placeholder": { "alias": "placeholder"; "required": false; }; "enableFilter": { "alias": "enableFilter"; "required": false; }; "filterDesign": { "alias": "filterDesign"; "required": false; }; "showClear": { "alias": "showClear"; "required": false; }; "options": { "alias": "options"; "required": true; }; "name": { "alias": "name"; "required": true; }; "validation": { "alias": "validation"; "required": true; }; "height": { "alias": "height"; "required": false; }; "viewType": { "alias": "viewType"; "required": false; }; "disabled": { "alias": "disabled"; "required": false; }; "reset": { "alias": "reset"; "required": false; }; }, {}, never, never, true, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<CustomMultiSelectFormComponent, "custom-multi-select-form", never, { "parentForm": { "alias": "parentForm"; "required": true; }; "controlName": { "alias": "controlName"; "required": true; }; "label": { "alias": "label"; "required": false; }; "labelClass": { "alias": "labelClass"; "required": false; }; "dropdownOptionsClass": { "alias": "dropdownOptionsClass"; "required": false; }; "dropdownHeaderClass": { "alias": "dropdownHeaderClass"; "required": false; }; "dropdownContainerClass": { "alias": "dropdownContainerClass"; "required": false; }; "placeholder": { "alias": "placeholder"; "required": false; }; "enableFilter": { "alias": "enableFilter"; "required": false; }; "filterDesign": { "alias": "filterDesign"; "required": false; }; "showClear": { "alias": "showClear"; "required": false; }; "height": { "alias": "height"; "required": false; }; "viewType": { "alias": "viewType"; "required": false; }; "disabled": { "alias": "disabled"; "required": false; }; "options": { "alias": "options"; "required": true; }; "name": { "alias": "name"; "required": true; }; "validation": { "alias": "validation"; "required": true; }; "reset": { "alias": "reset"; "required": false; }; }, { "valueChange": "valueChange"; }, never, never, true, never>;
 }

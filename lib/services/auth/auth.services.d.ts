@@ -16,6 +16,8 @@ export declare class AuthService {
     Permissions: typeof Permissions;
     constructor(authContextService: AuthContextService, authBeService: AuthBeService, router: Router, storageService: StorageService, toastService: ToastService);
     login(data: any): void;
+    forgetPassword(data: any): void;
+    resetPassword(data: any): void;
     logOutUser(): void;
     logout(): void;
     handleRefreshToken(): void;
