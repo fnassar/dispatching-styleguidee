@@ -54,3 +54,4 @@ export * from './custom-filter-dropdown/custom-filter-dropdown.component';
 export * from './custom-filter-dynamic-form/custom-filter-dynamic-form.component';
 export * from './custom-place-holder/custom-place-holder.component';
 export * from './task-priority/task-priority.component';
+export * from './custom-bulk-actions/custom-bulk-actions.component';

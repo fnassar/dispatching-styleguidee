@@ -32,3 +32,7 @@ export type EditingCell = {
     isChild: boolean;
     parentKey?: string;
 } | null;
+export interface TableSelection {
+    parents: Set<string>;
+    children: Set<string>;
+}

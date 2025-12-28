@@ -1,6 +1,7 @@
 import { EventEmitter, TemplateRef } from '@angular/core';
-import { IStatusCol, ITableHeader } from '../../interfaces';
+import { IStatusCol, ITableHeader, TableSelection } from '../../interfaces';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { BulkAction } from "../custom-bulk-actions/custom-bulk-actions.component";
 import * as i0 from "@angular/core";
 export declare class CustomTableComponent<T extends Record<string, any>> {
     private sanitizer;
@@ -25,7 +26,7 @@ export declare class CustomTableComponent<T extends Record<string, any>> {
     rowClass: string;
     headerClass: string;
     statusCol: IStatusCol<T>;
-    actions?: {
+    actions: {
         label: string;
         icon?: string;
         class?: string;
@@ -49,6 +50,18 @@ export declare class CustomTableComponent<T extends Record<string, any>> {
         parent?: any;
     }>;
     cellEditCancel: EventEmitter<void>;
+    enableSelection: boolean;
+    enableAllSelection: boolean;
+    selection: TableSelection;
+    selectAll: boolean;
+    selectedLabel: string;
+    bulkActions: BulkAction[];
+    selectionChange: EventEmitter<TableSelection>;
+    selectAllChange: EventEmitter<boolean>;
+    bulkAction: EventEmitter<{
+        action: any;
+        selection: TableSelection;
+    }>;
     expandedRows: Set<number>;
     checkedSortIcon: SafeHtml;
     checkedActionViewSvg: SafeHtml;
@@ -69,6 +82,15 @@ export declare class CustomTableComponent<T extends Record<string, any>> {
     clearEditing(): void;
     cancelEditing(): void;
     onContainerClick(ev: MouseEvent): void;
+    private getKey;
+    isParentSelected(row: any, index: number): boolean;
+    isChildSelected(child: any, index: number, parent: any): boolean;
+    hasSelectedChildren(parent: any): boolean;
+    toggleParent(row: any, index: number, event: MouseEvent): void;
+    toggleChild(child: any, index: number, parent: any, event: MouseEvent): void;
+    toggleSelectAll(): void;
+    removeSelections(): void;
+    onBulkAction(action: BulkAction): void;
     static ɵfac: i0.ɵɵFactoryDeclaration<CustomTableComponent<any>, never>;
-    static ɵcmp: i0.ɵɵComponentDeclaration<CustomTableComponent<any>, "custom-table", never, { "tableData": { "alias": "tableData"; "required": false; }; "tableHeader": { "alias": "tableHeader"; "required": false; }; "cellTemplates": { "alias": "cellTemplates"; "required": false; }; "expandedCellTemplates": { "alias": "expandedCellTemplates"; "required": false; }; "expandedChildAccessor": { "alias": "expandedChildAccessor"; "required": false; }; "expandable": { "alias": "expandable"; "required": false; }; "showStatusColumn": { "alias": "showStatusColumn"; "required": false; }; "showActionColumn": { "alias": "showActionColumn"; "required": false; }; "showNumberCol": { "alias": "showNumberCol"; "required": false; }; "sortedKey": { "alias": "sortedKey"; "required": false; }; "pagination": { "alias": "pagination"; "required": false; }; "enableEdit": { "alias": "enableEdit"; "required": false; }; "enableDelete": { "alias": "enableDelete"; "required": false; }; "enableView": { "alias": "enableView"; "required": false; }; "rowClass": { "alias": "rowClass"; "required": false; }; "headerClass": { "alias": "headerClass"; "required": false; }; "statusCol": { "alias": "statusCol"; "required": false; }; "actions": { "alias": "actions"; "required": false; }; }, { "onEdit": "onEdit"; "onView": "onView"; "onDelete": "onDelete"; "onRowClick": "onRowClick"; "sortColumn": "sortColumn"; "cellEditStart": "cellEditStart"; "cellEditEnd": "cellEditEnd"; "cellEditCancel": "cellEditCancel"; }, never, never, true, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<CustomTableComponent<any>, "custom-table", never, { "tableData": { "alias": "tableData"; "required": false; }; "tableHeader": { "alias": "tableHeader"; "required": false; }; "cellTemplates": { "alias": "cellTemplates"; "required": false; }; "expandedCellTemplates": { "alias": "expandedCellTemplates"; "required": false; }; "expandedChildAccessor": { "alias": "expandedChildAccessor"; "required": false; }; "expandable": { "alias": "expandable"; "required": false; }; "showStatusColumn": { "alias": "showStatusColumn"; "required": false; }; "showActionColumn": { "alias": "showActionColumn"; "required": false; }; "showNumberCol": { "alias": "showNumberCol"; "required": false; }; "sortedKey": { "alias": "sortedKey"; "required": false; }; "pagination": { "alias": "pagination"; "required": false; }; "enableEdit": { "alias": "enableEdit"; "required": false; }; "enableDelete": { "alias": "enableDelete"; "required": false; }; "enableView": { "alias": "enableView"; "required": false; }; "rowClass": { "alias": "rowClass"; "required": false; }; "headerClass": { "alias": "headerClass"; "required": false; }; "statusCol": { "alias": "statusCol"; "required": false; }; "actions": { "alias": "actions"; "required": false; }; "enableSelection": { "alias": "enableSelection"; "required": false; }; "enableAllSelection": { "alias": "enableAllSelection"; "required": false; }; "selection": { "alias": "selection"; "required": false; }; "selectAll": { "alias": "selectAll"; "required": false; }; "selectedLabel": { "alias": "selectedLabel"; "required": false; }; "bulkActions": { "alias": "bulkActions"; "required": false; }; }, { "onEdit": "onEdit"; "onView": "onView"; "onDelete": "onDelete"; "onRowClick": "onRowClick"; "sortColumn": "sortColumn"; "cellEditStart": "cellEditStart"; "cellEditEnd": "cellEditEnd"; "cellEditCancel": "cellEditCancel"; "selectionChange": "selectionChange"; "selectAllChange": "selectAllChange"; "bulkAction": "bulkAction"; }, never, never, true, never>;
 }
