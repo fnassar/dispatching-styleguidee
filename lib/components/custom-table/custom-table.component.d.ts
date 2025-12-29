@@ -85,7 +85,6 @@ export declare class CustomTableComponent<T extends Record<string, any>> {
     private getKey;
     isParentSelected(row: any, index: number): boolean;
     isChildSelected(child: any, index: number, parent: any): boolean;
-    hasSelectedChildren(parent: any): boolean;
     toggleParent(row: any, index: number, event: MouseEvent): void;
     toggleChild(child: any, index: number, parent: any, event: MouseEvent): void;
     toggleSelectAll(): void;
