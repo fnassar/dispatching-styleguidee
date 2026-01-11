@@ -1,7 +1,7 @@
 import { EventEmitter, TemplateRef } from '@angular/core';
 import { IStatusCol, ITableHeader, TableSelection } from '../../interfaces';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import { BulkAction } from "../custom-bulk-actions/custom-bulk-actions.component";
+import { BulkAction } from '../custom-bulk-actions/custom-bulk-actions.component';
 import * as i0 from "@angular/core";
 export declare class CustomTableComponent<T extends Record<string, any>> {
     private sanitizer;
