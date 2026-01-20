@@ -18,6 +18,7 @@ export declare class CustomActionsDropdownComponent {
     constructor(sanitizer: DomSanitizer);
     sanitizeSvg(svg: string): SafeHtml;
     openDropdown(triggerEl: HTMLElement): void;
+    toggleDropdown(triggerEl: HTMLElement): void;
     closeDropdown(): void;
     onClickAction(action: {
         callback: (ctx: any) => void;
