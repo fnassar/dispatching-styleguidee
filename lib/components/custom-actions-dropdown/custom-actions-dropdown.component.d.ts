@@ -12,6 +12,7 @@ export declare class CustomActionsDropdownComponent {
         class?: string;
         callback: (ctx: any) => void;
     }[];
+    hoverEffect: boolean;
     context: any;
     horizontalDots: boolean;
     isOpen: boolean;
@@ -24,5 +25,5 @@ export declare class CustomActionsDropdownComponent {
         callback: (ctx: any) => void;
     }, event: MouseEvent): void;
     static ɵfac: i0.ɵɵFactoryDeclaration<CustomActionsDropdownComponent, never>;
-    static ɵcmp: i0.ɵɵComponentDeclaration<CustomActionsDropdownComponent, "custom-actions-dropdown", never, { "actions": { "alias": "actions"; "required": false; }; "context": { "alias": "context"; "required": false; }; "horizontalDots": { "alias": "horizontalDots"; "required": false; }; }, {}, never, never, true, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<CustomActionsDropdownComponent, "custom-actions-dropdown", never, { "actions": { "alias": "actions"; "required": false; }; "hoverEffect": { "alias": "hoverEffect"; "required": false; }; "context": { "alias": "context"; "required": false; }; "horizontalDots": { "alias": "horizontalDots"; "required": false; }; }, {}, never, never, true, never>;
 }
