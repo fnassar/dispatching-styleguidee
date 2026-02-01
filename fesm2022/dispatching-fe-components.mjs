@@ -2670,7 +2670,7 @@ class CustomInputFormComponent {
     }
     onValueChange() {
         if (!this.disabled &&
-            this.parentForm.controls[this.controlName].value.length > 0) {
+            this.parentForm.controls[this.controlName].value?.length > 0) {
             this.parentForm.controls[this.controlName].markAsTouched();
         }
     }
