@@ -1,8 +1,8 @@
-import { EventEmitter } from '@angular/core';
+import { EventEmitter, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { IComponentFormError } from '../../interfaces';
 import * as i0 from "@angular/core";
-export declare class CustomPlateNumberInputFormComponent {
+export declare class CustomPlateNumberInputFormComponent implements OnInit {
     class: string;
     labelClass: string;
     label: string;

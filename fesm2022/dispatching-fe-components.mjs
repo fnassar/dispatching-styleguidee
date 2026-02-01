@@ -5641,7 +5641,6 @@ class CustomPlateNumberInputFormComponent {
     });
     ngOnInit() {
         // Initialize the form with values from the parent form
-        console.log('Initializing PlateInputForm', this.parentForm.controls[this.controlName].value);
         if (this.parentForm.controls[this.controlName].value?.length > 0) {
             const initialNumberValue = this.parentForm.controls[this.controlName].value.split(' ')[0] || '';
             const initialLettersValue = this.parentForm.controls[this.controlName].value.split(' ')[1] || '';
