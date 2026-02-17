@@ -1,6 +1,7 @@
 export * from './custom-app-error/custom-app-error.component';
 export * from './custom-button/custom-button.component';
 export * from './custom-calendar/custom-calendar.component';
+export * from './custom-calendar-expanded/custom-calendar-expanded.component';
 export * from './custom-calender-form/custom-calender-form.component';
 export * from './custom-check-box/custom-check-box.component';
 export * from './custom-check-box-form/custom-check-box-form.component';

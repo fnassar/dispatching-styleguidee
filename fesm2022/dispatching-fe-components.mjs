@@ -1996,6 +1996,116 @@ i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.15", ngImpo
                 type: Input
             }] } });
 
+class CustomCalendarExpandedComponent {
+    calendarPopUpClass = '';
+    calendarInputClass = '';
+    calendarContainerClass = '';
+    minDate = null;
+    maxDate = null;
+    value = null;
+    valueChange = new EventEmitter();
+    showCalendar = false;
+    currentMonth = new Date();
+    days = [];
+    weekdays = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+    constructor() {
+        this.generateCalendar();
+    }
+    toggleCalendar() {
+        this.showCalendar = !this.showCalendar;
+    }
+    selectDate(date) {
+        this.value = date;
+        this.showCalendar = false;
+        this.valueChange.emit(date);
+    }
+    prevMonth() {
+        this.currentMonth = new Date(this.currentMonth.getFullYear(), this.currentMonth.getMonth() - 1, 1);
+        this.generateCalendar();
+    }
+    nextMonth() {
+        this.currentMonth = new Date(this.currentMonth.getFullYear(), this.currentMonth.getMonth() + 1, 1);
+        this.generateCalendar();
+    }
+    generateCalendar() {
+        this.days = [];
+        const year = this.currentMonth.getFullYear();
+        const month = this.currentMonth.getMonth();
+        const firstDay = new Date(year, month, 1);
+        const lastDay = new Date(year, month + 1, 0);
+        // Previous month days
+        const prevMonthDays = firstDay.getDay();
+        for (let i = prevMonthDays - 1; i >= 0; i--) {
+            this.days.push(new Date(year, month, -i));
+        }
+        // Current month days
+        for (let i = 1; i <= lastDay.getDate(); i++) {
+            this.days.push(new Date(year, month, i));
+        }
+        // Next month days
+        const nextMonthDays = 6 - lastDay.getDay();
+        for (let i = 1; i <= nextMonthDays; i++) {
+            this.days.push(new Date(year, month + 1, i));
+        }
+    }
+    isSelected(date) {
+        if (!this.value)
+            return false;
+        return (date.getDate() === this.value.getDate() &&
+            date.getMonth() === this.value.getMonth() &&
+            date.getFullYear() === this.value.getFullYear());
+    }
+    isCurrentMonth(date) {
+        return date.getMonth() === this.currentMonth.getMonth();
+    }
+    isDisabled(date) {
+        const isBeforeMin = this.minDate ? date < this.minDate : false;
+        const isAfterMax = this.maxDate ? date > this.maxDate : false;
+        return isBeforeMin || isAfterMax;
+    }
+    getMonthName() {
+        return this.currentMonth.toLocaleString('default', { month: 'long' });
+    }
+    getYear() {
+        return this.currentMonth.getFullYear();
+    }
+    formatDisplayDate() {
+        if (!this.value)
+            return '';
+        return this.value.toLocaleDateString('en-GB', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+        });
+    }
+    static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "19.2.15", ngImport: i0, type: CustomCalendarExpandedComponent, deps: [], target: i0.ɵɵFactoryTarget.Component });
+    static ɵcmp = i0.ɵɵngDeclareComponent({ minVersion: "17.0.0", version: "19.2.15", type: CustomCalendarExpandedComponent, isStandalone: true, selector: "custom-calendar-expanded", inputs: { calendarPopUpClass: "calendarPopUpClass", calendarInputClass: "calendarInputClass", calendarContainerClass: "calendarContainerClass", minDate: "minDate", maxDate: "maxDate", value: "value" }, outputs: { valueChange: "valueChange" }, ngImport: i0, template: "<div [class]=\"'custom-calendar-container ' + calendarContainerClass\">\n  <div\n    [class]=\"'calendar-popup ' + calendarPopUpClass\"\n    #calendarPopup\n    [clickOutside]=\"calendarPopup\"\n    (clickOutsideEmitter)=\"showCalendar = false\"\n    [DropdownAnimationObject]=\"showCalendar\"\n  >\n    <div class=\"calendar-header\">\n      <button type=\"button\" class=\"nav-button\" (click)=\"prevMonth()\">\n        <svg\n          width=\"8\"\n          height=\"12\"\n          viewBox=\"0 0 8 12\"\n          fill=\"none\"\n          xmlns=\"http://www.w3.org/2000/svg\"\n        >\n          <path\n            d=\"M6.5 11L1.5 6L6.5 1\"\n            stroke=\"black\"\n            stroke-opacity=\"0.72\"\n            stroke-width=\"1.66667\"\n            stroke-linecap=\"round\"\n            stroke-linejoin=\"round\"\n          />\n        </svg>\n      </button>\n      <div class=\"month-title\">{{ getMonthName() }} {{ getYear() }}</div>\n      <button type=\"button\" class=\"nav-button\" (click)=\"nextMonth()\">\n        <svg\n          width=\"8\"\n          height=\"12\"\n          viewBox=\"0 0 8 12\"\n          fill=\"none\"\n          xmlns=\"http://www.w3.org/2000/svg\"\n        >\n          <path\n            d=\"M1.5 11L6.5 6L1.5 1\"\n            stroke=\"black\"\n            stroke-opacity=\"0.72\"\n            stroke-width=\"1.66667\"\n            stroke-linecap=\"round\"\n            stroke-linejoin=\"round\"\n          />\n        </svg>\n      </button>\n    </div>\n\n    <div class=\"weekdays\">\n      @for (weekday of weekdays; track weekday) {\n        <div class=\"weekday\">{{ weekday }}</div>\n      }\n    </div>\n\n    <div class=\"days-grid\">\n      @for (day of days; track day) {\n        <div\n          class=\"day\"\n          [class.current-month]=\"isCurrentMonth(day)\"\n          [class.selected]=\"isSelected(day)\"\n          [class.disabled]=\"isDisabled(day)\"\n          (click)=\"\n            $event.stopPropagation(); !isDisabled(day) && selectDate(day)\n          \"\n        >\n          {{ day.getDate() }}\n        </div>\n      }\n    </div>\n  </div>\n</div>\n", styles: [".custom-calendar-container{position:relative;width:100%}.fullWidth{width:100%}.calendar-popup{max-height:300px;overflow-y:auto;background-color:#fff;margin-top:4px;padding:1rem;z-index:10;box-shadow:0 4px 6px #0000001a}.calendar-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}.month-title{font-weight:600}.nav-button{background:none;border:none;font-size:16px;cursor:pointer;padding:4px 8px}.weekdays{display:grid;grid-template-columns:repeat(7,1fr);text-align:center;font-weight:500;font-size:12px;margin-bottom:8px}.days-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}.day{height:32px;display:flex;align-items:center;justify-content:center;border-radius:4px;cursor:pointer;font-size:14px}.day.current-month{color:#111827}.day:not(.current-month){color:#9ca3af}.day.selected{background-color:#602650;color:#fff}.day.disabled{color:#d1d5db;cursor:not-allowed!important;text-decoration:line-through}.day:not(.disabled):not(.selected):hover{background-color:#f3f4f6}\n"], dependencies: [{ kind: "ngmodule", type: FormsModule }, { kind: "directive", type: ClickOutsideDirective, selector: "[clickOutside]", inputs: ["clickOutside"], outputs: ["clickOutsideEmitter"] }, { kind: "ngmodule", type: CommonModule }, { kind: "directive", type: DropdownsAnimationDirective, selector: "[DropdownAnimationObject]", inputs: ["DropdownAnimationObject"] }], animations: [dropdownAnimation] });
+}
+i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.15", ngImport: i0, type: CustomCalendarExpandedComponent, decorators: [{
+            type: Component,
+            args: [{ selector: 'custom-calendar-expanded', standalone: true, imports: [
+                        FormsModule,
+                        ClickOutsideDirective,
+                        CommonModule,
+                        DropdownsAnimationDirective,
+                    ], animations: [dropdownAnimation], template: "<div [class]=\"'custom-calendar-container ' + calendarContainerClass\">\n  <div\n    [class]=\"'calendar-popup ' + calendarPopUpClass\"\n    #calendarPopup\n    [clickOutside]=\"calendarPopup\"\n    (clickOutsideEmitter)=\"showCalendar = false\"\n    [DropdownAnimationObject]=\"showCalendar\"\n  >\n    <div class=\"calendar-header\">\n      <button type=\"button\" class=\"nav-button\" (click)=\"prevMonth()\">\n        <svg\n          width=\"8\"\n          height=\"12\"\n          viewBox=\"0 0 8 12\"\n          fill=\"none\"\n          xmlns=\"http://www.w3.org/2000/svg\"\n        >\n          <path\n            d=\"M6.5 11L1.5 6L6.5 1\"\n            stroke=\"black\"\n            stroke-opacity=\"0.72\"\n            stroke-width=\"1.66667\"\n            stroke-linecap=\"round\"\n            stroke-linejoin=\"round\"\n          />\n        </svg>\n      </button>\n      <div class=\"month-title\">{{ getMonthName() }} {{ getYear() }}</div>\n      <button type=\"button\" class=\"nav-button\" (click)=\"nextMonth()\">\n        <svg\n          width=\"8\"\n          height=\"12\"\n          viewBox=\"0 0 8 12\"\n          fill=\"none\"\n          xmlns=\"http://www.w3.org/2000/svg\"\n        >\n          <path\n            d=\"M1.5 11L6.5 6L1.5 1\"\n            stroke=\"black\"\n            stroke-opacity=\"0.72\"\n            stroke-width=\"1.66667\"\n            stroke-linecap=\"round\"\n            stroke-linejoin=\"round\"\n          />\n        </svg>\n      </button>\n    </div>\n\n    <div class=\"weekdays\">\n      @for (weekday of weekdays; track weekday) {\n        <div class=\"weekday\">{{ weekday }}</div>\n      }\n    </div>\n\n    <div class=\"days-grid\">\n      @for (day of days; track day) {\n        <div\n          class=\"day\"\n          [class.current-month]=\"isCurrentMonth(day)\"\n          [class.selected]=\"isSelected(day)\"\n          [class.disabled]=\"isDisabled(day)\"\n          (click)=\"\n            $event.stopPropagation(); !isDisabled(day) && selectDate(day)\n          \"\n        >\n          {{ day.getDate() }}\n        </div>\n      }\n    </div>\n  </div>\n</div>\n", styles: [".custom-calendar-container{position:relative;width:100%}.fullWidth{width:100%}.calendar-popup{max-height:300px;overflow-y:auto;background-color:#fff;margin-top:4px;padding:1rem;z-index:10;box-shadow:0 4px 6px #0000001a}.calendar-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}.month-title{font-weight:600}.nav-button{background:none;border:none;font-size:16px;cursor:pointer;padding:4px 8px}.weekdays{display:grid;grid-template-columns:repeat(7,1fr);text-align:center;font-weight:500;font-size:12px;margin-bottom:8px}.days-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}.day{height:32px;display:flex;align-items:center;justify-content:center;border-radius:4px;cursor:pointer;font-size:14px}.day.current-month{color:#111827}.day:not(.current-month){color:#9ca3af}.day.selected{background-color:#602650;color:#fff}.day.disabled{color:#d1d5db;cursor:not-allowed!important;text-decoration:line-through}.day:not(.disabled):not(.selected):hover{background-color:#f3f4f6}\n"] }]
+        }], ctorParameters: () => [], propDecorators: { calendarPopUpClass: [{
+                type: Input
+            }], calendarInputClass: [{
+                type: Input
+            }], calendarContainerClass: [{
+                type: Input
+            }], minDate: [{
+                type: Input
+            }], maxDate: [{
+                type: Input
+            }], value: [{
+                type: Input,
+                args: [{ required: true }]
+            }], valueChange: [{
+                type: Output
+            }] } });
+
 class CustomCalenderFormComponent {
     // TODO: implement ControlValueAccessor properly
     // Inputs
@@ -6375,5 +6485,5 @@ i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.15", ngImpo
  * Generated bundle index. Do not edit.
  */
 
-export { API_BASE_URL, AllowNumberOnlyDirective, ArabicOnlyDirective, AuthBeService, AuthConstant, AuthContextService, AuthDirective, AuthInterceptor, AuthService, BlurBackdropDirective, ClickOutsideDirective, CommonHttpService, ComponentFormErrorConstant, CustomActionsDropdownComponent, CustomAppErrorComponent, CustomAvatarsComponent, CustomBreadcrumbComponent, CustomBulkActionsComponent, CustomButtonComponent, CustomCalendarComponent, CustomCalenderFormComponent, CustomCategoryTableComponent, CustomCheckBoxComponent, CustomCheckBoxFormComponent, CustomColorComponent, CustomConfirmPopupComponent, CustomDetailsHeaderComponent, CustomDetailsModalComponent, CustomDetailsNavComponent, CustomDropdownButtonComponent, CustomDropdownComponent, CustomDropdownFormComponent, CustomDynamicTableWithCategoriesComponent, CustomFieldsFormComponent, CustomFileUploadComponent, CustomFileViewerComponent, CustomFilterDropdownComponent, CustomFilterDynamicFormComponent, CustomInputComponent, CustomInputFormComponent, CustomLoadingSpinnerComponent, CustomModalComponent, CustomMultiSelectDropdownComponent, CustomMultiSelectFormComponent, CustomPaginationComponent, CustomPlaceHolderComponent, CustomPlateNumberInputFormComponent, CustomPopUpComponent, CustomProgressBarComponent, CustomProgressRingComponent, CustomRadioComponentComponent, CustomRadioGroupFormComponent, CustomReactiveSearchInputComponent, CustomSearchInputComponent, CustomSteppersContainerComponent, CustomSteppersControllersComponent, CustomSvgIconComponent, CustomTableComponent, CustomTabsComponent, CustomTextareaComponent, CustomTextareaFormComponent, CustomTimeInputFormComponent, CustomTitleContentComponent, CustomToastComponent, CustomToggleSwitchComponent, CustomToggleSwitchFormComponent, CustomTooltipComponent, DispatchingFeComponentsService, DropdownsAnimationDirective, EnglishOnlyDirective, ErrorInterceptor, GeoLocationService, I18nConstant, LoadingService, ModuleRoutes, NetworkConnectionInterceptor, OverlayPanelComponent, PermissionGuard, Permissions, Resources, Roles, SHOW_SUCCESS_TOASTER, SKIP_LOADER, SKIP_TOKEN, SidenavService, StepperService, StorageService, TaskPriorityComponent, ToastService, ToggleElementDirective, TranslationService, Types, USE_TOKEN, UserDataService, UserStatus, actionAssignTaskSvg, actionDeleteSvg$1 as actionDeleteSvg, actionDuplicateSvg, actionEdiSquaretSvg, actionEditSvg$1 as actionEditSvg, actionPermission, actionRenameSvg, assignTaskSvg, authGuard, b64toBlob, blobToB64, convertDateFormat, convertFileToBase64, convertFormGroupToFormData, diffTime, downloadBlob, dropdownAnimation, excelDateToJSDate, flattenTree, formatDate, formatDateWithTime, formatTimestamp, formatinitialTakeTime, generateRandomColor, generateUniqueNumber, getFormValidationErrors, isDocumentPath, isImagePath, isVedioPath, loadingInterceptor, logger, noAuthGuard, someFieldsContainData, timeAgo, viewIconSVG };
+export { API_BASE_URL, AllowNumberOnlyDirective, ArabicOnlyDirective, AuthBeService, AuthConstant, AuthContextService, AuthDirective, AuthInterceptor, AuthService, BlurBackdropDirective, ClickOutsideDirective, CommonHttpService, ComponentFormErrorConstant, CustomActionsDropdownComponent, CustomAppErrorComponent, CustomAvatarsComponent, CustomBreadcrumbComponent, CustomBulkActionsComponent, CustomButtonComponent, CustomCalendarComponent, CustomCalendarExpandedComponent, CustomCalenderFormComponent, CustomCategoryTableComponent, CustomCheckBoxComponent, CustomCheckBoxFormComponent, CustomColorComponent, CustomConfirmPopupComponent, CustomDetailsHeaderComponent, CustomDetailsModalComponent, CustomDetailsNavComponent, CustomDropdownButtonComponent, CustomDropdownComponent, CustomDropdownFormComponent, CustomDynamicTableWithCategoriesComponent, CustomFieldsFormComponent, CustomFileUploadComponent, CustomFileViewerComponent, CustomFilterDropdownComponent, CustomFilterDynamicFormComponent, CustomInputComponent, CustomInputFormComponent, CustomLoadingSpinnerComponent, CustomModalComponent, CustomMultiSelectDropdownComponent, CustomMultiSelectFormComponent, CustomPaginationComponent, CustomPlaceHolderComponent, CustomPlateNumberInputFormComponent, CustomPopUpComponent, CustomProgressBarComponent, CustomProgressRingComponent, CustomRadioComponentComponent, CustomRadioGroupFormComponent, CustomReactiveSearchInputComponent, CustomSearchInputComponent, CustomSteppersContainerComponent, CustomSteppersControllersComponent, CustomSvgIconComponent, CustomTableComponent, CustomTabsComponent, CustomTextareaComponent, CustomTextareaFormComponent, CustomTimeInputFormComponent, CustomTitleContentComponent, CustomToastComponent, CustomToggleSwitchComponent, CustomToggleSwitchFormComponent, CustomTooltipComponent, DispatchingFeComponentsService, DropdownsAnimationDirective, EnglishOnlyDirective, ErrorInterceptor, GeoLocationService, I18nConstant, LoadingService, ModuleRoutes, NetworkConnectionInterceptor, OverlayPanelComponent, PermissionGuard, Permissions, Resources, Roles, SHOW_SUCCESS_TOASTER, SKIP_LOADER, SKIP_TOKEN, SidenavService, StepperService, StorageService, TaskPriorityComponent, ToastService, ToggleElementDirective, TranslationService, Types, USE_TOKEN, UserDataService, UserStatus, actionAssignTaskSvg, actionDeleteSvg$1 as actionDeleteSvg, actionDuplicateSvg, actionEdiSquaretSvg, actionEditSvg$1 as actionEditSvg, actionPermission, actionRenameSvg, assignTaskSvg, authGuard, b64toBlob, blobToB64, convertDateFormat, convertFileToBase64, convertFormGroupToFormData, diffTime, downloadBlob, dropdownAnimation, excelDateToJSDate, flattenTree, formatDate, formatDateWithTime, formatTimestamp, formatinitialTakeTime, generateRandomColor, generateUniqueNumber, getFormValidationErrors, isDocumentPath, isImagePath, isVedioPath, loadingInterceptor, logger, noAuthGuard, someFieldsContainData, timeAgo, viewIconSVG };
 //# sourceMappingURL=dispatching-fe-components.mjs.map
