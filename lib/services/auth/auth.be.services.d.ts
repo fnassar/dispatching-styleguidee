@@ -26,7 +26,7 @@ export declare class AuthBeService {
     logout(): Observable<IGlobalAuthResponse<any>>;
     refreshToken(refreshToken: {
         refreshToken: string;
-    }): Observable<IGlobalAuthResponse<ILoginData>>;
+    }, firstLoad: boolean): Observable<IGlobalAuthResponse<ILoginData>>;
     validateToken(): Observable<IGlobalAuthResponse<any>>;
     getCurrUser(): Observable<IGlobalAuthResponse<IUserData>>;
     static ɵfac: i0.ɵɵFactoryDeclaration<AuthBeService, never>;

@@ -1,8 +1,8 @@
 import * as i0 from '@angular/core';
-import { Injectable, signal, InjectionToken, Inject, computed, Optional, inject, input, Input, Component, EventEmitter, Output, HostListener, Directive, PLATFORM_ID, effect, HostBinding, ViewChild, ContentChild, ViewEncapsulation, model } from '@angular/core';
-import { retry, catchError, BehaviorSubject, Observable, map, throwError, finalize, tap, Subscription, fromEvent, filter, Subject, takeUntil, debounceTime, distinctUntilChanged } from 'rxjs';
+import { Injectable, signal, InjectionToken, Inject, computed, Optional, inject, input, Input, Component, EventEmitter, Output, HostListener, Directive, PLATFORM_ID, effect, HostBinding, ViewChild, ContentChild, ViewEncapsulation, model, createComponent } from '@angular/core';
 import * as i1 from '@angular/common/http';
 import { HttpContextToken, HttpContext, HttpResponse } from '@angular/common/http';
+import { retry, catchError, BehaviorSubject, Observable, map, throwError, finalize, tap, Subscription, fromEvent, filter, Subject, takeUntil, debounceTime, distinctUntilChanged } from 'rxjs';
 import * as i3 from '@angular/router';
 import { Router } from '@angular/router';
 import * as i3$1 from '@ngx-translate/core';
@@ -409,9 +409,12 @@ class AuthBeService {
     logout() {
         return this.http.post(`${this.baseUrl}/api/v1/idm/auth/logout`, {});
     }
-    refreshToken(refreshToken) {
+    refreshToken(refreshToken, firstLoad) {
+        console.log('Refreshing token with data:', refreshToken, 'First load:', firstLoad);
         return this.http.post(`${this.baseUrl}/api/v1/idm/auth/refresh`, refreshToken, {
-            context: new HttpContext().set(SKIP_TOKEN, true),
+            context: new HttpContext()
+                .set(SKIP_TOKEN, true)
+                .set(SKIP_LOADER, !firstLoad),
         });
     }
     validateToken() {
@@ -539,11 +542,12 @@ class AuthService {
         const body = {
             refreshToken: this.getRefreshToken(),
         };
-        this.authBeService.refreshToken(body).subscribe({
+        const firstLoad = !this.getToken() && !!this.getRefreshToken();
+        this.authBeService.refreshToken(body, firstLoad).subscribe({
             next: (res) => {
                 if (res.success) {
                     this.authContextService.saveTokens(res.data);
-                    window.location.reload();
+                    // window.location.reload();
                 }
                 else {
                     this.logOutUser();
@@ -626,15 +630,14 @@ class AuthService {
                 '[]'));
     }
     getCurrentRoles() {
-        return (JSON.parse(this.storageService.getsessionItem(AuthConstant.USER_ROLES) ||
-            '[]'));
+        return JSON.parse(this.storageService.getsessionItem(AuthConstant.USER_ROLES) || '[]');
     }
     hasAnyCurrentRole(targetRoles) {
         const currentRoles = this.getCurrentRoles();
         if (!Array.isArray(currentRoles) || currentRoles.length === 0) {
             return false;
         }
-        return currentRoles.some(role => targetRoles.includes(role));
+        return currentRoles.some((role) => targetRoles.includes(role));
     }
     // PERMISSION MANAGEMENT
     hasCategory(route) {
@@ -884,59 +887,6 @@ i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.15", ngImpo
             type: Injectable,
             args: [{ providedIn: 'root' }]
         }] });
-
-class SidenavService {
-    _isCollapsed = signal(false);
-    constructor() {
-        // Initialize from sessionStorage on service creation
-        const storedState = sessionStorage.getItem('isCollapsed');
-        if (storedState === 'true') {
-            this._isCollapsed.set(true);
-        }
-        this.listenToWindowResize();
-    }
-    get isCollapsed() {
-        return this._isCollapsed();
-    }
-    toggle() {
-        const newVal = !this._isCollapsed();
-        sessionStorage.setItem('isCollapsed', newVal.toString());
-        this._isCollapsed.set(newVal);
-    }
-    collapse() {
-        this._isCollapsed.set(true);
-        sessionStorage.setItem('isCollapsed', 'true');
-    }
-    expand() {
-        this._isCollapsed.set(false);
-        sessionStorage.setItem('isCollapsed', 'false');
-    }
-    listenToWindowResize() {
-        const handleResize = () => {
-            const width = window.innerWidth;
-            // Always collapse when < 900px
-            if (width < 900) {
-                this._isCollapsed.set(true);
-                sessionStorage.setItem('isCollapsed', 'true');
-            }
-            // Always expand when >= 700px
-            else {
-                this._isCollapsed.set(false);
-                sessionStorage.setItem('isCollapsed', 'false');
-            }
-        };
-        // Initial check
-        handleResize();
-        // Listen to resize
-        window.addEventListener('resize', handleResize);
-    }
-    static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "19.2.15", ngImport: i0, type: SidenavService, deps: [], target: i0.ɵɵFactoryTarget.Injectable });
-    static ɵprov = i0.ɵɵngDeclareInjectable({ minVersion: "12.0.0", version: "19.2.15", ngImport: i0, type: SidenavService, providedIn: 'root' });
-}
-i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.15", ngImport: i0, type: SidenavService, decorators: [{
-            type: Injectable,
-            args: [{ providedIn: 'root' }]
-        }], ctorParameters: () => [] });
 
 class GeoLocationService {
     getCurrentPosition() {
@@ -6481,9 +6431,723 @@ i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.15", ngImpo
                 }]
         }], ctorParameters: () => [] });
 
+const icons = {
+    insightsSvg: (sanitizer) => sanitizer.bypassSecurityTrustHtml('<svg width="auto" height="auto" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#clip0_447_13885)"> <path d="M14.4887 0.994431H2.58867C1.64979 0.994431 0.888672 1.75555 0.888672 2.69443V14.5944C0.888672 15.5333 1.64979 16.2944 2.58867 16.2944H14.4887C15.4276 16.2944 16.1887 15.5333 16.1887 14.5944V2.69443C16.1887 1.75555 15.4276 0.994431 14.4887 0.994431Z" stroke="#545454" stroke-linecap="round" stroke-linejoin="round" /> <path d="M5.98828 5.24438H11.9383" stroke="#545454" stroke-linecap="round" stroke-linejoin="round" /> <path d="M5.13867 8.64444H10.2387" stroke="#545454" stroke-linecap="round" stroke-linejoin="round" /> <path d="M7.68945 12.0444H11.9395" stroke="#545454" stroke-linecap="round" stroke-linejoin="round" /></g><defs> <clipPath id="clip0_447_13885"> <rect width="17" height="17" fill="white" /> </clipPath></defs></svg>'),
+    planningSvg: (sanitizer) => sanitizer.bypassSecurityTrustHtml('<svg width="auto" height="auto" viewBox="0 0 17 19" fill="none" xmlns="http://www.w3.org/2000/svg"> <g clip-path="url(#clip0_447_13976)"> <path d="M5.09961 0.863525V4.31807" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M11.9004 0.863525V4.31807" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M14.4496 2.59082H2.54961C1.61073 2.59082 0.849609 3.36415 0.849609 4.31809V16.409C0.849609 17.3629 1.61073 18.1363 2.54961 18.1363H14.4496C15.3885 18.1363 16.1496 17.3629 16.1496 16.409V4.31809C16.1496 3.36415 15.3885 2.59082 14.4496 2.59082Z" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M0.849609 7.77271H16.1496" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M5.09961 11.2273H5.10861" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M8.5 11.2273H8.509" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M11.9004 11.2273H11.9094" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M5.09961 14.6819H5.10861" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M8.5 14.6818H8.509" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M11.9004 14.6819H11.9094" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> </g> <defs> <clipPath id="clip0_447_13976"> <rect width="17" height="19" fill="white"/> </clipPath> </defs> </svg>'),
+    plansSvg: (sanitizer) => sanitizer.bypassSecurityTrustHtml('<svg width="auto" height="auto" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg"> <path d="M2.47852 12.75V4.95834C2.47852 2.12501 3.18685 1.41667 6.02018 1.41667H10.9785C13.8118 1.41667 14.5202 2.12501 14.5202 4.95834V12.0417C14.5202 12.1408 14.5202 12.24 14.5131 12.3392" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M4.49727 10.625H14.5202V13.1042C14.5202 14.4713 13.4081 15.5833 12.041 15.5833H4.95768C3.5906 15.5833 2.47852 14.4713 2.47852 13.1042V12.6438C2.47852 11.5317 3.38518 10.625 4.49727 10.625Z" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M5.66602 4.95833H11.3327" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M5.66602 7.4375H9.20768" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> </svg>'),
+    tasksSvg: (sanitizer) => sanitizer.bypassSecurityTrustHtml('<svg width="auto" height="auto" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg"> <path d="M6.37435 15.5833H10.6243C14.166 15.5833 15.5827 14.1667 15.5827 10.625V6.37501C15.5827 2.83334 14.166 1.41667 10.6243 1.41667H6.37435C2.83268 1.41667 1.41602 2.83334 1.41602 6.37501V10.625C1.41602 14.1667 2.83268 15.5833 6.37435 15.5833Z" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M8.76172 6.28999H12.4805" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M4.51953 6.28999L5.05078 6.82124L6.64453 5.22749" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M8.76172 11.2483H12.4805" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M4.51953 11.2483L5.05078 11.7796L6.64453 10.1858" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> </svg>'),
+    resourcesSvg: (sanitizer) => sanitizer.bypassSecurityTrustHtml('<svg width="auto" height="auto" viewBox="0 0 17 15" fill="none" xmlns="http://www.w3.org/2000/svg"> <g clip-path="url(#clip0_447_14259)"> <path d="M11.5916 14.25V12.75C11.5916 11.9544 11.266 11.1913 10.6863 10.6287C10.1067 10.0661 9.32047 9.75 8.50071 9.75H3.86435C3.04459 9.75 2.2584 10.0661 1.67874 10.6287C1.09909 11.1913 0.773438 11.9544 0.773438 12.75V14.25" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M6.18271 6.75C7.88977 6.75 9.27362 5.40685 9.27362 3.75C9.27362 2.09315 7.88977 0.75 6.18271 0.75C4.47564 0.75 3.0918 2.09315 3.0918 3.75C3.0918 5.40685 4.47564 6.75 6.18271 6.75Z" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M16.2264 14.2499V12.7499C16.2259 12.0852 15.9979 11.4395 15.5783 10.9141C15.1588 10.3888 14.5713 10.0136 13.9082 9.84741" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M11.5918 0.847412C12.2567 1.01264 12.846 1.38794 13.2668 1.91414C13.6876 2.44035 13.916 3.08753 13.916 3.75366C13.916 4.41979 13.6876 5.06697 13.2668 5.59318C12.846 6.11939 12.2567 6.49469 11.5918 6.65991" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> </g> <defs> <clipPath id="clip0_447_14259"> <rect width="17" height="15" fill="white"/> </clipPath> </defs> </svg>'),
+    teamsSvg: (sanitizer) => sanitizer.bypassSecurityTrustHtml('<svg width="auto" height="auto" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg"> <path d="M7.08268 14.1667C7.08268 14.9491 7.71695 15.5833 8.49935 15.5833C9.28175 15.5833 9.91602 14.9491 9.91602 14.1667C9.91602 13.3843 9.28175 12.75 8.49935 12.75C7.71695 12.75 7.08268 13.3843 7.08268 14.1667Z" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M12.7507 14.1667C12.7507 14.9491 13.3849 15.5833 14.1673 15.5833C14.9497 15.5833 15.584 14.9491 15.584 14.1667C15.584 13.3843 14.9497 12.75 14.1673 12.75C13.3849 12.75 12.7507 13.3843 12.7507 14.1667Z" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M1.41667 14.1667C1.41667 14.9491 2.05093 15.5833 2.83333 15.5833C3.61574 15.5833 4.25 14.9491 4.25 14.1667C4.25 13.3843 3.61574 12.75 2.83333 12.75C2.05093 12.75 1.41667 13.3843 1.41667 14.1667Z" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M7.08268 2.83335C7.08268 3.61576 7.71695 4.25002 8.49935 4.25002C9.28175 4.25002 9.91602 3.61576 9.91602 2.83335C9.91602 2.05095 9.28175 1.41669 8.49935 1.41669C7.71695 1.41669 7.08268 2.05095 7.08268 2.83335Z" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M8.5 4.25V12.75" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M14.166 12.75V9.91669C14.166 8.50002 13.4577 7.79169 12.041 7.79169L4.95768 7.79169C3.54102 7.79169 2.83268 8.50002 2.83268 9.91669V12.75" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> </svg>'),
+    usersSvg: (sanitizer) => sanitizer.bypassSecurityTrustHtml('<svg width="auto" height="auto" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg"> <path d="M12.7506 5.07166C12.7081 5.06458 12.6585 5.06458 12.616 5.07166C11.6385 5.03624 10.8594 4.23582 10.8594 3.24416C10.8594 2.23124 11.674 1.41666 12.6869 1.41666C13.6998 1.41666 14.5144 2.23832 14.5144 3.24416C14.5073 4.23582 13.7281 5.03624 12.7506 5.07166Z" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M12.0213 10.2283C12.9917 10.3912 14.0613 10.2212 14.8121 9.71831C15.8108 9.05248 15.8108 7.96165 14.8121 7.29582C14.0542 6.7929 12.9704 6.62289 12 6.79289" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M4.2286 5.07166C4.2711 5.06458 4.32068 5.06458 4.36318 5.07166C5.34068 5.03624 6.11984 4.23582 6.11984 3.24416C6.11984 2.23124 5.30526 1.41666 4.29235 1.41666C3.27943 1.41666 2.46484 2.23832 2.46484 3.24416C2.47193 4.23582 3.25109 5.03624 4.2286 5.07166Z" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M4.95786 10.2283C3.98745 10.3912 2.91786 10.2212 2.16703 9.71831C1.16828 9.05248 1.16828 7.96165 2.16703 7.29582C2.92495 6.7929 4.0087 6.62289 4.97911 6.79289" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M8.50062 10.3629C8.45812 10.3558 8.40854 10.3558 8.36604 10.3629C7.38854 10.3275 6.60938 9.52708 6.60938 8.53542C6.60938 7.5225 7.42396 6.70792 8.43687 6.70792C9.44979 6.70792 10.2644 7.52958 10.2644 8.53542C10.2573 9.52708 9.47812 10.3346 8.50062 10.3629Z" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M6.43852 12.5942C5.43977 13.26 5.43977 14.3509 6.43852 15.0167C7.57185 15.7746 9.42768 15.7746 10.561 15.0167C11.5598 14.3509 11.5598 13.26 10.561 12.5942C9.43477 11.8434 7.57185 11.8434 6.43852 12.5942Z" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> </svg>'),
+    assetsSvg: (sanitizer) => sanitizer.bypassSecurityTrustHtml('<svg width="auto" height="auto" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg"> <path d="M14.875 4.95832V12.0417C14.875 14.1667 13.8125 15.5833 11.3333 15.5833H5.66667C3.1875 15.5833 2.125 14.1667 2.125 12.0417V4.95832C2.125 2.83332 3.1875 1.41666 5.66667 1.41666H11.3333C13.8125 1.41666 14.875 2.83332 14.875 4.95832Z" stroke="#545454" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/> <path d="M10.2715 3.1875V4.60417C10.2715 5.38333 10.909 6.02083 11.6882 6.02083H13.1048" stroke="#545454" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/> <path d="M5.66602 9.20831H8.49935" stroke="#545454" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/> <path d="M5.66602 12.0417H11.3327" stroke="#545454" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/> </svg>'),
+    vehiclesSvg: (sanitizer) => sanitizer.bypassSecurityTrustHtml('<svg width="auto" height="auto" viewBox="0 0 19 15" fill="none" xmlns="http://www.w3.org/2000/svg"> <path d="M15.5451 11.7858H17.2724C17.7906 11.7858 18.136 11.3572 18.136 10.7144V7.5001C18.136 6.53582 17.5315 5.67868 16.8406 5.46439C15.286 4.92868 12.9542 4.28582 12.9542 4.28582C12.9542 4.28582 11.8315 2.78582 11.0542 1.82153C10.6224 1.39296 10.1042 1.07153 9.49964 1.07153H3.45419C2.93601 1.07153 2.50419 1.5001 2.2451 2.03582L1.03601 5.14296C0.921646 5.55677 0.863281 5.99122 0.863281 6.42868V10.7144C0.863281 11.3572 1.20874 11.7858 1.72692 11.7858H3.45419" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M5.18235 13.9285C6.1363 13.9285 6.90962 12.9691 6.90962 11.7857C6.90962 10.6022 6.1363 9.64282 5.18235 9.64282C4.2284 9.64282 3.45508 10.6022 3.45508 11.7857C3.45508 12.9691 4.2284 13.9285 5.18235 13.9285Z" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M6.9082 11.7856H12.09" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M13.8191 13.9285C14.773 13.9285 15.5463 12.9691 15.5463 11.7857C15.5463 10.6022 14.773 9.64282 13.8191 9.64282C12.8651 9.64282 12.0918 10.6022 12.0918 11.7857C12.0918 12.9691 12.8651 13.9285 13.8191 13.9285Z" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> </svg>'),
+    equipmentSvg: (sanitizer) => sanitizer.bypassSecurityTrustHtml('<svg width="auto" height="auto" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg"> <path d="M4.78813 15.5834H12.2115C14.1665 15.5834 14.9456 14.3863 15.0377 12.9271L15.406 7.07627C15.5052 5.54627 14.2869 4.25002 12.7498 4.25002C12.3177 4.25002 11.921 4.0021 11.7227 3.6196L11.2127 2.59252C10.8869 1.94794 10.0369 1.41669 9.31438 1.41669H7.69229C6.96271 1.41669 6.11271 1.94794 5.78688 2.59252L5.27688 3.6196C5.07854 4.0021 4.68188 4.25002 4.24979 4.25002C2.71271 4.25002 1.49438 5.54627 1.59354 7.07627L1.96188 12.9271C2.04688 14.3863 2.83313 15.5834 4.78813 15.5834Z" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M7.4375 5.66669H9.5625" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M8.49935 12.75C9.76727 12.75 10.8014 11.7158 10.8014 10.4479C10.8014 9.17998 9.76727 8.14581 8.49935 8.14581C7.23143 8.14581 6.19727 9.17998 6.19727 10.4479C6.19727 11.7158 7.23143 12.75 8.49935 12.75Z" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> </svg>'),
+    zonesSvg: (sanitizer) => sanitizer.bypassSecurityTrustHtml('<svg width="auto" height="auto" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg"> <g clip-path="url(#clip0_447_15078)"> <path d="M5.9612 10.0454H3.09438C2.93236 10.0455 2.77446 10.0965 2.64301 10.1912C2.51156 10.2859 2.4132 10.4195 2.36184 10.5732L0.813291 15.2095C0.774469 15.3257 0.76381 15.4494 0.782192 15.5705C0.800574 15.6916 0.847471 15.8065 0.919016 15.9059C0.990561 16.0053 1.08471 16.0863 1.19369 16.1422C1.30267 16.198 1.42337 16.2272 1.54584 16.2272H15.4549C15.5773 16.2271 15.6979 16.198 15.8068 16.1422C15.9157 16.0863 16.0098 16.0055 16.0813 15.9062C16.1529 15.8069 16.1998 15.692 16.2182 15.571C16.2367 15.4501 16.2261 15.3264 16.1875 15.2103L14.642 10.574C14.5907 10.42 14.4923 10.2861 14.3607 10.1913C14.2291 10.0964 14.0709 10.0454 13.9087 10.0454H11.0403" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M13.136 5.40907C13.136 8.20093 10.1463 11.1497 8.96869 12.2052C8.83398 12.3081 8.66916 12.3638 8.49965 12.3638C8.33013 12.3638 8.16531 12.3081 8.0306 12.2052C6.85374 11.1497 3.86328 8.20093 3.86328 5.40907C3.86328 4.17943 4.35175 3.00015 5.22124 2.13066C6.09073 1.26118 7.27 0.772705 8.49965 0.772705C9.72929 0.772705 10.9086 1.26118 11.7781 2.13066C12.6475 3.00015 13.136 4.17943 13.136 5.40907Z" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M8.50053 6.95443C9.35406 6.95443 10.046 6.26251 10.046 5.40898C10.046 4.55545 9.35406 3.86353 8.50053 3.86353C7.647 3.86353 6.95508 4.55545 6.95508 5.40898C6.95508 6.26251 7.647 6.95443 8.50053 6.95443Z" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> </g> <defs> <clipPath id="clip0_447_15078"> <rect width="17" height="17" fill="white"/> </clipPath> </defs> </svg>'),
+    AnalysisSvg: (sanitizer) => sanitizer.bypassSecurityTrustHtml('<svg width="auto" height="auto" viewBox="0 0 17 19" fill="none" xmlns="http://www.w3.org/2000/svg"> <g clip-path="url(#clip0_447_15136)"> <path d="M11.3342 0.86377H2.8342C2.33324 0.86377 1.85279 1.04575 1.49856 1.36968C1.14432 1.6936 0.945313 2.13294 0.945312 2.59104V16.4092C0.945313 16.8673 1.14432 17.3067 1.49856 17.6306C1.85279 17.9545 2.33324 18.1365 2.8342 18.1365H14.1675C14.6685 18.1365 15.1489 17.9545 15.5032 17.6306C15.8574 17.3067 16.0564 16.8673 16.0564 16.4092V5.18195L11.3342 0.86377Z" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M10.3887 0.863647V4.31819C10.3887 4.77629 10.5877 5.21563 10.9419 5.53956C11.2962 5.86349 11.7766 6.04547 12.2776 6.04547H16.0553" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M4.72266 14.6819V12.9546" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M8.5 14.6818V11.2273" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M12.2773 14.6818V9.5" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> </g> <defs> <clipPath id="clip0_447_15136"> <rect width="17" height="19" fill="white"/> </clipPath> </defs> </svg>'),
+};
+const iconsDark = {
+    insightsSvg: (sanitizer) => sanitizer.bypassSecurityTrustHtml('<svg width="inherit" height="inherit" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M14.4887 0.994446H2.58867C1.64979 0.994446 0.888672 1.75556 0.888672 2.69445V14.5944C0.888672 15.5333 1.64979 16.2944 2.58867 16.2944H14.4887C15.4276 16.2944 16.1887 15.5333 16.1887 14.5944V2.69445C16.1887 1.75556 15.4276 0.994446 14.4887 0.994446Z" fill="#147A72"/><path d="M5.98828 5.24438H11.9383" stroke="white" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.13867 8.64444H10.2387" stroke="white" stroke-linecap="round" stroke-linejoin="round"/><path d="M7.68945 12.0444H11.9395" stroke="white" stroke-linecap="round" stroke-linejoin="round"/></svg>'),
+    planningSvg: (sanitizer) => sanitizer.bypassSecurityTrustHtml('<svg width="auto" height="auto" viewBox="0 0 17 19" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#clip0_447_14069)"><path d="M5.09961 0.863525V4.31807" stroke="#147A72" stroke-linecap="round" stroke-linejoin="round"/><path d="M11.9004 0.863525V4.31807" stroke="#147A72" stroke-linecap="round" stroke-linejoin="round"/><path d="M14.4496 2.59082H2.54961C1.61073 2.59082 0.849609 3.36415 0.849609 4.31809V16.409C0.849609 17.3629 1.61073 18.1363 2.54961 18.1363H14.4496C15.3885 18.1363 16.1496 17.3629 16.1496 16.409V4.31809C16.1496 3.36415 15.3885 2.59082 14.4496 2.59082Z" fill="#147A72"/><path d="M0.849609 7.77271H16.1496" stroke="white" stroke-linecap="square" stroke-linejoin="round"/><path d="M5.09961 11.2273H5.10861" stroke="white" stroke-linecap="round" stroke-linejoin="round"/><path d="M8.5 11.2273H8.509" stroke="white" stroke-linecap="round" stroke-linejoin="round"/><path d="M11.9004 11.2273H11.9094" stroke="white" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.09961 14.6819H5.10861" stroke="white" stroke-linecap="round" stroke-linejoin="round"/><path d="M8.5 14.6818H8.509" stroke="white" stroke-linecap="round" stroke-linejoin="round"/><path d="M11.9004 14.6819H11.9094" stroke="white" stroke-linecap="round" stroke-linejoin="round"/></g><defs><clipPath id="clip0_447_14069"><rect width="17" height="19" fill="white"/></clipPath></defs></svg>'),
+    plansSvg: (sanitizer) => sanitizer.bypassSecurityTrustHtml('<svg width="auto" height="auto" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2.47852 12.75V4.95832C2.47852 2.12499 3.18685 1.41666 6.02018 1.41666H10.9785C13.8118 1.41666 14.5202 2.12499 14.5202 4.95832V12.0417C14.5202 12.1408 14.5202 12.24 14.5131 12.3392" fill="#147A72"/><path d="M2.47852 12.75V4.95832C2.47852 2.12499 3.18685 1.41666 6.02018 1.41666H10.9785C13.8118 1.41666 14.5202 2.12499 14.5202 4.95832V12.0417C14.5202 12.1408 14.5202 12.24 14.5131 12.3392" stroke="white" stroke-linecap="round" stroke-linejoin="round"/><path d="M4.49727 10.625H14.5202V13.1042C14.5202 14.4713 13.4081 15.5833 12.041 15.5833H4.95768C3.5906 15.5833 2.47852 14.4713 2.47852 13.1042V12.6438C2.47852 11.5317 3.38518 10.625 4.49727 10.625Z" fill="#147A72" stroke="white" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.66602 4.95834H11.3327" stroke="white" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.66602 7.4375H9.20768" stroke="white" stroke-linecap="round" stroke-linejoin="round"/></svg>'),
+    tasksSvg: (sanitizer) => sanitizer.bypassSecurityTrustHtml('<svg width="auto" height="auto" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6.37435 15.5834H10.6243C14.166 15.5834 15.5827 14.1667 15.5827 10.625V6.37502C15.5827 2.83335 14.166 1.41669 10.6243 1.41669H6.37435C2.83268 1.41669 1.41602 2.83335 1.41602 6.37502V10.625C1.41602 14.1667 2.83268 15.5834 6.37435 15.5834Z" fill="#147A72"/><path d="M8.76172 6.29001H12.4805" stroke="white" stroke-linecap="round" stroke-linejoin="round"/><path d="M4.51953 6.29001L5.05078 6.82126L6.64453 5.22751" stroke="white" stroke-linecap="round" stroke-linejoin="round"/><path d="M8.76172 11.2483H12.4805" stroke="white" stroke-linecap="round" stroke-linejoin="round"/><path d="M4.51953 11.2483L5.05078 11.7796L6.64453 10.1858" stroke="white" stroke-linecap="round" stroke-linejoin="round"/></svg>'),
+    resourcesSvg: (sanitizer) => sanitizer.bypassSecurityTrustHtml('<svg width="auto" height="auto" viewBox="0 0 17 15" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#clip0_529_19934)"><path d="M11.5916 14.25V12.75C11.5916 11.9544 11.266 11.1913 10.6863 10.6287C10.1067 10.0661 9.32047 9.75 8.50071 9.75H3.86435C3.04459 9.75 2.2584 10.0661 1.67874 10.6287C1.09909 11.1913 0.773438 11.9544 0.773438 12.75V14.25" fill="#147A72"/><path d="M11.5916 14.25V12.75C11.5916 11.9544 11.266 11.1913 10.6863 10.6287C10.1067 10.0661 9.32047 9.75 8.50071 9.75H3.86435C3.04459 9.75 2.2584 10.0661 1.67874 10.6287C1.09909 11.1913 0.773438 11.9544 0.773438 12.75V14.25" stroke="#147A72" stroke-linecap="round" stroke-linejoin="round"/><path d="M6.18271 6.75C7.88977 6.75 9.27362 5.40685 9.27362 3.75C9.27362 2.09315 7.88977 0.75 6.18271 0.75C4.47564 0.75 3.0918 2.09315 3.0918 3.75C3.0918 5.40685 4.47564 6.75 6.18271 6.75Z" fill="#147A72" stroke="#147A72" stroke-linecap="round" stroke-linejoin="round"/><path d="M16.2264 14.2499V12.7499C16.2259 12.0852 15.9979 11.4395 15.5783 10.9141C15.1588 10.3888 14.5713 10.0136 13.9082 9.84741" fill="#147A72"/><path d="M16.2264 14.2499V12.7499C16.2259 12.0852 15.9979 11.4395 15.5783 10.9141C15.1588 10.3888 14.5713 10.0136 13.9082 9.84741" stroke="#147A72" stroke-linecap="round" stroke-linejoin="round"/><path d="M11.5918 0.847412C12.2567 1.01264 12.846 1.38794 13.2668 1.91414C13.6876 2.44035 13.916 3.08753 13.916 3.75366C13.916 4.41979 13.6876 5.06697 13.2668 5.59318C12.846 6.11939 12.2567 6.49469 11.5918 6.65991" fill="#147A72"/><path d="M11.5918 0.847412C12.2567 1.01264 12.846 1.38794 13.2668 1.91414C13.6876 2.44035 13.916 3.08753 13.916 3.75366C13.916 4.41979 13.6876 5.06697 13.2668 5.59318C12.846 6.11939 12.2567 6.49469 11.5918 6.65991" stroke="#147A72" stroke-linecap="round" stroke-linejoin="round"/></g><defs><clipPath id="clip0_529_19934"><rect width="17" height="15" fill="white"/></clipPath></defs></svg>'),
+    teamsSvg: (sanitizer) => sanitizer.bypassSecurityTrustHtml('<svg width="auto" height="auto" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7.08268 14.1667C7.08268 14.9491 7.71695 15.5833 8.49935 15.5833C9.28175 15.5833 9.91602 14.9491 9.91602 14.1667C9.91602 13.3843 9.28175 12.75 8.49935 12.75C7.71695 12.75 7.08268 13.3843 7.08268 14.1667Z" stroke="#147A72" stroke-linecap="round" stroke-linejoin="round"/><path d="M12.7507 14.1667C12.7507 14.9491 13.3849 15.5833 14.1673 15.5833C14.9497 15.5833 15.584 14.9491 15.584 14.1667C15.584 13.3843 14.9497 12.75 14.1673 12.75C13.3849 12.75 12.7507 13.3843 12.7507 14.1667Z" stroke="#147A72" stroke-linecap="round" stroke-linejoin="round"/><path d="M1.41667 14.1667C1.41667 14.9491 2.05093 15.5833 2.83333 15.5833C3.61574 15.5833 4.25 14.9491 4.25 14.1667C4.25 13.3843 3.61574 12.75 2.83333 12.75C2.05093 12.75 1.41667 13.3843 1.41667 14.1667Z" stroke="#147A72" stroke-linecap="round" stroke-linejoin="round"/><path d="M7.08268 2.83335C7.08268 3.61576 7.71695 4.25002 8.49935 4.25002C9.28175 4.25002 9.91602 3.61576 9.91602 2.83335C9.91602 2.05095 9.28175 1.41669 8.49935 1.41669C7.71695 1.41669 7.08268 2.05095 7.08268 2.83335Z" stroke="#147A72" stroke-linecap="round" stroke-linejoin="round"/><path d="M8.5 4.25V12.75" stroke="#147A72" stroke-linecap="round" stroke-linejoin="round"/><path d="M14.166 12.75V9.91669C14.166 8.50002 13.4577 7.79169 12.041 7.79169L4.95768 7.79169C3.54102 7.79169 2.83268 8.50002 2.83268 9.91669V12.75" stroke="#147A72" stroke-linecap="round" stroke-linejoin="round"/></svg>'),
+    usersSvg: (sanitizer) => sanitizer.bypassSecurityTrustHtml('<svg width="auto" height="auto" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12.7506 5.07169C12.7081 5.06461 12.6585 5.06461 12.616 5.07169C11.6385 5.03627 10.8594 4.23585 10.8594 3.24419C10.8594 2.23127 11.674 1.41669 12.6869 1.41669C13.6998 1.41669 14.5144 2.23835 14.5144 3.24419C14.5073 4.23585 13.7281 5.03627 12.7506 5.07169Z" stroke="#147A72" stroke-linecap="round" stroke-linejoin="round"/><path d="M12.0213 10.2283C12.9917 10.3913 14.0613 10.2213 14.8121 9.71835C15.8108 9.05251 15.8108 7.96168 14.8121 7.29585C14.0542 6.79293 12.9704 6.62293 12 6.79293" stroke="#147A72" stroke-linecap="round" stroke-linejoin="round"/><path d="M4.2286 5.07169C4.2711 5.06461 4.32068 5.06461 4.36318 5.07169C5.34068 5.03627 6.11984 4.23585 6.11984 3.24419C6.11984 2.23127 5.30526 1.41669 4.29235 1.41669C3.27943 1.41669 2.46484 2.23835 2.46484 3.24419C2.47193 4.23585 3.25109 5.03627 4.2286 5.07169Z" stroke="#147A72" stroke-linecap="round" stroke-linejoin="round"/><path d="M4.95786 10.2283C3.98745 10.3913 2.91786 10.2213 2.16703 9.71835C1.16828 9.05251 1.16828 7.96168 2.16703 7.29585C2.92495 6.79293 4.0087 6.62293 4.97911 6.79293" stroke="#147A72" stroke-linecap="round" stroke-linejoin="round"/><path d="M8.50062 10.3629C8.45812 10.3559 8.40854 10.3559 8.36604 10.3629C7.38854 10.3275 6.60938 9.52711 6.60938 8.53545C6.60938 7.52253 7.42396 6.70795 8.43687 6.70795C9.44979 6.70795 10.2644 7.52961 10.2644 8.53545C10.2573 9.52711 9.47812 10.3346 8.50062 10.3629Z" stroke="#147A72" stroke-linecap="round" stroke-linejoin="round"/><path d="M6.43852 12.5942C5.43977 13.26 5.43977 14.3509 6.43852 15.0167C7.57185 15.7746 9.42768 15.7746 10.561 15.0167C11.5598 14.3509 11.5598 13.26 10.561 12.5942C9.43477 11.8434 7.57185 11.8434 6.43852 12.5942Z" stroke="#147A72" stroke-linecap="round" stroke-linejoin="round"/></svg>'),
+    assetsSvg: (sanitizer) => sanitizer.bypassSecurityTrustHtml('<svg width="auto" height="auto" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M14.875 4.95835V12.0417C14.875 14.1667 13.8125 15.5834 11.3333 15.5834H5.66667C3.1875 15.5834 2.125 14.1667 2.125 12.0417V4.95835C2.125 2.83335 3.1875 1.41669 5.66667 1.41669H11.3333C13.8125 1.41669 14.875 2.83335 14.875 4.95835Z" fill="#147A72"/><path d="M10.2715 3.1875V4.60417C10.2715 5.38333 10.909 6.02083 11.6882 6.02083H13.1048" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.66602 9.20831H8.49935" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.66602 12.0417H11.3327" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/></svg>'),
+    vehiclesSvg: (sanitizer) => sanitizer.bypassSecurityTrustHtml('<svg width="auto" height="auto" viewBox="0 0 19 15" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15.5451 11.7858H17.2724C17.7906 11.7858 18.136 11.3572 18.136 10.7144V7.5001C18.136 6.53582 17.5315 5.67868 16.8406 5.46439C15.286 4.92868 12.9542 4.28582 12.9542 4.28582C12.9542 4.28582 11.8315 2.78582 11.0542 1.82153C10.6224 1.39296 10.1042 1.07153 9.49964 1.07153H3.45419C2.93601 1.07153 2.50419 1.5001 2.2451 2.03582L1.03601 5.14296C0.921646 5.55677 0.863281 5.99122 0.863281 6.42868V10.7144C0.863281 11.3572 1.20874 11.7858 1.72692 11.7858H3.45419" fill="#147A72"></path><path d="M15.5451 11.7858H17.2724C17.7906 11.7858 18.136 11.3572 18.136 10.7144V7.5001C18.136 6.53582 17.5315 5.67868 16.8406 5.46439C15.286 4.92868 12.9542 4.28582 12.9542 4.28582C12.9542 4.28582 11.8315 2.78582 11.0542 1.82153C10.6224 1.39296 10.1042 1.07153 9.49964 1.07153H3.45419C2.93601 1.07153 2.50419 1.5001 2.2451 2.03582L1.03601 5.14296C0.921646 5.55677 0.863281 5.99122 0.863281 6.42868V10.7144C0.863281 11.3572 1.20874 11.7858 1.72692 11.7858H3.45419" stroke="white" stroke-linecap="round" stroke-linejoin="round"></path><path d="M6.9082 11.7856H12.09" stroke="white" stroke-linecap="round" stroke-linejoin="round"></path><path d="M5.18235 13.9285C6.1363 13.9285 6.90962 12.9691 6.90962 11.7857C6.90962 10.6022 6.1363 9.64282 5.18235 9.64282C4.2284 9.64282 3.45508 10.6022 3.45508 11.7857C3.45508 12.9691 4.2284 13.9285 5.18235 13.9285Z" stroke="white" stroke-linecap="round" stroke-linejoin="round" fill="#147A72"></path><path d="M13.8191 13.9285C14.773 13.9285 15.5463 12.9691 15.5463 11.7857C15.5463 10.6022 14.773 9.64282 13.8191 9.64282C12.8651 9.64282 12.0918 10.6022 12.0918 11.7857C12.0918 12.9691 12.8651 13.9285 13.8191 13.9285Z" stroke="white" stroke-linecap="round" stroke-linejoin="round" fill="#147A72"></path></svg>'),
+    equipmentSvg: (sanitizer) => sanitizer.bypassSecurityTrustHtml('<svg width="auto" height="auto" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4.78813 15.5834H12.2115C14.1665 15.5834 14.9456 14.3863 15.0377 12.9271L15.406 7.07627C15.5052 5.54627 14.2869 4.25002 12.7498 4.25002C12.3177 4.25002 11.921 4.0021 11.7227 3.6196L11.2127 2.59252C10.8869 1.94794 10.0369 1.41669 9.31438 1.41669H7.69229C6.96271 1.41669 6.11271 1.94794 5.78688 2.59252L5.27688 3.6196C5.07854 4.0021 4.68188 4.25002 4.24979 4.25002C2.71271 4.25002 1.49438 5.54627 1.59354 7.07627L1.96188 12.9271C2.04688 14.3863 2.83313 15.5834 4.78813 15.5834Z" fill="#147A72"/><path d="M7.4375 5.66669H9.5625" stroke="white" stroke-linecap="round" stroke-linejoin="round"/><path d="M8.49935 12.75C9.76727 12.75 10.8014 11.7159 10.8014 10.448C10.8014 9.18004 9.76727 8.14587 8.49935 8.14587C7.23143 8.14587 6.19727 9.18004 6.19727 10.448C6.19727 11.7159 7.23143 12.75 8.49935 12.75Z" stroke="white" stroke-linecap="round" stroke-linejoin="round"/></svg>'),
+    zonesSvg: (sanitizer) => sanitizer.bypassSecurityTrustHtml('<svg width="auto" height="auto" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#clip0_447_15070)"><path d="M5.9612 10.0454H3.09438C2.93236 10.0455 2.77446 10.0965 2.64301 10.1912C2.51156 10.2859 2.4132 10.4195 2.36184 10.5732L0.813291 15.2095C0.774469 15.3257 0.76381 15.4494 0.782192 15.5705C0.800574 15.6916 0.847471 15.8065 0.919016 15.9059C0.990561 16.0053 1.08471 16.0863 1.19369 16.1422C1.30267 16.198 1.42337 16.2272 1.54584 16.2272H15.4549C15.5773 16.2271 15.6979 16.198 15.8068 16.1422C15.9157 16.0863 16.0098 16.0055 16.0813 15.9062C16.1529 15.8069 16.1998 15.692 16.2182 15.571C16.2367 15.4501 16.2261 15.3264 16.1875 15.2103L14.642 10.574C14.5907 10.42 14.4923 10.2861 14.3607 10.1913C14.2291 10.0964 14.0709 10.0454 13.9087 10.0454H11.0403" fill="#147A72"/><path d="M5.9612 10.0454H3.09438C2.93236 10.0455 2.77446 10.0965 2.64301 10.1912C2.51156 10.2859 2.4132 10.4195 2.36184 10.5732L0.813291 15.2095C0.774469 15.3257 0.76381 15.4494 0.782192 15.5705C0.800574 15.6916 0.847471 15.8065 0.919016 15.9059C0.990561 16.0053 1.08471 16.0863 1.19369 16.1422C1.30267 16.198 1.42337 16.2272 1.54584 16.2272H15.4549C15.5773 16.2271 15.6979 16.198 15.8068 16.1422C15.9157 16.0863 16.0098 16.0055 16.0813 15.9062C16.1529 15.8069 16.1998 15.692 16.2182 15.571C16.2367 15.4501 16.2261 15.3264 16.1875 15.2103L14.642 10.574C14.5907 10.42 14.4923 10.2861 14.3607 10.1913C14.2291 10.0964 14.0709 10.0454 13.9087 10.0454H11.0403" stroke="#147A72" stroke-linecap="round" stroke-linejoin="round"/><path d="M13.136 5.40907C13.136 8.20093 10.1463 11.1497 8.96869 12.2052C8.83398 12.3081 8.66916 12.3638 8.49965 12.3638C8.33013 12.3638 8.16531 12.3081 8.0306 12.2052C6.85374 11.1497 3.86328 8.20093 3.86328 5.40907C3.86328 4.17943 4.35175 3.00015 5.22124 2.13066C6.09073 1.26118 7.27 0.772705 8.49965 0.772705C9.72929 0.772705 10.9086 1.26118 11.778 2.13066C12.6475 3.00015 13.136 4.17943 13.136 5.40907Z" fill="#147A72" stroke="white" stroke-linecap="round" stroke-linejoin="round"/><path d="M8.50053 6.95443C9.35406 6.95443 10.046 6.26251 10.046 5.40898C10.046 4.55545 9.35406 3.86353 8.50053 3.86353C7.647 3.86353 6.95508 4.55545 6.95508 5.40898C6.95508 6.26251 7.647 6.95443 8.50053 6.95443Z" stroke="white" stroke-linecap="round" stroke-linejoin="round"/></g><defs><clipPath id="clip0_447_15070"><rect width="17" height="17" fill="white"/></clipPath></defs></svg>'),
+    AnalysisSvg: (sanitizer) => sanitizer.bypassSecurityTrustHtml('<svg width="auto" height="auto" viewBox="0 0 17 19" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#clip0_447_15118)"><path d="M11.3342 0.86377H2.8342C2.33324 0.86377 1.85279 1.04575 1.49856 1.36968C1.14432 1.6936 0.945313 2.13294 0.945312 2.59104V16.4092C0.945313 16.8673 1.14432 17.3067 1.49856 17.6306C1.85279 17.9545 2.33324 18.1365 2.8342 18.1365H14.1675C14.6685 18.1365 15.1489 17.9545 15.5032 17.6306C15.8574 17.3067 16.0564 16.8673 16.0564 16.4092V5.18195L11.3342 0.86377Z" fill="#147A72" stroke="#147A72" stroke-linecap="round" stroke-linejoin="round"/><path d="M10.3887 0.863647V4.31819C10.3887 4.77629 10.5877 5.21563 10.9419 5.53956C11.2962 5.86349 11.7766 6.04547 12.2776 6.04547H16.0553" fill="white"/><path d="M10.3887 0.863647V4.31819C10.3887 4.77629 10.5877 5.21563 10.9419 5.53956C11.2962 5.86349 11.7766 6.04547 12.2776 6.04547H16.0553" stroke="white" stroke-linecap="round" stroke-linejoin="round"/><path d="M4.72266 14.6819V12.9546" stroke="white" stroke-linecap="round" stroke-linejoin="round"/><path d="M8.5 14.6818V11.2273" stroke="white" stroke-linecap="round" stroke-linejoin="round"/><path d="M12.2773 14.6818V9.5" stroke="white" stroke-linecap="round" stroke-linejoin="round"/></g><defs><clipPath id="clip0_447_15118"><rect width="17" height="19" fill="white"/></clipPath></defs></svg>'),
+};
+
+const headerLogoSvg = `
+<svg
+  width="auto"
+  height="auto"
+  viewBox="0 0 70 66"
+  fill="none"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <path
+    d="M12.1063 19.7319H19.5225C20.1367 19.7319 20.6396 20.2132 20.6396 20.8009V27.8982C20.6396 28.4869 20.1367 28.9673 19.5225 28.9673H12.1063C11.4921 28.9673 10.9883 28.4869 10.9883 27.8982V20.8009C10.9883 20.2132 11.4921 19.7319 12.1063 19.7319Z"
+    fill="#602650"
+  />
+  <path
+    d="M22.8014 10.3033H29.5031C30.0385 10.3033 30.4763 10.7223 30.4763 11.2347V17.6482C30.4763 18.1606 30.0385 18.5796 29.5031 18.5796H22.8014C22.2659 18.5796 21.8281 18.1606 21.8281 17.6482V11.2347C21.8281 10.7223 22.2659 10.3033 22.8014 10.3033Z"
+    fill="#602650"
+  />
+  <path
+    d="M33.4837 0.889208H39.4816C39.9384 0.889208 40.3129 1.24671 40.3129 1.68472V7.4247C40.3129 7.86184 39.9384 8.22021 39.4816 8.22021H33.4837C33.0269 8.22021 32.6533 7.86184 32.6533 7.4247V1.68472C32.6533 1.24671 33.0269 0.889208 33.4837 0.889208Z"
+    fill="#602650"
+  />
+  <path
+    d="M44.0514 11.3772H49.3556C49.7364 11.3772 50.0466 11.6749 50.0466 12.0385V17.1145C50.0466 17.479 49.7364 17.7759 49.3556 17.7759H44.0514C43.6715 17.7759 43.3604 17.479 43.3604 17.1145V12.0385C43.3604 11.6749 43.6715 11.3772 44.0514 11.3772Z"
+    fill="#602650"
+  />
+  <path
+    d="M54.6786 21.7239H59.2999C59.6038 21.7239 59.8535 21.962 59.8535 22.2537V26.6762C59.8535 26.967 59.6038 27.2051 59.2999 27.2051H54.6786C54.3747 27.2051 54.126 26.967 54.126 26.6762V22.2537C54.126 21.962 54.3747 21.7239 54.6786 21.7239Z"
+    fill="#602650"
+  />
+  <path
+    d="M65.4112 32.0727H69.3595C69.5892 32.0727 69.7765 32.2528 69.7765 32.4718V36.2502C69.7765 36.4701 69.5892 36.6484 69.3595 36.6484H65.4112C65.1824 36.6484 64.9951 36.4701 64.9951 36.2502V32.4718C64.9951 32.2528 65.1824 32.0727 65.4112 32.0727Z"
+    fill="#602650"
+  />
+  <path
+    d="M55.3955 42.4077H58.6789C58.8354 42.4077 58.9621 42.5297 58.9621 42.6786V45.8217C58.9621 45.9706 58.8354 46.0918 58.6789 46.0918H55.3955C55.2399 46.0918 55.1133 45.9706 55.1133 45.8217V42.6786C55.1133 42.5297 55.2399 42.4077 55.3955 42.4077Z"
+    fill="#602650"
+  />
+  <path
+    d="M45.3815 52.7584H48.011C48.0942 52.7584 48.1611 52.8224 48.1611 52.9029V55.4184C48.1611 55.4981 48.0942 55.563 48.011 55.563H45.3815C45.2983 55.563 45.2305 55.4981 45.2305 55.4184V52.9029C45.2305 52.8224 45.2983 52.7584 45.3815 52.7584Z"
+    fill="#602650"
+  />
+  <path
+    d="M35.3685 63.0832H37.3531C37.3648 63.0832 37.373 63.0919 37.373 63.1023V65.0015C37.373 65.0119 37.3648 65.0205 37.3531 65.0205H35.3685C35.3577 65.0205 35.3486 65.0119 35.3486 65.0015V63.1023C35.3486 63.0919 35.3577 63.0832 35.3685 63.0832Z"
+    fill="#602650"
+  />
+  <path
+    d="M46.6884 28.7491C46.067 28.7491 45.4673 28.8435 44.9037 29.0175C43.1689 29.3049 41.5253 27.6221 42.0002 25.9852L41.9939 25.9791C42.1359 25.497 42.2119 24.9888 42.2119 24.466C42.2119 21.3852 39.5788 18.8637 36.3586 18.8637C33.1385 18.8637 30.5054 21.3844 30.5054 24.4651C30.5054 25.9462 31.3919 26.9919 30.0224 28.3025C28.6511 29.6148 27.5675 28.7621 26.0162 28.7621C22.7961 28.763 20.1621 31.2828 20.1621 34.3627C20.1621 35.8239 21.0477 36.8912 19.6673 38.2113C18.2861 39.5349 17.1727 38.6857 15.6449 38.6866C15.0977 38.6866 14.5667 38.7593 14.0629 38.8952L14.0565 38.8882C11.9499 39.2224 11.1765 38.2408 10.8916 36.9259V30.2623C10.8916 29.5966 10.3226 29.053 9.62796 29.053H1.48628C0.791605 29.053 0.222656 29.5966 0.222656 30.2623V38.0538C0.222656 38.7186 0.791605 39.2631 1.48628 39.2631H6.95779C8.83017 39.4258 10.6872 40.0932 10.0024 42.7671L10.0106 42.774C9.86495 43.2675 9.79078 43.7764 9.79078 44.288C9.79078 46.6988 11.4036 48.7668 13.6468 49.5519C14.2709 49.7709 14.9439 49.8904 15.6449 49.8904C18.8641 49.8904 21.4981 47.3688 21.4981 44.288C21.4981 42.8243 20.542 41.6383 21.8952 40.3434C23.2411 39.0553 24.493 39.9651 26.0162 39.9651C29.2355 39.9651 31.8695 37.4444 31.8695 34.3636C31.8695 32.8496 30.8862 31.7399 32.2503 30.4337C33.6107 29.1317 34.7793 30.0666 36.3586 30.0666C36.9068 30.0666 37.4368 29.9939 37.9407 29.858L37.947 29.8641C39.671 29.2824 41.5045 30.786 41.1653 32.5034C40.9519 33.0825 40.8352 33.704 40.8352 34.3506C40.8352 35.8317 41.7216 36.8783 40.3531 38.188C38.9809 39.5011 37.8982 38.6476 36.3451 38.6476C33.1259 38.6476 30.4928 41.1683 30.4919 44.2491C30.4919 45.7103 31.3774 46.7776 29.998 48.0977C28.624 49.4134 27.5621 48.5461 26.0027 48.5461V48.5452C24.398 48.5452 22.939 49.1719 21.8789 50.1812C20.8125 51.1975 20.1495 52.6015 20.1495 54.1475C20.1495 57.2283 22.7835 59.749 26.0027 59.749C29.2219 59.749 31.8568 57.2283 31.8568 54.1475C31.8568 52.6232 30.8591 51.5368 32.2258 50.2288C33.5718 48.9408 34.8237 49.8506 36.3451 49.8506C39.5652 49.8506 42.1992 47.3307 42.1992 44.2491C42.1992 42.7334 41.216 41.6254 42.58 40.3191C43.9413 39.0172 45.1091 39.953 46.6884 39.953C49.9085 39.953 52.5425 37.4323 52.5425 34.3515C52.5425 31.2707 49.9085 28.7491 46.6884 28.7491Z"
+    fill="#25C7BC"
+  />
+</svg>`;
+const collapseIconSvg = `
+<svg width="20" height="15" viewBox="0 0 20 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect x="0.5" y="0.5" width="19" height="14" rx="3.5" stroke="#602650" />
+    <line x1="7.5" y1="15" x2="7.5" y2="-2.18556e-08" stroke="#602650" />
+</svg>`;
+const collapseDarkIconSvg = `
+<svg width="20" height="15" viewBox="0 0 20 15" fill="#602650" xmlns="http://www.w3.org/2000/svg">
+    <rect x="0.5" y="0.5" width="19" height="14" rx="3.5" stroke="#ffffff" />
+    <line x1="7.5" y1="15" x2="7.5" y2="-2.18556e-08" stroke="#ffffff" />
+</svg>`;
+const settingsIconSvg = `
+<svg width="17" height="19" viewBox="0 0 17 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g clip-path="url(#clip0_612_4317)">
+        <path
+            d="M8.68788 0.86377H8.31388C7.86301 0.86377 7.43061 1.04575 7.1118 1.36968C6.79299 1.6936 6.61388 2.13294 6.61388 2.59104V2.7465C6.61357 3.0494 6.53488 3.34689 6.38569 3.60913C6.2365 3.87137 6.02206 4.08914 5.76388 4.24059L5.39838 4.4565C5.13995 4.6081 4.84679 4.68791 4.54838 4.68791C4.24997 4.68791 3.95681 4.6081 3.69838 4.4565L3.57088 4.38741C3.18079 4.15877 2.71734 4.09674 2.28228 4.21494C1.84722 4.33315 1.4761 4.62191 1.25038 5.01786L1.06338 5.34604C0.838354 5.7424 0.777308 6.21327 0.893642 6.65531C1.00998 7.09735 1.29419 7.47443 1.68388 7.70377L1.81138 7.79013C2.06832 7.94085 2.28196 8.15726 2.43107 8.41785C2.58019 8.67845 2.65959 8.97415 2.66138 9.27559V9.71604C2.66257 10.0204 2.58458 10.3197 2.43532 10.5836C2.28605 10.8475 2.07081 11.0666 1.81138 11.2188L1.68388 11.2965C1.29419 11.5258 1.00998 11.9029 0.893642 12.345C0.777308 12.787 0.838354 13.2579 1.06338 13.6542L1.25038 13.9824C1.4761 14.3784 1.84722 14.6671 2.28228 14.7853C2.71734 14.9035 3.18079 14.8415 3.57088 14.6129L3.69838 14.5438C3.95681 14.3922 4.24997 14.3124 4.54838 14.3124C4.84679 14.3124 5.13995 14.3922 5.39838 14.5438L5.76388 14.7597C6.02206 14.9111 6.2365 15.1289 6.38569 15.3911C6.53488 15.6534 6.61357 15.9509 6.61388 16.2538V16.4092C6.61388 16.8673 6.79299 17.3067 7.1118 17.6306C7.43061 17.9545 7.86301 18.1365 8.31388 18.1365H8.68788C9.13875 18.1365 9.57115 17.9545 9.88996 17.6306C10.2088 17.3067 10.3879 16.8673 10.3879 16.4092V16.2538C10.3882 15.9509 10.4669 15.6534 10.6161 15.3911C10.7653 15.1289 10.9797 14.9111 11.2379 14.7597L11.6034 14.5438C11.8618 14.3922 12.155 14.3124 12.4534 14.3124C12.7518 14.3124 13.0449 14.3922 13.3034 14.5438L13.4309 14.6129C13.821 14.8415 14.2844 14.9035 14.7195 14.7853C15.1545 14.6671 15.5257 14.3784 15.7514 13.9824L15.9384 13.6456C16.1634 13.2492 16.2245 12.7784 16.1081 12.3363C15.9918 11.8943 15.7076 11.5172 15.3179 11.2879L15.1904 11.2188C14.931 11.0666 14.7157 10.8475 14.5664 10.5836C14.4172 10.3197 14.3392 10.0204 14.3404 9.71604V9.28422C14.3392 8.97986 14.4172 8.68058 14.5664 8.41669C14.7157 8.15281 14.931 7.93368 15.1904 7.7815L15.3179 7.70377C15.7076 7.47443 15.9918 7.09735 16.1081 6.65531C16.2245 6.21327 16.1634 5.7424 15.9384 5.34604L15.7514 5.01786C15.5257 4.62191 15.1545 4.33315 14.7195 4.21494C14.2844 4.09674 13.821 4.15877 13.4309 4.38741L13.3034 4.4565C13.0449 4.6081 12.7518 4.68791 12.4534 4.68791C12.155 4.68791 11.8618 4.6081 11.6034 4.4565L11.2379 4.24059C10.9797 4.08914 10.7653 3.87137 10.6161 3.60913C10.4669 3.34689 10.3882 3.0494 10.3879 2.7465V2.59104C10.3879 2.13294 10.2088 1.6936 9.88996 1.36968C9.57115 1.04575 9.13875 0.86377 8.68788 0.86377Z"
+            stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" />
+        <path
+            d="M8.49922 12.091C9.90754 12.091 11.0492 10.931 11.0492 9.50009C11.0492 8.06917 9.90754 6.90918 8.49922 6.90918C7.09089 6.90918 5.94922 8.06917 5.94922 9.50009C5.94922 10.931 7.09089 12.091 8.49922 12.091Z"
+            stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" />
+    </g>
+    <defs>
+        <clipPath id="clip0_612_4317">
+            <rect width="17" height="19" fill="white" />
+        </clipPath>
+    </defs>
+</svg>`;
+const settingsDarkIconSvg = `
+<svg width="17" height="19" viewBox="0 0 17 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g clip-path="url(#clip0_447_15217)">
+        <path
+            d="M14.8408 9.71826C14.84 9.93596 14.8957 10.1496 15.002 10.3374C15.1068 10.5227 15.2569 10.6757 15.4365 10.7827L15.5557 10.8481C15.5608 10.8509 15.5663 10.854 15.5713 10.8569C16.0761 11.154 16.4423 11.6414 16.5918 12.2095C16.7406 12.7755 16.6624 13.3781 16.375 13.8872L16.376 13.8882L16.1885 14.2251L16.1855 14.23C15.8948 14.74 15.4155 15.1146 14.8506 15.2681C14.2855 15.4216 13.6833 15.3408 13.1777 15.0444V15.0435L13.0654 14.9829C13.0606 14.9803 13.0556 14.9779 13.0508 14.9751C12.8687 14.8683 12.6622 14.812 12.4531 14.812C12.2441 14.8121 12.0384 14.8684 11.8564 14.9751L11.8555 14.9741L11.4922 15.1899L11.4912 15.1909C11.3094 15.2976 11.157 15.4516 11.0508 15.6382C10.9446 15.8249 10.8879 16.0377 10.8877 16.2544V16.4097C10.8876 16.9976 10.6576 17.5628 10.2461 17.981C9.83415 18.3995 9.27357 18.6362 8.6875 18.6362H8.31348C7.72757 18.6361 7.16771 18.3994 6.75586 17.981C6.34428 17.5628 6.11437 16.9977 6.11426 16.4097V16.2544L6.10352 16.0933C6.08263 15.9332 6.03091 15.7784 5.95117 15.6382C5.84497 15.4516 5.69263 15.2976 5.51074 15.1909L5.50977 15.1899L5.14551 14.9741V14.9751C4.9636 14.8684 4.75777 14.8121 4.54883 14.812C4.33974 14.812 4.13321 14.8683 3.95117 14.9751C3.9464 14.9779 3.94139 14.9803 3.93652 14.9829L3.80957 15.0522L3.80859 15.0513C3.30604 15.3407 2.7111 15.4201 2.15137 15.2681C1.65698 15.1337 1.22788 14.8301 0.933594 14.4146L0.816406 14.23L0.628906 13.9019V13.9009C0.339205 13.3906 0.260695 12.7852 0.410156 12.2173C0.559078 11.6518 0.922551 11.167 1.42383 10.8696L1.55078 10.7915L1.55859 10.7876C1.74134 10.6804 1.89376 10.5252 2 10.3374C2.10625 10.1496 2.16194 9.93596 2.16113 9.71826V9.27881L2.15039 9.11768C2.12888 8.95878 2.07658 8.80553 1.99707 8.6665C1.89094 8.48102 1.73962 8.32739 1.55859 8.22119C1.54941 8.2158 1.54007 8.21055 1.53125 8.20459L1.40332 8.11768V8.1167C0.912945 7.81829 0.556927 7.34025 0.410156 6.78271C0.260694 6.2148 0.3392 5.6094 0.628906 5.09912V5.09814L0.816406 4.77002C1.10718 4.26016 1.58656 3.88636 2.15137 3.73291C2.71095 3.58089 3.3061 3.65851 3.80859 3.94775H3.80957L3.93652 4.01709L3.95117 4.0249C4.13321 4.13169 4.33974 4.18799 4.54883 4.18799C4.70561 4.18793 4.86043 4.15602 5.00488 4.09521L5.14551 4.0249L5.50977 3.81006L5.51074 3.80908C5.69267 3.70236 5.84497 3.54849 5.95117 3.36182C6.05727 3.17528 6.11394 2.96308 6.11426 2.74658V2.59131C6.11426 2.00314 6.34418 1.43733 6.75586 1.01904C7.1677 0.600685 7.72763 0.363878 8.31348 0.36377H8.6875C9.27354 0.36377 9.83415 0.600529 10.2461 1.01904C10.6578 1.43733 10.8877 2.00314 10.8877 2.59131V2.74561C10.8879 2.96234 10.9446 3.17509 11.0508 3.36182C11.1304 3.50177 11.2359 3.62314 11.3604 3.72021L11.4912 3.80908L11.4922 3.81006L11.8555 4.0249C12.0374 4.13165 12.2441 4.18794 12.4531 4.18799C12.6622 4.18799 12.8687 4.13169 13.0508 4.0249L13.0654 4.01709L13.1924 3.94775C13.695 3.65822 14.2908 3.58081 14.8506 3.73291C15.4154 3.88639 15.8948 4.26016 16.1855 4.77002L16.373 5.09814V5.09912C16.6628 5.6094 16.7413 6.2148 16.5918 6.78271C16.4429 7.3483 16.0785 7.83199 15.5771 8.12939L15.5781 8.13037L15.4502 8.2085L15.4434 8.2124C15.2607 8.31957 15.1082 8.47489 15.002 8.6626C14.8957 8.85051 14.84 9.06493 14.8408 9.28271V9.71826Z"
+            fill="#147A72" stroke="white" stroke-linecap="round" stroke-linejoin="round" />
+        <path
+            d="M8.49922 12.091C9.90754 12.091 11.0492 10.931 11.0492 9.50009C11.0492 8.06917 9.90754 6.90918 8.49922 6.90918C7.09089 6.90918 5.94922 8.06917 5.94922 9.50009C5.94922 10.931 7.09089 12.091 8.49922 12.091Z"
+            fill="#147A72" stroke="white" stroke-linecap="round" stroke-linejoin="round" />
+    </g>
+    <defs>
+        <clipPath id="clip0_447_15217">
+            <rect width="17" height="19" fill="white" />
+        </clipPath>
+    </defs>
+</svg>`;
+const logoutIconSvg = `
+<svg width="17" height="17" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path
+        d="M6.30469 5.35492C6.52427 2.80492 7.83469 1.76367 10.7034 1.76367H10.7955C13.9618 1.76367 15.2297 3.03159 15.2297 6.19784V10.8162C15.2297 13.9824 13.9618 15.2503 10.7955 15.2503H10.7034C7.85594 15.2503 6.54552 14.2233 6.31177 11.7158"
+        stroke="#F43F5E" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M10.6253 8.5H2.56445" stroke="#F43F5E" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M4.1444 6.12695L1.77148 8.49987L4.1444 10.8728" stroke="#F43F5E" stroke-linecap="round"
+        stroke-linejoin="round" />
+</svg>`;
+// arrows
+const arrowDownSmallSvg = `
+<svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M3.71289 7.29995L6.42956 5.58328C6.75039 5.26245 6.75039 4.73745 6.42956 4.41662L3.71289 2.69995"
+        stroke="#545454" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+</svg>`;
+const arrowDownSvg = `
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M8.94922 6.08L14.4692 10.6C15.2392 11.37 15.2392 12.63 14.4692 13.4L8.94922 17.92" stroke="#545454"
+        stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+</svg>`;
+
+// ===========================================================
+// ===================== Team Management =====================
+// ===========================================================
+const TeamManagementPaths = {
+    MODULE_NAME: 'user-management',
+    TEAM: 'team',
+    USER: 'user',
+    PROFILE: 'profile',
+};
+const TeamManagementModules = {
+    MAIN_USER_USER_MANAGEMENT: {
+        key: 'team-management',
+        permissions: {
+            ADD_TEAM_MEMBERS: 'add-team-members',
+            VIEW_TEAM_MEMBERS: 'view-team-members',
+        },
+    },
+};
+// ===========================================================
+// ========================= ASSETS ==========================
+// ===========================================================
+class AssetManagementPaths {
+    static MODULE_NAME = 'asset-management';
+    static MAIN = `main`;
+    static VEHICLES = 'vehicles';
+    static EQUIPMENT = 'equipment';
+}
+const AssetManagementModules = {
+    MAIN_ASSET_MANAGEMENT: {
+        key: 'asset-management',
+        permissions: {
+            ADD_ASSETS: 'add-assets',
+            VIEW_ASSETS: 'view-assets',
+        },
+    },
+};
+// ===========================================================
+// ====================== Plans & Tasks ======================
+// ===========================================================
+class WeeklyPlansPaths {
+    static MODULE_NAME = `plan-management`;
+    static LAYOUT = `${WeeklyPlansPaths.MODULE_NAME}/main`;
+    static TASKS = `${WeeklyPlansPaths.MODULE_NAME}/tasks`;
+    static VIEW_W_PLAN = 'user-management';
+    static CREATE_W_PLAN = 'role-management';
+}
+const WeeklyPlansModules = {
+    WEEKLY_PLAN_VIEW: {
+        key: 'view-w-plan-list',
+        permissions: {
+            VIEW_WEEKLY_PLAN: 'view-weekly-plan',
+            EDIT_WEEKLY_PLAN: 'edit-weekly-plan',
+        },
+    },
+    WEEKLY_PLAN_CREATE: {
+        key: 'create-w-plan-form',
+        permissions: {
+            CREATE_WEEKLY_PLAN: 'create-weekly-plan',
+        },
+    },
+};
+class TasksPaths {
+    static MODULE_NAME = `task-management`;
+    static LAYOUT = `${TasksPaths.MODULE_NAME}/main`;
+    static VIEW_W_PLAN = 'user-management';
+    static CREATE_W_PLAN = 'role-management';
+}
+// ===========================================================
+// ====================== STORAGE KEYS =======================
+// ===========================================================
+class STORAGE_KEYS {
+    static PARSED_TOKEN = 'logged-in-user-parsed-token';
+    static TABS = 'TABS';
+    static TEAMS_MODULE = 'TEAMS_MODULE';
+    static WEEKLY_PLAN = 'WEEKLY_PLAN';
+}
+const ZERO_INDEX = 0;
+
+const weeklyPlanTabs = [
+    {
+        title: 'NAV.PLAN.MAIN',
+        icon: 'planningSvg',
+        partnerTypes: ['ALL'],
+        subTabs: [
+            {
+                title: 'NAV.PLAN.PLANS_TITLE',
+                link: `/${WeeklyPlansPaths.LAYOUT}`,
+                icon: 'plansSvg',
+                partnerTypes: ['ALL'],
+                permissions: [Permissions.PlanViewGanttChartSelf],
+            },
+            {
+                title: 'NAV.PLAN.TASKS_TITLE',
+                link: `/${WeeklyPlansPaths.TASKS}`,
+                icon: 'tasksSvg',
+                partnerTypes: [Permissions.TaskViewListSelf],
+            },
+        ],
+    },
+];
+
+const teamManagement = [
+    {
+        title: 'NAV.USER_MANAGEMENT.MAIN',
+        icon: 'resourcesSvg',
+        subTabs: [
+            {
+                title: 'NAV.USER_MANAGEMENT.TEAM_TITLE',
+                link: `/${TeamManagementPaths.MODULE_NAME}/${TeamManagementPaths.TEAM}`,
+                icon: 'teamsSvg',
+                partnerTypes: ['ALL'],
+                permissions: [Permissions.teamViewListORGANIZATION],
+            },
+            {
+                title: 'NAV.USER_MANAGEMENT.USER_TITLE',
+                link: `/${TeamManagementPaths.MODULE_NAME}/${TeamManagementPaths.USER}`,
+                icon: 'usersSvg',
+                partnerTypes: ['ALL'],
+                permissions: [Permissions.UserViewListOrganization],
+            },
+        ],
+    },
+];
+
+const assetManagementTabs = [
+    {
+        title: 'NAV.ASSET.MAIN',
+        icon: 'assetsSvg',
+        partnerTypes: ['ALL'],
+        subTabs: [
+            {
+                title: 'NAV.ASSET.VEHICLES_TITLE',
+                link: `/${AssetManagementPaths.MODULE_NAME}/${AssetManagementPaths.VEHICLES}`,
+                icon: 'vehiclesSvg',
+                partnerTypes: ['ALL'],
+                permissions: [Permissions.VehicleViewListOrganization],
+            },
+            {
+                title: 'NAV.ASSET.EQUIPMENT_TITLE',
+                link: `/${AssetManagementPaths.MODULE_NAME}/${AssetManagementPaths.EQUIPMENT}`,
+                icon: 'equipmentSvg',
+                partnerTypes: ['ALL'],
+                permissions: [Permissions.EquipmentViewListOrganization],
+            },
+        ],
+    },
+];
+
+const dashboardTabs = [
+    {
+        title: 'NAV.MAIN',
+        link: '/dashboard',
+        icon: 'insightsSvg',
+        permissions: [Permissions.all],
+    },
+    {
+        title: 'NAV.REPORTS',
+        link: '/reports',
+        icon: 'AnalysisSvg',
+        permissions: [Permissions.all],
+    },
+];
+
+const TABS = [
+    dashboardTabs[0],
+    ...weeklyPlanTabs,
+    ...teamManagement,
+    ...assetManagementTabs,
+    {
+        title: 'NAV.ZONES',
+        link: '/zones-management',
+        icon: 'zonesSvg',
+        permissions: [Permissions.zoneViewListTeam],
+    },
+    dashboardTabs[1],
+];
+
+class CollapseService {
+    authService;
+    router;
+    filteredTabs = [];
+    activeTab = null;
+    activeSubTab = null;
+    constructor(authService, router) {
+        this.authService = authService;
+        this.router = router;
+    }
+    isExpanded(tab) {
+        const url = this.getCurrentUrl();
+        return (tab.isExpanded || // manual toggle still works
+            (tab.link && url.includes(tab.link)) ||
+            !!tab.subTabs?.some((st) => url.includes(st.link)));
+    }
+    isActiveTab(tab) {
+        const url = this.getCurrentUrl();
+        // 1. If mainTab has a link and it matches the current route
+        if (tab.link && url.includes(tab.link)) {
+            // console.log('main tab');
+            return true;
+        }
+        return false;
+    }
+    isActiveSubTab(tab, subTab) {
+        const url = this.getCurrentUrl();
+        return (subTab.link !== undefined &&
+            url.includes(subTab.link) &&
+            tab.subTabs?.includes(subTab) === true);
+    }
+    filterTabs() {
+        const userPermissions = this.authService.getCurrentPermissions();
+        if (userPermissions && TABS) {
+            this.filteredTabs = TABS.filter((tab) => {
+                const tabHasPermission = tab.permissions?.some((permission) => userPermissions.includes(permission));
+                const subTabHasPermission = tab.subTabs?.some((subTab) => subTab.permissions?.some((permission) => userPermissions.includes(permission)));
+                return (tabHasPermission ||
+                    subTabHasPermission ||
+                    tab.permissions?.includes(Permissions.all));
+            });
+        }
+    }
+    onMainTabClick(tab) {
+        if (tab.link) {
+            this.router.navigate([tab.link]);
+            this.filteredTabs.forEach((t) => {
+                if (t !== tab) {
+                    t.isExpanded = false;
+                }
+            });
+        }
+        else {
+            this.toggleTab(tab);
+        }
+    }
+    closeAllTabs(tab) {
+        this.filteredTabs.forEach((t) => {
+            if (t !== tab) {
+                t.isExpanded = false;
+            }
+        });
+    }
+    toggleTab(tab) {
+        this.closeAllTabs(tab);
+        tab.isExpanded = !tab.isExpanded;
+        if (this.activeTab === tab) {
+            this.activeTab = null;
+            this.activeSubTab = null;
+        }
+        else {
+            this.activeTab = tab;
+            this.activeSubTab = null;
+        }
+    }
+    routeModules(link) {
+        this.router.navigateByUrl('/', { skipLocationChange: false }).then(() => {
+            this.router.navigate([link]);
+        });
+    }
+    onSubTabClick(subTab) {
+        this.activeSubTab = subTab;
+        this.routeModules(subTab.link);
+    }
+    getCurrentUrl() {
+        return this.router.url;
+    }
+    static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "19.2.15", ngImport: i0, type: CollapseService, deps: [{ token: AuthService }, { token: i3.Router }], target: i0.ɵɵFactoryTarget.Injectable });
+    static ɵprov = i0.ɵɵngDeclareInjectable({ minVersion: "12.0.0", version: "19.2.15", ngImport: i0, type: CollapseService, providedIn: 'root' });
+}
+i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.15", ngImport: i0, type: CollapseService, decorators: [{
+            type: Injectable,
+            args: [{
+                    providedIn: 'root',
+                }]
+        }], ctorParameters: () => [{ type: AuthService }, { type: i3.Router }] });
+
+class SidenavService {
+    _isCollapsed = signal(false);
+    constructor() {
+        // Initialize from sessionStorage on service creation
+        const storedState = sessionStorage.getItem('isCollapsed');
+        if (storedState === 'true') {
+            this._isCollapsed.set(true);
+        }
+        this.listenToWindowResize();
+    }
+    get isCollapsed() {
+        return this._isCollapsed();
+    }
+    toggle() {
+        const newVal = !this._isCollapsed();
+        sessionStorage.setItem('isCollapsed', newVal.toString());
+        this._isCollapsed.set(newVal);
+    }
+    collapse() {
+        this._isCollapsed.set(true);
+        sessionStorage.setItem('isCollapsed', 'true');
+    }
+    expand() {
+        this._isCollapsed.set(false);
+        sessionStorage.setItem('isCollapsed', 'false');
+    }
+    listenToWindowResize() {
+        const handleResize = () => {
+            const width = window.innerWidth;
+            // Always collapse when < 900px
+            if (width < 900) {
+                this._isCollapsed.set(true);
+                sessionStorage.setItem('isCollapsed', 'true');
+            }
+            // Always expand when >= 700px
+            else {
+                this._isCollapsed.set(false);
+                sessionStorage.setItem('isCollapsed', 'false');
+            }
+        };
+        // Initial check
+        handleResize();
+        // Listen to resize
+        window.addEventListener('resize', handleResize);
+    }
+    static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "19.2.15", ngImport: i0, type: SidenavService, deps: [], target: i0.ɵɵFactoryTarget.Injectable });
+    static ɵprov = i0.ɵɵngDeclareInjectable({ minVersion: "12.0.0", version: "19.2.15", ngImport: i0, type: SidenavService, providedIn: 'root' });
+}
+i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.15", ngImport: i0, type: SidenavService, decorators: [{
+            type: Injectable,
+            args: [{ providedIn: 'root' }]
+        }], ctorParameters: () => [] });
+
+class ExpandedBarComponent {
+    collapseService;
+    sanitizer;
+    sidenav;
+    assetUrl = (string) => `assets/${string}`;
+    tab = input({});
+    collapseAll = new EventEmitter();
+    arrowDownIcon;
+    constructor(collapseService, sanitizer, sidenav) {
+        this.collapseService = collapseService;
+        this.sanitizer = sanitizer;
+        this.sidenav = sidenav;
+        this.arrowDownIcon = this.sanitizer.bypassSecurityTrustHtml(arrowDownSvg);
+    }
+    ngOnInit() {
+        this.collapseService.closeAllTabs();
+    }
+    isExpanded(tab) {
+        return this.collapseService.isExpanded(tab) && !tab.link;
+    }
+    isActiveTab(tab) {
+        return this.collapseService.isActiveTab(tab);
+    }
+    isActiveSubTab(tab, subTab) {
+        return this.collapseService.isActiveSubTab(tab, subTab);
+    }
+    getIcon(icon) {
+        const iconMap = icons;
+        const iconFn = iconMap[icon] ?? iconMap['insightsSvg'];
+        return iconFn(this.sanitizer);
+    }
+    getDarkIcon(icon) {
+        const iconMap = iconsDark;
+        const iconFn = iconMap[icon] ?? iconMap['insightsSvg'];
+        return iconFn(this.sanitizer);
+    }
+    static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "19.2.15", ngImport: i0, type: ExpandedBarComponent, deps: [{ token: CollapseService }, { token: i1$2.DomSanitizer }, { token: SidenavService }], target: i0.ɵɵFactoryTarget.Component });
+    static ɵcmp = i0.ɵɵngDeclareComponent({ minVersion: "17.0.0", version: "19.2.15", type: ExpandedBarComponent, isStandalone: true, selector: "app-expanded-bar", inputs: { tab: { classPropertyName: "tab", publicName: "tab", isSignal: true, isRequired: false, transformFunction: null } }, outputs: { collapseAll: "collapseAll" }, ngImport: i0, template: "<li class=\"main-nav-list-item\">\n  <a\n    (click)=\"collapseService.onMainTabClick(tab())\"\n    style=\"border-radius: 0.5em\"\n    class=\"main-tab link-tag\"\n    [class]=\"{\n      'expanded-tab': isExpanded(tab()),\n      'active-tab': isActiveTab(tab()),\n      'justify-between': !sidenav.isCollapsed,\n      'justify-center': sidenav.isCollapsed,\n    }\"\n  >\n    <div class=\"header-container\">\n      <!-- <custom-svg-icon [path]=\"tab.icon\" class=\"svg-icon\"></custom-svg-icon> -->\n      <div\n        class=\"svg-icon\"\n        [innerHTML]=\"\n          collapseService.isActiveTab(tab())\n            ? getDarkIcon(tab().icon)\n            : getIcon(tab().icon)\n        \"\n      ></div>\n      <h2 class=\"main-title-text\">\n        {{ tab().title | translate }}\n      </h2>\n    </div>\n    @if (!tab().link) {\n      <span\n        [class]=\"{\n          'arrow-icon': !isExpanded(tab()),\n          'arrow-icon-expanded': isExpanded(tab()),\n        }\"\n        [innerHTML]=\"arrowDownIcon\"\n      ></span>\n    }\n  </a>\n  <!-- [style.maxHeight]=\"isExpanded(tab()) ? '60em' : '0em'\" -->\n  <ul class=\"sub-nav-list\">\n    @if (isExpanded(tab())) {\n      <!--  -->\n      @for (subTab of tab().subTabs; track subTab) {\n        <li class=\"sub-nav-item\" [DropdownAnimationObject]=\"isExpanded(tab())\">\n          <a\n            class=\"link-tag\"\n            (click)=\"collapseService.onSubTabClick(subTab)\"\n            [class]=\"{\n              'active-tab': collapseService.isActiveSubTab(tab(), subTab),\n              'no-color':\n                subTab.icon === 'teamsSvg' || subTab.icon === 'usersSvg',\n            }\"\n          >\n            <div class=\"header-container\">\n              <div\n                class=\"svg-icon\"\n                [innerHTML]=\"\n                  collapseService.isActiveSubTab(tab(), subTab)\n                    ? getDarkIcon(subTab.icon)\n                    : getIcon(subTab.icon)\n                \"\n              ></div>\n              <h2 class=\"main-title-text\">\n                {{ subTab.title | translate }}\n              </h2>\n            </div>\n          </a>\n        </li>\n      }\n    }\n  </ul>\n</li>\n", styles: [".arrow-icon{width:1.5em;height:1.5em;background-color:none;transition:transform .3s ease;transform-origin:center;rotate:0deg}.arrow-icon-expanded{width:1.5em;height:1.5em;background-color:none;transition:transform .3s ease;transform-origin:center;rotate:90deg}.link-title{font-family:var(--FM-Light);line-height:1.37em}.main-nav-list-item{display:flex;color:var(--neutral-800);flex-direction:column;align-items:center}.main-nav-list-item .main-tab.link-tag{display:flex;align-items:center;cursor:pointer;width:100%;border-radius:var(--border-radius-m-16);transition:all .4s ease-in-out;padding-inline:.9375em;height:2.5em;color:var(--neutral-500);font-family:var(--FM-Light)}.main-nav-list-item .main-tab.link-tag.expanded-tab{background:none;color:var(--link-color);font-family:var(--FM-Medium)}.main-nav-list-item .main-tab.link-tag.active-tab{background:var(--secondary-75);color:var(--link-color);font-family:var(--FM-Medium)}.main-nav-list-item .main-tab.link-tag:hover:not(.active-tab):not(.expanded-tab){background-color:var(--neutral-100);color:var(--neutral-500)}.main-nav-list-item .main-tab.link-tag:active{box-shadow:0 0 1px 0 var(--box-shadow-10);box-shadow:0 0 5px 0 var(--box-shadow-10)}.main-nav-list-item .main-tab.link-tag .header-container{display:flex;align-items:center;gap:.5em;transition:all .4s ease-in-out}.main-nav-list-item .main-tab.link-tag .main-title-text{font-size:1em;text-overflow:ellipsis;text-wrap:nowrap}.main-nav-list-item .sub-nav-list{overflow:hidden;transition:all .7s ease-in-out;width:100%;display:flex;flex-direction:column;gap:.5em}.main-nav-list-item .sub-nav-list .sub-nav-item{color:var(--neutral-500);font-family:var(--FM-Light)}.main-nav-list-item .sub-nav-list .sub-nav-item .link-tag{display:flex;align-items:center;justify-content:start;gap:.5em;padding:.5em .5em .5em 2.0625em;border-radius:var(--border-radius-m-16);cursor:pointer;text-overflow:ellipsis;text-wrap:nowrap}.main-nav-list-item .sub-nav-list .sub-nav-item .link-tag.active-tab{background:var(--secondary-75);color:var(--link-color);font-family:var(--FM-Medium)}.main-nav-list-item .sub-nav-list .sub-nav-item .link-tag:hover:not(.active-tab):not(.expanded-tab){background-color:var(--neutral-100);color:var(--neutral-500)}.main-nav-list-item .sub-nav-list .sub-nav-item .link-tag:active{box-shadow:0 0 1px 0 var(--box-shadow-10);box-shadow:0 0 5px 0 var(--box-shadow-10)}.main-nav-list-item .sub-nav-list .sub-nav-item .link-tag .header-container{display:flex;align-items:center;gap:.5em;transition:all .4s ease-in-out}::ng-deep .link-tag .header-container .svg-icon{width:1.06em;height:1.06em;background-color:none;transition:all .7s ease-in-out}::ng-deep .link-tag .header-container .svg-icon svg{width:inherit;height:inherit;fill:none;transition:all .7s ease-in-out}::ng-deep .link-tag.expanded-tab .header-container .svg-icon{width:1.06em;height:1.06em;background-color:none}::ng-deep .link-tag.expanded-tab .header-container .svg-icon svg{fill:none}::ng-deep .link-tag.expanded-tab .header-container .svg-icon svg g path{stroke:var(--link-color)}::ng-deep .link-tag.expanded-tab .header-container .svg-icon svg path{stroke:var(--link-color)}::ng-deep .link-tag:hover:not(.active-tab):not(.expanded-tab) .header-container .svg-icon{width:1.06em;height:1.06em;background-color:none}::ng-deep .link-tag:hover:not(.active-tab):not(.expanded-tab) .header-container .svg-icon svg{fill:none}::ng-deep .link-tag:hover:not(.active-tab):not(.expanded-tab) .header-container .svg-icon svg g path{stroke:var(--neutral-500)}::ng-deep .link-tag:hover:not(.active-tab):not(.expanded-tab) .header-container .svg-icon svg path{stroke:var(--neutral-500)}\n"], dependencies: [{ kind: "ngmodule", type: TranslateModule }, { kind: "pipe", type: i3$1.TranslatePipe, name: "translate" }, { kind: "directive", type: DropdownsAnimationDirective, selector: "[DropdownAnimationObject]", inputs: ["DropdownAnimationObject"] }], animations: [dropdownAnimation] });
+}
+i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.15", ngImport: i0, type: ExpandedBarComponent, decorators: [{
+            type: Component,
+            args: [{ selector: 'app-expanded-bar', imports: [TranslateModule, DropdownsAnimationDirective], animations: [dropdownAnimation], template: "<li class=\"main-nav-list-item\">\n  <a\n    (click)=\"collapseService.onMainTabClick(tab())\"\n    style=\"border-radius: 0.5em\"\n    class=\"main-tab link-tag\"\n    [class]=\"{\n      'expanded-tab': isExpanded(tab()),\n      'active-tab': isActiveTab(tab()),\n      'justify-between': !sidenav.isCollapsed,\n      'justify-center': sidenav.isCollapsed,\n    }\"\n  >\n    <div class=\"header-container\">\n      <!-- <custom-svg-icon [path]=\"tab.icon\" class=\"svg-icon\"></custom-svg-icon> -->\n      <div\n        class=\"svg-icon\"\n        [innerHTML]=\"\n          collapseService.isActiveTab(tab())\n            ? getDarkIcon(tab().icon)\n            : getIcon(tab().icon)\n        \"\n      ></div>\n      <h2 class=\"main-title-text\">\n        {{ tab().title | translate }}\n      </h2>\n    </div>\n    @if (!tab().link) {\n      <span\n        [class]=\"{\n          'arrow-icon': !isExpanded(tab()),\n          'arrow-icon-expanded': isExpanded(tab()),\n        }\"\n        [innerHTML]=\"arrowDownIcon\"\n      ></span>\n    }\n  </a>\n  <!-- [style.maxHeight]=\"isExpanded(tab()) ? '60em' : '0em'\" -->\n  <ul class=\"sub-nav-list\">\n    @if (isExpanded(tab())) {\n      <!--  -->\n      @for (subTab of tab().subTabs; track subTab) {\n        <li class=\"sub-nav-item\" [DropdownAnimationObject]=\"isExpanded(tab())\">\n          <a\n            class=\"link-tag\"\n            (click)=\"collapseService.onSubTabClick(subTab)\"\n            [class]=\"{\n              'active-tab': collapseService.isActiveSubTab(tab(), subTab),\n              'no-color':\n                subTab.icon === 'teamsSvg' || subTab.icon === 'usersSvg',\n            }\"\n          >\n            <div class=\"header-container\">\n              <div\n                class=\"svg-icon\"\n                [innerHTML]=\"\n                  collapseService.isActiveSubTab(tab(), subTab)\n                    ? getDarkIcon(subTab.icon)\n                    : getIcon(subTab.icon)\n                \"\n              ></div>\n              <h2 class=\"main-title-text\">\n                {{ subTab.title | translate }}\n              </h2>\n            </div>\n          </a>\n        </li>\n      }\n    }\n  </ul>\n</li>\n", styles: [".arrow-icon{width:1.5em;height:1.5em;background-color:none;transition:transform .3s ease;transform-origin:center;rotate:0deg}.arrow-icon-expanded{width:1.5em;height:1.5em;background-color:none;transition:transform .3s ease;transform-origin:center;rotate:90deg}.link-title{font-family:var(--FM-Light);line-height:1.37em}.main-nav-list-item{display:flex;color:var(--neutral-800);flex-direction:column;align-items:center}.main-nav-list-item .main-tab.link-tag{display:flex;align-items:center;cursor:pointer;width:100%;border-radius:var(--border-radius-m-16);transition:all .4s ease-in-out;padding-inline:.9375em;height:2.5em;color:var(--neutral-500);font-family:var(--FM-Light)}.main-nav-list-item .main-tab.link-tag.expanded-tab{background:none;color:var(--link-color);font-family:var(--FM-Medium)}.main-nav-list-item .main-tab.link-tag.active-tab{background:var(--secondary-75);color:var(--link-color);font-family:var(--FM-Medium)}.main-nav-list-item .main-tab.link-tag:hover:not(.active-tab):not(.expanded-tab){background-color:var(--neutral-100);color:var(--neutral-500)}.main-nav-list-item .main-tab.link-tag:active{box-shadow:0 0 1px 0 var(--box-shadow-10);box-shadow:0 0 5px 0 var(--box-shadow-10)}.main-nav-list-item .main-tab.link-tag .header-container{display:flex;align-items:center;gap:.5em;transition:all .4s ease-in-out}.main-nav-list-item .main-tab.link-tag .main-title-text{font-size:1em;text-overflow:ellipsis;text-wrap:nowrap}.main-nav-list-item .sub-nav-list{overflow:hidden;transition:all .7s ease-in-out;width:100%;display:flex;flex-direction:column;gap:.5em}.main-nav-list-item .sub-nav-list .sub-nav-item{color:var(--neutral-500);font-family:var(--FM-Light)}.main-nav-list-item .sub-nav-list .sub-nav-item .link-tag{display:flex;align-items:center;justify-content:start;gap:.5em;padding:.5em .5em .5em 2.0625em;border-radius:var(--border-radius-m-16);cursor:pointer;text-overflow:ellipsis;text-wrap:nowrap}.main-nav-list-item .sub-nav-list .sub-nav-item .link-tag.active-tab{background:var(--secondary-75);color:var(--link-color);font-family:var(--FM-Medium)}.main-nav-list-item .sub-nav-list .sub-nav-item .link-tag:hover:not(.active-tab):not(.expanded-tab){background-color:var(--neutral-100);color:var(--neutral-500)}.main-nav-list-item .sub-nav-list .sub-nav-item .link-tag:active{box-shadow:0 0 1px 0 var(--box-shadow-10);box-shadow:0 0 5px 0 var(--box-shadow-10)}.main-nav-list-item .sub-nav-list .sub-nav-item .link-tag .header-container{display:flex;align-items:center;gap:.5em;transition:all .4s ease-in-out}::ng-deep .link-tag .header-container .svg-icon{width:1.06em;height:1.06em;background-color:none;transition:all .7s ease-in-out}::ng-deep .link-tag .header-container .svg-icon svg{width:inherit;height:inherit;fill:none;transition:all .7s ease-in-out}::ng-deep .link-tag.expanded-tab .header-container .svg-icon{width:1.06em;height:1.06em;background-color:none}::ng-deep .link-tag.expanded-tab .header-container .svg-icon svg{fill:none}::ng-deep .link-tag.expanded-tab .header-container .svg-icon svg g path{stroke:var(--link-color)}::ng-deep .link-tag.expanded-tab .header-container .svg-icon svg path{stroke:var(--link-color)}::ng-deep .link-tag:hover:not(.active-tab):not(.expanded-tab) .header-container .svg-icon{width:1.06em;height:1.06em;background-color:none}::ng-deep .link-tag:hover:not(.active-tab):not(.expanded-tab) .header-container .svg-icon svg{fill:none}::ng-deep .link-tag:hover:not(.active-tab):not(.expanded-tab) .header-container .svg-icon svg g path{stroke:var(--neutral-500)}::ng-deep .link-tag:hover:not(.active-tab):not(.expanded-tab) .header-container .svg-icon svg path{stroke:var(--neutral-500)}\n"] }]
+        }], ctorParameters: () => [{ type: CollapseService }, { type: i1$2.DomSanitizer }, { type: SidenavService }], propDecorators: { collapseAll: [{
+                type: Output
+            }] } });
+
+class CollapsedBarComponent {
+    collapseService;
+    sanitizer;
+    sidenav;
+    assetUrl = (str) => `assets/${str}`;
+    tab = input({});
+    collapseAll = new EventEmitter();
+    arrowDownSmallIcon;
+    constructor(collapseService, sanitizer, sidenav) {
+        this.collapseService = collapseService;
+        this.sanitizer = sanitizer;
+        this.sidenav = sidenav;
+        this.arrowDownSmallIcon =
+            this.sanitizer.bypassSecurityTrustHtml(arrowDownSmallSvg);
+    }
+    ngOnInit() {
+        this.collapseService.closeAllTabs();
+    }
+    getIcon(icon) {
+        const iconMap = icons;
+        const iconFn = iconMap[icon] ?? iconMap['insightsSvg'];
+        return iconFn(this.sanitizer);
+    }
+    getDarkIcon(icon) {
+        const iconMap = iconsDark;
+        const iconFn = iconMap[icon] ?? iconMap['insightsSvg'];
+        return iconFn(this.sanitizer);
+    }
+    isExpanded(tab) {
+        return tab.isExpanded ?? false;
+    }
+    isActiveTab(tab) {
+        // if (tab.link && url.includes(tab.link)) {
+        //   console.log('main tab');
+        //   return true;
+        // }
+        return (this.collapseService.isActiveTab(tab) ||
+            this.collapseService.isExpanded(tab));
+    }
+    isActiveSubTab(tab, subTab) {
+        return this.collapseService.isActiveSubTab(tab, subTab);
+    }
+    static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "19.2.15", ngImport: i0, type: CollapsedBarComponent, deps: [{ token: CollapseService }, { token: i1$2.DomSanitizer }, { token: SidenavService }], target: i0.ɵɵFactoryTarget.Component });
+    static ɵcmp = i0.ɵɵngDeclareComponent({ minVersion: "17.0.0", version: "19.2.15", type: CollapsedBarComponent, isStandalone: true, selector: "app-collapsed-bar", inputs: { tab: { classPropertyName: "tab", publicName: "tab", isSignal: true, isRequired: false, transformFunction: null } }, outputs: { collapseAll: "collapseAll" }, ngImport: i0, template: "<li class=\"main-nav-list-item\">\n  <a\n    (click)=\"collapseService.onMainTabClick(tab())\"\n    [title]=\"tab().title | translate\"\n    class=\"collapsed-link-tag\"\n    [class]=\"{\n      'active-tab': isActiveTab(tab()),\n      'expanded-tab': isExpanded(tab()),\n    }\"\n  >\n    <div class=\"icon-container\">\n      <!-- 'bg-[#6026501C]': isActiveTab(tab()), -->\n      <div\n        class=\"svg-icon-collapsed\"\n        [innerHTML]=\"\n          isActiveTab(tab()) || isExpanded(tab())\n            ? getDarkIcon(tab().icon)\n            : getIcon(tab().icon)\n        \"\n      ></div>\n\n      <!-- if parent tab not sub tab -->\n      @if (!tab().link) {\n        <div class=\"absolute right-0\">\n          <!-- <custom-svg-icon\n          [path]=\"assetUrl('/images/svg/arrow-down-small.svg')\"\n          class=\"arrow-icon\"\n        ></custom-svg-icon> -->\n          <span class=\"arrow-icon\" [innerHTML]=\"arrowDownSmallIcon\"></span>\n        </div>\n      }\n      <!--  -->\n      @if (isExpanded(tab()) && !tab().link) {\n        <!--  -->\n        <ul\n          #expandedTabs\n          class=\"sub-nav-popup absolute left-[100%]\"\n          [clickOutside]=\"expandedTabs\"\n          (clickOutsideEmitter)=\"collapseService.toggleTab(tab())\"\n        >\n          @for (subTab of tab().subTabs; track subTab) {\n            <li\n              class=\"sub-nav-item\"\n              [DropdownAnimationObject]=\"isExpanded(tab())\"\n            >\n              <a\n                class=\"link-tag\"\n                (click)=\"collapseService.onSubTabClick(subTab)\"\n                [class]=\"{\n                  'active-tab': collapseService.isActiveSubTab(tab(), subTab),\n                }\"\n              >\n                <div class=\"header-container\">\n                  <div\n                    class=\"svg-icon\"\n                    [innerHTML]=\"\n                      collapseService.isActiveSubTab(tab(), subTab)\n                        ? getDarkIcon(subTab.icon)\n                        : getIcon(subTab.icon)\n                    \"\n                  ></div>\n                  <h2 class=\"main-title-text\">\n                    {{ subTab.title | translate }}\n                  </h2>\n                </div>\n              </a>\n            </li>\n          }\n        </ul>\n      }\n    </div>\n  </a>\n</li>\n", styles: [".svg-icon-collapsed{width:auto;height:auto;background-color:none}.arrow-icon{width:.625em;height:.625em;background-color:none;transition:transform .3s ease;transform-origin:center}.link-title{font-family:var(--FM-Light);line-height:1.37em}.main-nav-list-item{display:flex;color:var(--neutral-800);flex-direction:column;align-items:center}.main-nav-list-item .collapsed-link-tag{display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:all .4s;border-radius:var(--border-radius-m-16);width:min-content;color:var(--neutral-500)}.main-nav-list-item .collapsed-link-tag .icon-container{position:relative;display:flex;align-items:center;justify-content:center;padding:.5em;width:2.5em;height:2.5em}.main-nav-list-item .collapsed-link-tag .icon-container svg{width:1.06em;height:auto}.main-nav-list-item .collapsed-link-tag .icon-container .sub-nav-popup{background:var(--white);z-index:9999999;width:16.0625em;padding:1.5em;box-shadow:0 2px 8px #63636333;border-radius:var(--border-radius-m-16);left:calc(100% + 1em);position:absolute;top:0;display:flex;flex-direction:column;gap:.625em}.main-nav-list-item .collapsed-link-tag .icon-container .sub-nav-popup .sub-nav-item{color:var(--neutral-500);font-family:var(--FM-Light)}.main-nav-list-item .collapsed-link-tag .icon-container .sub-nav-popup .sub-nav-item .link-tag{display:flex;align-items:center;justify-content:start;gap:.5em;padding:.5em;border-radius:var(--border-radius-m-16);cursor:pointer;text-overflow:ellipsis;text-wrap:nowrap}.main-nav-list-item .collapsed-link-tag .icon-container .sub-nav-popup .sub-nav-item .link-tag.active-tab{background:var(--secondary-75);color:var(--link-color);font-family:var(--FM-Medium)}.main-nav-list-item .collapsed-link-tag .icon-container .sub-nav-popup .sub-nav-item .link-tag:hover:not(.active-tab):not(.expanded-tab){background-color:var(--neutral-100);color:var(--neutral-500)}.main-nav-list-item .collapsed-link-tag .icon-container .sub-nav-popup .sub-nav-item .link-tag:active{box-shadow:0 0 1px 0 var(--box-shadow-10);box-shadow:0 0 5px 0 var(--box-shadow-10)}.main-nav-list-item .collapsed-link-tag .icon-container .sub-nav-popup .sub-nav-item .link-tag .header-container{display:flex;align-items:center;gap:.5em;transition:all .4s ease-in-out}.main-nav-list-item .collapsed-link-tag .icon-container .sub-nav-popup .sub-nav-item .link-tag .header-container .svg-icon{width:1.06em;height:1.06em;background-color:none;transition:all .4s ease-in-out}.main-nav-list-item .collapsed-link-tag .icon-container .sub-nav-popup .sub-nav-item .link-tag .header-container .svg-icon g path{stroke:var(--neutral-500)}.main-nav-list-item .collapsed-link-tag .icon-container .sub-nav-popup .sub-nav-item .link-tag .header-container .svg-icon path{stroke:var(--neutral-500)}.main-nav-list-item .collapsed-link-tag:hover:not(.active-tab):not(.expanded-tab){background-color:var(--neutral-100)}.main-nav-list-item .collapsed-link-tag.expanded-tab,.main-nav-list-item .collapsed-link-tag.active-tab{background:var(--secondary-75);color:var(--link-color);font-family:var(--FM-Medium)}::ng-deep .collapsed-link-tag .icon-container .svg-icon-collapsed{width:1.06em;height:1.06em;background-color:none;transition:all .7s ease-in-out}::ng-deep .collapsed-link-tag .icon-container .svg-icon-collapsed :not(.active-tab):not(.expanded-tab) svg{width:inherit;height:inherit;fill:none;transition:all .7s ease-in-out}::ng-deep .collapsed-link-tag .icon-container .svg-icon-collapsed :not(.active-tab):not(.expanded-tab) svg g path{stroke:var(--neutral-500)}::ng-deep .collapsed-link-tag .icon-container .svg-icon-collapsed :not(.active-tab):not(.expanded-tab) svg path{stroke:var(--neutral-500)}::ng-deep .collapsed-link-tag.expanded-tab .icon-container .svg-icon-collapsed,::ng-deep .collapsed-link-tag.active-tab .icon-container .svg-icon-collapsed{width:1.06em;height:1.06em;background-color:none}::ng-deep .collapsed-link-tag.no-color.active-tab .icon-container .svg-icon-collapsed{width:1.06em;height:1.06em;background-color:none}::ng-deep .collapsed-link-tag.no-color.active-tab .icon-container .svg-icon-collapsed svg{fill:none}::ng-deep .collapsed-link-tag.no-color.active-tab .icon-container .svg-icon-collapsed svg g path{stroke:var(--link-color);stroke-width:1.3}::ng-deep .collapsed-link-tag.no-color.active-tab .icon-container .svg-icon-collapsed svg path{stroke:var(--link-color);stroke-width:1.3}::ng-deep .collapsed-link-tag:hover:not(.active-tab):not(.expanded-tab) .icon-container .svg-icon-collapsed{width:1.06em;height:1.06em;background-color:none}::ng-deep .collapsed-link-tag:hover:not(.active-tab):not(.expanded-tab) .icon-container .svg-icon-collapsed svg{fill:none}::ng-deep .collapsed-link-tag:hover:not(.active-tab):not(.expanded-tab) .icon-container .svg-icon-collapsed svg g path{stroke:var(--neutral-500)}::ng-deep .collapsed-link-tag:hover:not(.active-tab):not(.expanded-tab) .icon-container .svg-icon-collapsed svg path{stroke:var(--neutral-500)}\n"], dependencies: [{ kind: "ngmodule", type: TranslateModule }, { kind: "pipe", type: i3$1.TranslatePipe, name: "translate" }, { kind: "directive", type: ClickOutsideDirective, selector: "[clickOutside]", inputs: ["clickOutside"], outputs: ["clickOutsideEmitter"] }, { kind: "directive", type: DropdownsAnimationDirective, selector: "[DropdownAnimationObject]", inputs: ["DropdownAnimationObject"] }], animations: [dropdownAnimation] });
+}
+i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.15", ngImport: i0, type: CollapsedBarComponent, decorators: [{
+            type: Component,
+            args: [{ selector: 'app-collapsed-bar', imports: [
+                        TranslateModule,
+                        ClickOutsideDirective,
+                        DropdownsAnimationDirective,
+                    ], animations: [dropdownAnimation], template: "<li class=\"main-nav-list-item\">\n  <a\n    (click)=\"collapseService.onMainTabClick(tab())\"\n    [title]=\"tab().title | translate\"\n    class=\"collapsed-link-tag\"\n    [class]=\"{\n      'active-tab': isActiveTab(tab()),\n      'expanded-tab': isExpanded(tab()),\n    }\"\n  >\n    <div class=\"icon-container\">\n      <!-- 'bg-[#6026501C]': isActiveTab(tab()), -->\n      <div\n        class=\"svg-icon-collapsed\"\n        [innerHTML]=\"\n          isActiveTab(tab()) || isExpanded(tab())\n            ? getDarkIcon(tab().icon)\n            : getIcon(tab().icon)\n        \"\n      ></div>\n\n      <!-- if parent tab not sub tab -->\n      @if (!tab().link) {\n        <div class=\"absolute right-0\">\n          <!-- <custom-svg-icon\n          [path]=\"assetUrl('/images/svg/arrow-down-small.svg')\"\n          class=\"arrow-icon\"\n        ></custom-svg-icon> -->\n          <span class=\"arrow-icon\" [innerHTML]=\"arrowDownSmallIcon\"></span>\n        </div>\n      }\n      <!--  -->\n      @if (isExpanded(tab()) && !tab().link) {\n        <!--  -->\n        <ul\n          #expandedTabs\n          class=\"sub-nav-popup absolute left-[100%]\"\n          [clickOutside]=\"expandedTabs\"\n          (clickOutsideEmitter)=\"collapseService.toggleTab(tab())\"\n        >\n          @for (subTab of tab().subTabs; track subTab) {\n            <li\n              class=\"sub-nav-item\"\n              [DropdownAnimationObject]=\"isExpanded(tab())\"\n            >\n              <a\n                class=\"link-tag\"\n                (click)=\"collapseService.onSubTabClick(subTab)\"\n                [class]=\"{\n                  'active-tab': collapseService.isActiveSubTab(tab(), subTab),\n                }\"\n              >\n                <div class=\"header-container\">\n                  <div\n                    class=\"svg-icon\"\n                    [innerHTML]=\"\n                      collapseService.isActiveSubTab(tab(), subTab)\n                        ? getDarkIcon(subTab.icon)\n                        : getIcon(subTab.icon)\n                    \"\n                  ></div>\n                  <h2 class=\"main-title-text\">\n                    {{ subTab.title | translate }}\n                  </h2>\n                </div>\n              </a>\n            </li>\n          }\n        </ul>\n      }\n    </div>\n  </a>\n</li>\n", styles: [".svg-icon-collapsed{width:auto;height:auto;background-color:none}.arrow-icon{width:.625em;height:.625em;background-color:none;transition:transform .3s ease;transform-origin:center}.link-title{font-family:var(--FM-Light);line-height:1.37em}.main-nav-list-item{display:flex;color:var(--neutral-800);flex-direction:column;align-items:center}.main-nav-list-item .collapsed-link-tag{display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:all .4s;border-radius:var(--border-radius-m-16);width:min-content;color:var(--neutral-500)}.main-nav-list-item .collapsed-link-tag .icon-container{position:relative;display:flex;align-items:center;justify-content:center;padding:.5em;width:2.5em;height:2.5em}.main-nav-list-item .collapsed-link-tag .icon-container svg{width:1.06em;height:auto}.main-nav-list-item .collapsed-link-tag .icon-container .sub-nav-popup{background:var(--white);z-index:9999999;width:16.0625em;padding:1.5em;box-shadow:0 2px 8px #63636333;border-radius:var(--border-radius-m-16);left:calc(100% + 1em);position:absolute;top:0;display:flex;flex-direction:column;gap:.625em}.main-nav-list-item .collapsed-link-tag .icon-container .sub-nav-popup .sub-nav-item{color:var(--neutral-500);font-family:var(--FM-Light)}.main-nav-list-item .collapsed-link-tag .icon-container .sub-nav-popup .sub-nav-item .link-tag{display:flex;align-items:center;justify-content:start;gap:.5em;padding:.5em;border-radius:var(--border-radius-m-16);cursor:pointer;text-overflow:ellipsis;text-wrap:nowrap}.main-nav-list-item .collapsed-link-tag .icon-container .sub-nav-popup .sub-nav-item .link-tag.active-tab{background:var(--secondary-75);color:var(--link-color);font-family:var(--FM-Medium)}.main-nav-list-item .collapsed-link-tag .icon-container .sub-nav-popup .sub-nav-item .link-tag:hover:not(.active-tab):not(.expanded-tab){background-color:var(--neutral-100);color:var(--neutral-500)}.main-nav-list-item .collapsed-link-tag .icon-container .sub-nav-popup .sub-nav-item .link-tag:active{box-shadow:0 0 1px 0 var(--box-shadow-10);box-shadow:0 0 5px 0 var(--box-shadow-10)}.main-nav-list-item .collapsed-link-tag .icon-container .sub-nav-popup .sub-nav-item .link-tag .header-container{display:flex;align-items:center;gap:.5em;transition:all .4s ease-in-out}.main-nav-list-item .collapsed-link-tag .icon-container .sub-nav-popup .sub-nav-item .link-tag .header-container .svg-icon{width:1.06em;height:1.06em;background-color:none;transition:all .4s ease-in-out}.main-nav-list-item .collapsed-link-tag .icon-container .sub-nav-popup .sub-nav-item .link-tag .header-container .svg-icon g path{stroke:var(--neutral-500)}.main-nav-list-item .collapsed-link-tag .icon-container .sub-nav-popup .sub-nav-item .link-tag .header-container .svg-icon path{stroke:var(--neutral-500)}.main-nav-list-item .collapsed-link-tag:hover:not(.active-tab):not(.expanded-tab){background-color:var(--neutral-100)}.main-nav-list-item .collapsed-link-tag.expanded-tab,.main-nav-list-item .collapsed-link-tag.active-tab{background:var(--secondary-75);color:var(--link-color);font-family:var(--FM-Medium)}::ng-deep .collapsed-link-tag .icon-container .svg-icon-collapsed{width:1.06em;height:1.06em;background-color:none;transition:all .7s ease-in-out}::ng-deep .collapsed-link-tag .icon-container .svg-icon-collapsed :not(.active-tab):not(.expanded-tab) svg{width:inherit;height:inherit;fill:none;transition:all .7s ease-in-out}::ng-deep .collapsed-link-tag .icon-container .svg-icon-collapsed :not(.active-tab):not(.expanded-tab) svg g path{stroke:var(--neutral-500)}::ng-deep .collapsed-link-tag .icon-container .svg-icon-collapsed :not(.active-tab):not(.expanded-tab) svg path{stroke:var(--neutral-500)}::ng-deep .collapsed-link-tag.expanded-tab .icon-container .svg-icon-collapsed,::ng-deep .collapsed-link-tag.active-tab .icon-container .svg-icon-collapsed{width:1.06em;height:1.06em;background-color:none}::ng-deep .collapsed-link-tag.no-color.active-tab .icon-container .svg-icon-collapsed{width:1.06em;height:1.06em;background-color:none}::ng-deep .collapsed-link-tag.no-color.active-tab .icon-container .svg-icon-collapsed svg{fill:none}::ng-deep .collapsed-link-tag.no-color.active-tab .icon-container .svg-icon-collapsed svg g path{stroke:var(--link-color);stroke-width:1.3}::ng-deep .collapsed-link-tag.no-color.active-tab .icon-container .svg-icon-collapsed svg path{stroke:var(--link-color);stroke-width:1.3}::ng-deep .collapsed-link-tag:hover:not(.active-tab):not(.expanded-tab) .icon-container .svg-icon-collapsed{width:1.06em;height:1.06em;background-color:none}::ng-deep .collapsed-link-tag:hover:not(.active-tab):not(.expanded-tab) .icon-container .svg-icon-collapsed svg{fill:none}::ng-deep .collapsed-link-tag:hover:not(.active-tab):not(.expanded-tab) .icon-container .svg-icon-collapsed svg g path{stroke:var(--neutral-500)}::ng-deep .collapsed-link-tag:hover:not(.active-tab):not(.expanded-tab) .icon-container .svg-icon-collapsed svg path{stroke:var(--neutral-500)}\n"] }]
+        }], ctorParameters: () => [{ type: CollapseService }, { type: i1$2.DomSanitizer }, { type: SidenavService }], propDecorators: { collapseAll: [{
+                type: Output
+            }] } });
+
+class SideBarListComponent {
+    authService;
+    authContextService;
+    sidenav;
+    collapseService;
+    assetUrl = (str) => `assets/${str}`;
+    constructor(authService, authContextService, sidenav, collapseService) {
+        this.authService = authService;
+        this.authContextService = authContextService;
+        this.sidenav = sidenav;
+        this.collapseService = collapseService;
+        effect(() => {
+            if (this.authContextService.userPermissionsAndRoles$()) {
+                this.collapseService.filterTabs();
+            }
+        });
+    }
+    ngOnInit() {
+        this.collapseService.filterTabs();
+        this.authService.handlePermissionConfig();
+    }
+    static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "19.2.15", ngImport: i0, type: SideBarListComponent, deps: [{ token: AuthService }, { token: AuthContextService }, { token: SidenavService }, { token: CollapseService }], target: i0.ɵɵFactoryTarget.Component });
+    static ɵcmp = i0.ɵɵngDeclareComponent({ minVersion: "17.0.0", version: "19.2.15", type: SideBarListComponent, isStandalone: true, selector: "app-side-bar-list", ngImport: i0, template: "<nav class=\"sidenav w-full flex justify-center\">\n  @if(sidenav.isCollapsed) {\n  <ul\n    class=\"side-nav-collapsed\"\n    [ngClass]=\"{\n      'gap-[0.75em]': sidenav.isCollapsed\n    }\"\n  >\n    @for(tab of collapseService.filteredTabs;track tab) {\n    <app-collapsed-bar [tab]=\"tab\"></app-collapsed-bar>\n    }\n  </ul>\n  } @else{\n  <!-- class=\"flex flex-col transition-all duration-400 p-[0.625em]\" -->\n  <ul\n    class=\"main-side-nav-list\"\n    [ngClass]=\"{\n      'gap-[0.75em]': sidenav.isCollapsed,\n      'opacity-0': sidenav.isCollapsed\n    }\"\n  >\n    @for(tab of collapseService.filteredTabs;track tab) {\n    <app-expanded-bar [tab]=\"tab\"></app-expanded-bar>\n    }\n  </ul>\n  }\n</nav>\n", styles: [".arrow-icon{width:1.5em;height:1.5em;background-color:none;transition:transform .3s ease;transform-origin:center;rotate:0deg}.arrow-icon-expanded{width:1.5em;height:1.5em;background-color:none;transition:transform .3s ease;transform-origin:center;rotate:90deg}.svg-icon-collapsed{width:1.45em;height:1.45em;background-color:none}.link-title{font-family:var(--FM-Light);line-height:1.37em}.main-side-nav-list{display:flex;flex-direction:column;justify-content:flex-start;width:12.8em;gap:1.5em;transition:all .4s ease-in-out}.side-nav-collapsed{display:flex;flex-direction:column;justify-content:flex-start;gap:1.5em;transition:all .4s ease-in-out}\n"], dependencies: [{ kind: "ngmodule", type: CommonModule }, { kind: "directive", type: i2.NgClass, selector: "[ngClass]", inputs: ["class", "ngClass"] }, { kind: "ngmodule", type: TranslateModule }, { kind: "component", type: ExpandedBarComponent, selector: "app-expanded-bar", inputs: ["tab"], outputs: ["collapseAll"] }, { kind: "component", type: CollapsedBarComponent, selector: "app-collapsed-bar", inputs: ["tab"], outputs: ["collapseAll"] }] });
+}
+i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.15", ngImport: i0, type: SideBarListComponent, decorators: [{
+            type: Component,
+            args: [{ selector: 'app-side-bar-list', imports: [
+                        CommonModule,
+                        TranslateModule,
+                        ExpandedBarComponent,
+                        CollapsedBarComponent,
+                    ], template: "<nav class=\"sidenav w-full flex justify-center\">\n  @if(sidenav.isCollapsed) {\n  <ul\n    class=\"side-nav-collapsed\"\n    [ngClass]=\"{\n      'gap-[0.75em]': sidenav.isCollapsed\n    }\"\n  >\n    @for(tab of collapseService.filteredTabs;track tab) {\n    <app-collapsed-bar [tab]=\"tab\"></app-collapsed-bar>\n    }\n  </ul>\n  } @else{\n  <!-- class=\"flex flex-col transition-all duration-400 p-[0.625em]\" -->\n  <ul\n    class=\"main-side-nav-list\"\n    [ngClass]=\"{\n      'gap-[0.75em]': sidenav.isCollapsed,\n      'opacity-0': sidenav.isCollapsed\n    }\"\n  >\n    @for(tab of collapseService.filteredTabs;track tab) {\n    <app-expanded-bar [tab]=\"tab\"></app-expanded-bar>\n    }\n  </ul>\n  }\n</nav>\n", styles: [".arrow-icon{width:1.5em;height:1.5em;background-color:none;transition:transform .3s ease;transform-origin:center;rotate:0deg}.arrow-icon-expanded{width:1.5em;height:1.5em;background-color:none;transition:transform .3s ease;transform-origin:center;rotate:90deg}.svg-icon-collapsed{width:1.45em;height:1.45em;background-color:none}.link-title{font-family:var(--FM-Light);line-height:1.37em}.main-side-nav-list{display:flex;flex-direction:column;justify-content:flex-start;width:12.8em;gap:1.5em;transition:all .4s ease-in-out}.side-nav-collapsed{display:flex;flex-direction:column;justify-content:flex-start;gap:1.5em;transition:all .4s ease-in-out}\n"] }]
+        }], ctorParameters: () => [{ type: AuthService }, { type: AuthContextService }, { type: SidenavService }, { type: CollapseService }] });
+
+const collapseAnimation = trigger('collapseBar', [
+    state('false', style({
+        width: '15.78em',
+    })),
+    state('true', style({
+        width: '5.5em',
+    })),
+    transition('false <=> true', [animate('500ms ease-in-out')]),
+]);
+class CustomNavBarComponent {
+    sidenav;
+    authService;
+    router;
+    domSanitizer;
+    assetUrl = (str) => `assets/${str}`;
+    headerLogo;
+    collapseIcon;
+    collapseDarkIcon;
+    logoutIcon;
+    settingsIcon;
+    settingsDarkIcon;
+    constructor(sidenav, authService, router, domSanitizer) {
+        this.sidenav = sidenav;
+        this.authService = authService;
+        this.router = router;
+        this.domSanitizer = domSanitizer;
+        this.headerLogo = this.domSanitizer.bypassSecurityTrustHtml(headerLogoSvg);
+        this.collapseIcon =
+            this.domSanitizer.bypassSecurityTrustHtml(collapseIconSvg);
+        this.collapseDarkIcon =
+            this.domSanitizer.bypassSecurityTrustHtml(collapseDarkIconSvg);
+        this.logoutIcon = this.domSanitizer.bypassSecurityTrustHtml(logoutIconSvg);
+        this.settingsIcon =
+            this.domSanitizer.bypassSecurityTrustHtml(settingsIconSvg);
+        this.settingsDarkIcon =
+            this.domSanitizer.bypassSecurityTrustHtml(settingsDarkIconSvg);
+    }
+    logout() {
+        this.authService.logout();
+    }
+    openSettings() {
+        console.log('settings');
+        this.router.navigate([`settings`]);
+    }
+    isSettingsActive() {
+        if (this.router.url.includes('settings')) {
+            return true;
+        }
+        return false;
+    }
+    static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "19.2.15", ngImport: i0, type: CustomNavBarComponent, deps: [{ token: SidenavService }, { token: AuthService }, { token: i3.Router }, { token: i1$2.DomSanitizer }], target: i0.ɵɵFactoryTarget.Component });
+    static ɵcmp = i0.ɵɵngDeclareComponent({ minVersion: "17.0.0", version: "19.2.15", type: CustomNavBarComponent, isStandalone: true, selector: "app-custom-nav-bar", ngImport: i0, template: "<div\n  class=\"collapse-button-container\"\n  style=\"left: calc(100% + 1.5em); top: 1.75em\"\n  (click)=\"sidenav.toggle()\"\n>\n  <span\n    [innerHtml]=\"sidenav.isCollapsed ? collapseDarkIcon : collapseIcon\"\n    class=\"header-icon-size\"\n  ></span>\n</div>\n\n<!-- transition-[width] duration-400 -->\n<div\n  class=\"sidenav-container\"\n  [style]=\"{\n    width: sidenav.isCollapsed ? '5.5em' : '15.78em',\n  }\"\n  [@collapseBar]=\"sidenav.isCollapsed\"\n>\n  <div class=\"sidenav-sub-container\">\n    <div class=\"title-container\">\n      <span\n        [style]=\"{\n          width: sidenav.isCollapsed ? '1.875em' : '1.5em',\n          height: sidenav.isCollapsed ? '1.875em' : '1.5em',\n        }\"\n        [innerHTML]=\"headerLogo\"\n      >\n      </span>\n      @if (!sidenav.isCollapsed) {\n        <h1\n          class=\"gradient-text header-text\"\n          style=\"font-family: var(--FM-Bold)\"\n        >\n          {{ \"NAV.TITLE\" | translate }}\n        </h1>\n      }\n    </div>\n    <app-side-bar-list></app-side-bar-list>\n    <div class=\"main-buttons\">\n      <a\n        class=\"link-tag settings\"\n        (click)=\"openSettings()\"\n        [class]=\"{\n          'active-tab': isSettingsActive(),\n          'is-expanded': !sidenav.isCollapsed,\n        }\"\n      >\n        @if (isSettingsActive()) {\n          <span class=\"svg-icon\" [innerHTML]=\"settingsDarkIcon\"></span>\n        } @else {\n          <span class=\"svg-icon\" [innerHTML]=\"settingsIcon\"></span>\n        }\n        @if (!sidenav.isCollapsed) {\n          <span>\n            {{ \"GENERAL.SETTINGS\" | translate }}\n          </span>\n        }\n      </a>\n\n      <a\n        class=\"link-tag logout\"\n        (click)=\"logout()\"\n        [class]=\"{\n          'active-tab': isSettingsActive(),\n          'is-expanded': !sidenav.isCollapsed,\n        }\"\n      >\n        <span class=\"svg-icon\" [innerHTML]=\"logoutIcon\"></span>\n        @if (!sidenav.isCollapsed) {\n          <span>\n            {{ \"GENERAL.LOGOUT\" | translate }}\n          </span>\n        }\n      </a>\n    </div>\n  </div>\n</div>\n", styles: [":host{font-size:1.6rem}.collapse-button-container{position:relative;z-index:10;display:flex;align-items:center;cursor:pointer;width:2.5em;height:2.5em}.link-tag{font-family:var(--FM-Light)}.header-icon-size{width:1.25em;height:.94em;display:block;transition:all .4s ease}.sidenav-container{position:relative;top:-2.5em;display:flex;flex-direction:column;justify-content:center;height:100vh}.title-container{width:100%;height:min-content;display:flex;flex-direction:row;justify-content:center;align-items:center;gap:.5em;transition:all .4s ease}.svg-icon{width:1.8em;height:1.8em;background-color:none}.gradient-text{background:linear-gradient(to right,#602650,#25c7bc,#b284a6);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}.header-text{line-height:2em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:center;font-size:1.15em;transition:all .4s ease}.sidenav-sub-container{display:grid;grid-template-columns:repeat(1,minmax(0,1fr));grid-template-rows:4.3em auto 7.25em;width:100%;height:100%;align-items:start;justify-content:center;padding-left:.5em;padding-right:.5em;padding-top:1.5em;transition:all .4s ease;box-shadow:0 4px 4px #00000014}.main-buttons{display:flex;flex-direction:column;align-items:center;justify-content:start;gap:1em;width:100%;height:100%}.main-buttons .link-tag{border-radius:var(--border-radius-m-16);display:flex;align-items:center;justify-content:start;gap:.5em;cursor:pointer;transition:all .4s ease-in-out}.main-buttons .link-tag.is-expanded{width:12.8em;padding:.5em .9375em}.main-buttons .link-tag:not(.is-expanded){width:2.5em;height:2.5em;padding:.5em;justify-content:center}.main-buttons .link-tag .svg-icon{width:1.06em;height:1.06em;background-color:none}.main-buttons .link-tag.settings{color:var(--neutral-500)}.main-buttons .link-tag.settings.active-tab{background-color:var(--secondary-75);font-family:var(--FM-Medium);color:var(--link-color)}.main-buttons .link-tag.settings:hover:not(.active-tab){background-color:var(--neutral-100)}.main-buttons .link-tag.logout{color:var(--warning-600)}.main-buttons .link-tag.logout:hover{background-color:var(--warning-100)}.main-buttons .link-tag:active{box-shadow:0 0 1px 0 var(--box-shadow-10);box-shadow:0 0 5px 0 var(--box-shadow-10)}\n"], dependencies: [{ kind: "ngmodule", type: TranslateModule }, { kind: "pipe", type: i3$1.TranslatePipe, name: "translate" }, { kind: "component", type: SideBarListComponent, selector: "app-side-bar-list" }], animations: [collapseAnimation] });
+}
+i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.15", ngImport: i0, type: CustomNavBarComponent, decorators: [{
+            type: Component,
+            args: [{ selector: 'app-custom-nav-bar', imports: [TranslateModule, SideBarListComponent], animations: [collapseAnimation], template: "<div\n  class=\"collapse-button-container\"\n  style=\"left: calc(100% + 1.5em); top: 1.75em\"\n  (click)=\"sidenav.toggle()\"\n>\n  <span\n    [innerHtml]=\"sidenav.isCollapsed ? collapseDarkIcon : collapseIcon\"\n    class=\"header-icon-size\"\n  ></span>\n</div>\n\n<!-- transition-[width] duration-400 -->\n<div\n  class=\"sidenav-container\"\n  [style]=\"{\n    width: sidenav.isCollapsed ? '5.5em' : '15.78em',\n  }\"\n  [@collapseBar]=\"sidenav.isCollapsed\"\n>\n  <div class=\"sidenav-sub-container\">\n    <div class=\"title-container\">\n      <span\n        [style]=\"{\n          width: sidenav.isCollapsed ? '1.875em' : '1.5em',\n          height: sidenav.isCollapsed ? '1.875em' : '1.5em',\n        }\"\n        [innerHTML]=\"headerLogo\"\n      >\n      </span>\n      @if (!sidenav.isCollapsed) {\n        <h1\n          class=\"gradient-text header-text\"\n          style=\"font-family: var(--FM-Bold)\"\n        >\n          {{ \"NAV.TITLE\" | translate }}\n        </h1>\n      }\n    </div>\n    <app-side-bar-list></app-side-bar-list>\n    <div class=\"main-buttons\">\n      <a\n        class=\"link-tag settings\"\n        (click)=\"openSettings()\"\n        [class]=\"{\n          'active-tab': isSettingsActive(),\n          'is-expanded': !sidenav.isCollapsed,\n        }\"\n      >\n        @if (isSettingsActive()) {\n          <span class=\"svg-icon\" [innerHTML]=\"settingsDarkIcon\"></span>\n        } @else {\n          <span class=\"svg-icon\" [innerHTML]=\"settingsIcon\"></span>\n        }\n        @if (!sidenav.isCollapsed) {\n          <span>\n            {{ \"GENERAL.SETTINGS\" | translate }}\n          </span>\n        }\n      </a>\n\n      <a\n        class=\"link-tag logout\"\n        (click)=\"logout()\"\n        [class]=\"{\n          'active-tab': isSettingsActive(),\n          'is-expanded': !sidenav.isCollapsed,\n        }\"\n      >\n        <span class=\"svg-icon\" [innerHTML]=\"logoutIcon\"></span>\n        @if (!sidenav.isCollapsed) {\n          <span>\n            {{ \"GENERAL.LOGOUT\" | translate }}\n          </span>\n        }\n      </a>\n    </div>\n  </div>\n</div>\n", styles: [":host{font-size:1.6rem}.collapse-button-container{position:relative;z-index:10;display:flex;align-items:center;cursor:pointer;width:2.5em;height:2.5em}.link-tag{font-family:var(--FM-Light)}.header-icon-size{width:1.25em;height:.94em;display:block;transition:all .4s ease}.sidenav-container{position:relative;top:-2.5em;display:flex;flex-direction:column;justify-content:center;height:100vh}.title-container{width:100%;height:min-content;display:flex;flex-direction:row;justify-content:center;align-items:center;gap:.5em;transition:all .4s ease}.svg-icon{width:1.8em;height:1.8em;background-color:none}.gradient-text{background:linear-gradient(to right,#602650,#25c7bc,#b284a6);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}.header-text{line-height:2em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:center;font-size:1.15em;transition:all .4s ease}.sidenav-sub-container{display:grid;grid-template-columns:repeat(1,minmax(0,1fr));grid-template-rows:4.3em auto 7.25em;width:100%;height:100%;align-items:start;justify-content:center;padding-left:.5em;padding-right:.5em;padding-top:1.5em;transition:all .4s ease;box-shadow:0 4px 4px #00000014}.main-buttons{display:flex;flex-direction:column;align-items:center;justify-content:start;gap:1em;width:100%;height:100%}.main-buttons .link-tag{border-radius:var(--border-radius-m-16);display:flex;align-items:center;justify-content:start;gap:.5em;cursor:pointer;transition:all .4s ease-in-out}.main-buttons .link-tag.is-expanded{width:12.8em;padding:.5em .9375em}.main-buttons .link-tag:not(.is-expanded){width:2.5em;height:2.5em;padding:.5em;justify-content:center}.main-buttons .link-tag .svg-icon{width:1.06em;height:1.06em;background-color:none}.main-buttons .link-tag.settings{color:var(--neutral-500)}.main-buttons .link-tag.settings.active-tab{background-color:var(--secondary-75);font-family:var(--FM-Medium);color:var(--link-color)}.main-buttons .link-tag.settings:hover:not(.active-tab){background-color:var(--neutral-100)}.main-buttons .link-tag.logout{color:var(--warning-600)}.main-buttons .link-tag.logout:hover{background-color:var(--warning-100)}.main-buttons .link-tag:active{box-shadow:0 0 1px 0 var(--box-shadow-10);box-shadow:0 0 5px 0 var(--box-shadow-10)}\n"] }]
+        }], ctorParameters: () => [{ type: SidenavService }, { type: AuthService }, { type: i3.Router }, { type: i1$2.DomSanitizer }] });
+
+class EmptyRouteComponent {
+    static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "19.2.15", ngImport: i0, type: EmptyRouteComponent, deps: [], target: i0.ɵɵFactoryTarget.Component });
+    static ɵcmp = i0.ɵɵngDeclareComponent({ minVersion: "14.0.0", version: "19.2.15", type: EmptyRouteComponent, isStandalone: true, selector: "app-empty-route", ngImport: i0, template: '', isInline: true });
+}
+i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.15", ngImport: i0, type: EmptyRouteComponent, decorators: [{
+            type: Component,
+            args: [{
+                    selector: 'app-empty-route',
+                    template: '',
+                }]
+        }] });
+
+class SidenavMainService {
+    appRef;
+    injector;
+    sidebarComponentRef;
+    constructor(appRef, injector) {
+        this.appRef = appRef;
+        this.injector = injector;
+    }
+    pushSidebarToLayout() {
+        console.log('Pushing sidebar to layout');
+        const sidebarHost = document.getElementById('sidebar-host');
+        if (sidebarHost) {
+            // Create component reference
+            this.sidebarComponentRef = createComponent(CustomNavBarComponent, {
+                environmentInjector: this.injector,
+            });
+            // Attach the component to the Angular application
+            this.appRef.attachView(this.sidebarComponentRef.hostView);
+            // Append the component's DOM element to the sidebar host
+            sidebarHost.appendChild(this.sidebarComponentRef.location.nativeElement);
+        }
+    }
+    sideBarLoaded() {
+        return !!this.sidebarComponentRef;
+    }
+    removeSidebarFromLayout() {
+        if (this.sidebarComponentRef) {
+            this.appRef.detachView(this.sidebarComponentRef.hostView);
+            this.sidebarComponentRef.destroy();
+            this.sidebarComponentRef = undefined;
+        }
+    }
+    static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "19.2.15", ngImport: i0, type: SidenavMainService, deps: [{ token: i0.ApplicationRef }, { token: i0.EnvironmentInjector }], target: i0.ɵɵFactoryTarget.Injectable });
+    static ɵprov = i0.ɵɵngDeclareInjectable({ minVersion: "12.0.0", version: "19.2.15", ngImport: i0, type: SidenavMainService, providedIn: 'root' });
+}
+i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.15", ngImport: i0, type: SidenavMainService, decorators: [{
+            type: Injectable,
+            args: [{ providedIn: 'root' }]
+        }], ctorParameters: () => [{ type: i0.ApplicationRef }, { type: i0.EnvironmentInjector }] });
+
 /**
  * Generated bundle index. Do not edit.
  */
 
-export { API_BASE_URL, AllowNumberOnlyDirective, ArabicOnlyDirective, AuthBeService, AuthConstant, AuthContextService, AuthDirective, AuthInterceptor, AuthService, BlurBackdropDirective, ClickOutsideDirective, CommonHttpService, ComponentFormErrorConstant, CustomActionsDropdownComponent, CustomAppErrorComponent, CustomAvatarsComponent, CustomBreadcrumbComponent, CustomBulkActionsComponent, CustomButtonComponent, CustomCalendarComponent, CustomCalendarExpandedComponent, CustomCalenderFormComponent, CustomCategoryTableComponent, CustomCheckBoxComponent, CustomCheckBoxFormComponent, CustomColorComponent, CustomConfirmPopupComponent, CustomDetailsHeaderComponent, CustomDetailsModalComponent, CustomDetailsNavComponent, CustomDropdownButtonComponent, CustomDropdownComponent, CustomDropdownFormComponent, CustomDynamicTableWithCategoriesComponent, CustomFieldsFormComponent, CustomFileUploadComponent, CustomFileViewerComponent, CustomFilterDropdownComponent, CustomFilterDynamicFormComponent, CustomInputComponent, CustomInputFormComponent, CustomLoadingSpinnerComponent, CustomModalComponent, CustomMultiSelectDropdownComponent, CustomMultiSelectFormComponent, CustomPaginationComponent, CustomPlaceHolderComponent, CustomPlateNumberInputFormComponent, CustomPopUpComponent, CustomProgressBarComponent, CustomProgressRingComponent, CustomRadioComponentComponent, CustomRadioGroupFormComponent, CustomReactiveSearchInputComponent, CustomSearchInputComponent, CustomSteppersContainerComponent, CustomSteppersControllersComponent, CustomSvgIconComponent, CustomTableComponent, CustomTabsComponent, CustomTextareaComponent, CustomTextareaFormComponent, CustomTimeInputFormComponent, CustomTitleContentComponent, CustomToastComponent, CustomToggleSwitchComponent, CustomToggleSwitchFormComponent, CustomTooltipComponent, DispatchingFeComponentsService, DropdownsAnimationDirective, EnglishOnlyDirective, ErrorInterceptor, GeoLocationService, I18nConstant, LoadingService, ModuleRoutes, NetworkConnectionInterceptor, OverlayPanelComponent, PermissionGuard, Permissions, Resources, Roles, SHOW_SUCCESS_TOASTER, SKIP_LOADER, SKIP_TOKEN, SidenavService, StepperService, StorageService, TaskPriorityComponent, ToastService, ToggleElementDirective, TranslationService, Types, USE_TOKEN, UserDataService, UserStatus, actionAssignTaskSvg, actionDeleteSvg$1 as actionDeleteSvg, actionDuplicateSvg, actionEdiSquaretSvg, actionEditSvg$1 as actionEditSvg, actionPermission, actionRenameSvg, assignTaskSvg, authGuard, b64toBlob, blobToB64, convertDateFormat, convertFileToBase64, convertFormGroupToFormData, diffTime, downloadBlob, dropdownAnimation, excelDateToJSDate, flattenTree, formatDate, formatDateWithTime, formatTimestamp, formatinitialTakeTime, generateRandomColor, generateUniqueNumber, getFormValidationErrors, isDocumentPath, isImagePath, isVedioPath, loadingInterceptor, logger, noAuthGuard, someFieldsContainData, timeAgo, viewIconSVG };
+export { API_BASE_URL, AllowNumberOnlyDirective, ArabicOnlyDirective, AuthBeService, AuthConstant, AuthContextService, AuthDirective, AuthInterceptor, AuthService, BlurBackdropDirective, ClickOutsideDirective, CollapsedBarComponent, CommonHttpService, ComponentFormErrorConstant, CustomActionsDropdownComponent, CustomAppErrorComponent, CustomAvatarsComponent, CustomBreadcrumbComponent, CustomBulkActionsComponent, CustomButtonComponent, CustomCalendarComponent, CustomCalendarExpandedComponent, CustomCalenderFormComponent, CustomCategoryTableComponent, CustomCheckBoxComponent, CustomCheckBoxFormComponent, CustomColorComponent, CustomConfirmPopupComponent, CustomDetailsHeaderComponent, CustomDetailsModalComponent, CustomDetailsNavComponent, CustomDropdownButtonComponent, CustomDropdownComponent, CustomDropdownFormComponent, CustomDynamicTableWithCategoriesComponent, CustomFieldsFormComponent, CustomFileUploadComponent, CustomFileViewerComponent, CustomFilterDropdownComponent, CustomFilterDynamicFormComponent, CustomInputComponent, CustomInputFormComponent, CustomLoadingSpinnerComponent, CustomModalComponent, CustomMultiSelectDropdownComponent, CustomMultiSelectFormComponent, CustomNavBarComponent, CustomPaginationComponent, CustomPlaceHolderComponent, CustomPlateNumberInputFormComponent, CustomPopUpComponent, CustomProgressBarComponent, CustomProgressRingComponent, CustomRadioComponentComponent, CustomRadioGroupFormComponent, CustomReactiveSearchInputComponent, CustomSearchInputComponent, CustomSteppersContainerComponent, CustomSteppersControllersComponent, CustomSvgIconComponent, CustomTableComponent, CustomTabsComponent, CustomTextareaComponent, CustomTextareaFormComponent, CustomTimeInputFormComponent, CustomTitleContentComponent, CustomToastComponent, CustomToggleSwitchComponent, CustomToggleSwitchFormComponent, CustomTooltipComponent, DispatchingFeComponentsService, DropdownsAnimationDirective, EmptyRouteComponent, EnglishOnlyDirective, ErrorInterceptor, GeoLocationService, I18nConstant, LoadingService, ModuleRoutes, NetworkConnectionInterceptor, OverlayPanelComponent, PermissionGuard, Permissions, Resources, Roles, SHOW_SUCCESS_TOASTER, SKIP_LOADER, SKIP_TOKEN, SideBarListComponent, SidenavMainService, SidenavService, StepperService, StorageService, TaskPriorityComponent, ToastService, ToggleElementDirective, TranslationService, Types, USE_TOKEN, UserDataService, UserStatus, actionAssignTaskSvg, actionDeleteSvg$1 as actionDeleteSvg, actionDuplicateSvg, actionEdiSquaretSvg, actionEditSvg$1 as actionEditSvg, actionPermission, actionRenameSvg, assignTaskSvg, authGuard, b64toBlob, blobToB64, collapseAnimation, convertDateFormat, convertFileToBase64, convertFormGroupToFormData, diffTime, downloadBlob, dropdownAnimation, excelDateToJSDate, flattenTree, formatDate, formatDateWithTime, formatTimestamp, formatinitialTakeTime, generateRandomColor, generateUniqueNumber, getFormValidationErrors, isDocumentPath, isImagePath, isVedioPath, loadingInterceptor, logger, noAuthGuard, someFieldsContainData, timeAgo, viewIconSVG };
 //# sourceMappingURL=dispatching-fe-components.mjs.map
