@@ -6826,9 +6826,10 @@ class CollapseService {
         }
     }
     routeModules(link) {
-        this.router.navigateByUrl('/', { skipLocationChange: false }).then(() => {
-            this.router.navigate([link]);
-        });
+        this.router.navigate([link]);
+        // this.router.navigateByUrl('/', { skipLocationChange: false }).then(() => {
+        //   this.router.navigate([link]);
+        // });
     }
     onSubTabClick(subTab) {
         this.activeSubTab = subTab;
