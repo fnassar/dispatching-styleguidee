@@ -8,7 +8,6 @@ export declare class CollapsedBarComponent {
     protected collapseService: CollapseService;
     private sanitizer;
     protected sidenav: SidenavService;
-    protected readonly assetUrl: (str: string) => string;
     tab: import("@angular/core").InputSignal<MainTab>;
     collapseAll: EventEmitter<MainTab>;
     arrowDownSmallIcon: SafeHtml;

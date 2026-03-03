@@ -1,5 +1,5 @@
 import * as i0 from '@angular/core';
-import { Injectable, signal, InjectionToken, Inject, computed, Optional, inject, input, Input, Component, EventEmitter, Output, HostListener, Directive, PLATFORM_ID, effect, HostBinding, ViewChild, ContentChild, ViewEncapsulation, model, createComponent } from '@angular/core';
+import { Injectable, signal, InjectionToken, Inject, computed, Optional, inject, input, Input, Component, EventEmitter, Output, HostListener, Directive, PLATFORM_ID, effect, HostBinding, ViewChild, ContentChild, ViewEncapsulation, model, createComponent, NgZone } from '@angular/core';
 import * as i1 from '@angular/common/http';
 import { HttpContextToken, HttpContext, HttpResponse } from '@angular/common/http';
 import { retry, catchError, BehaviorSubject, Observable, map, throwError, finalize, tap, Subscription, fromEvent, filter, Subject, takeUntil, debounceTime, distinctUntilChanged } from 'rxjs';
@@ -10,10 +10,11 @@ import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import * as i1$1 from '@angular/forms';
 import { FormsModule, ReactiveFormsModule, FormArray, FormGroup, Validators, FormControl } from '@angular/forms';
 import * as i2 from '@angular/common';
-import { isPlatformBrowser, CommonModule, NgStyle, NgClass, NgComponentOutlet, NgTemplateOutlet, DecimalPipe } from '@angular/common';
+import { isPlatformBrowser, CommonModule, NgStyle, NgClass, NgComponentOutlet, NgTemplateOutlet, DecimalPipe, DatePipe, APP_BASE_HREF } from '@angular/common';
 import { trigger, transition, style, animate, state, keyframes, group, query } from '@angular/animations';
 import * as i1$2 from '@angular/platform-browser';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { webSocket } from 'rxjs/webSocket';
 
 const ModuleRoutes = {
     AUTH: 'auth',
@@ -6432,32 +6433,32 @@ i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.15", ngImpo
         }], ctorParameters: () => [] });
 
 const icons = {
-    insightsSvg: (sanitizer) => sanitizer.bypassSecurityTrustHtml('<svg width="auto" height="auto" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#clip0_447_13885)"> <path d="M14.4887 0.994431H2.58867C1.64979 0.994431 0.888672 1.75555 0.888672 2.69443V14.5944C0.888672 15.5333 1.64979 16.2944 2.58867 16.2944H14.4887C15.4276 16.2944 16.1887 15.5333 16.1887 14.5944V2.69443C16.1887 1.75555 15.4276 0.994431 14.4887 0.994431Z" stroke="#545454" stroke-linecap="round" stroke-linejoin="round" /> <path d="M5.98828 5.24438H11.9383" stroke="#545454" stroke-linecap="round" stroke-linejoin="round" /> <path d="M5.13867 8.64444H10.2387" stroke="#545454" stroke-linecap="round" stroke-linejoin="round" /> <path d="M7.68945 12.0444H11.9395" stroke="#545454" stroke-linecap="round" stroke-linejoin="round" /></g><defs> <clipPath id="clip0_447_13885"> <rect width="17" height="17" fill="white" /> </clipPath></defs></svg>'),
-    planningSvg: (sanitizer) => sanitizer.bypassSecurityTrustHtml('<svg width="auto" height="auto" viewBox="0 0 17 19" fill="none" xmlns="http://www.w3.org/2000/svg"> <g clip-path="url(#clip0_447_13976)"> <path d="M5.09961 0.863525V4.31807" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M11.9004 0.863525V4.31807" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M14.4496 2.59082H2.54961C1.61073 2.59082 0.849609 3.36415 0.849609 4.31809V16.409C0.849609 17.3629 1.61073 18.1363 2.54961 18.1363H14.4496C15.3885 18.1363 16.1496 17.3629 16.1496 16.409V4.31809C16.1496 3.36415 15.3885 2.59082 14.4496 2.59082Z" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M0.849609 7.77271H16.1496" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M5.09961 11.2273H5.10861" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M8.5 11.2273H8.509" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M11.9004 11.2273H11.9094" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M5.09961 14.6819H5.10861" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M8.5 14.6818H8.509" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M11.9004 14.6819H11.9094" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> </g> <defs> <clipPath id="clip0_447_13976"> <rect width="17" height="19" fill="white"/> </clipPath> </defs> </svg>'),
-    plansSvg: (sanitizer) => sanitizer.bypassSecurityTrustHtml('<svg width="auto" height="auto" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg"> <path d="M2.47852 12.75V4.95834C2.47852 2.12501 3.18685 1.41667 6.02018 1.41667H10.9785C13.8118 1.41667 14.5202 2.12501 14.5202 4.95834V12.0417C14.5202 12.1408 14.5202 12.24 14.5131 12.3392" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M4.49727 10.625H14.5202V13.1042C14.5202 14.4713 13.4081 15.5833 12.041 15.5833H4.95768C3.5906 15.5833 2.47852 14.4713 2.47852 13.1042V12.6438C2.47852 11.5317 3.38518 10.625 4.49727 10.625Z" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M5.66602 4.95833H11.3327" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M5.66602 7.4375H9.20768" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> </svg>'),
-    tasksSvg: (sanitizer) => sanitizer.bypassSecurityTrustHtml('<svg width="auto" height="auto" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg"> <path d="M6.37435 15.5833H10.6243C14.166 15.5833 15.5827 14.1667 15.5827 10.625V6.37501C15.5827 2.83334 14.166 1.41667 10.6243 1.41667H6.37435C2.83268 1.41667 1.41602 2.83334 1.41602 6.37501V10.625C1.41602 14.1667 2.83268 15.5833 6.37435 15.5833Z" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M8.76172 6.28999H12.4805" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M4.51953 6.28999L5.05078 6.82124L6.64453 5.22749" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M8.76172 11.2483H12.4805" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M4.51953 11.2483L5.05078 11.7796L6.64453 10.1858" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> </svg>'),
-    resourcesSvg: (sanitizer) => sanitizer.bypassSecurityTrustHtml('<svg width="auto" height="auto" viewBox="0 0 17 15" fill="none" xmlns="http://www.w3.org/2000/svg"> <g clip-path="url(#clip0_447_14259)"> <path d="M11.5916 14.25V12.75C11.5916 11.9544 11.266 11.1913 10.6863 10.6287C10.1067 10.0661 9.32047 9.75 8.50071 9.75H3.86435C3.04459 9.75 2.2584 10.0661 1.67874 10.6287C1.09909 11.1913 0.773438 11.9544 0.773438 12.75V14.25" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M6.18271 6.75C7.88977 6.75 9.27362 5.40685 9.27362 3.75C9.27362 2.09315 7.88977 0.75 6.18271 0.75C4.47564 0.75 3.0918 2.09315 3.0918 3.75C3.0918 5.40685 4.47564 6.75 6.18271 6.75Z" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M16.2264 14.2499V12.7499C16.2259 12.0852 15.9979 11.4395 15.5783 10.9141C15.1588 10.3888 14.5713 10.0136 13.9082 9.84741" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M11.5918 0.847412C12.2567 1.01264 12.846 1.38794 13.2668 1.91414C13.6876 2.44035 13.916 3.08753 13.916 3.75366C13.916 4.41979 13.6876 5.06697 13.2668 5.59318C12.846 6.11939 12.2567 6.49469 11.5918 6.65991" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> </g> <defs> <clipPath id="clip0_447_14259"> <rect width="17" height="15" fill="white"/> </clipPath> </defs> </svg>'),
-    teamsSvg: (sanitizer) => sanitizer.bypassSecurityTrustHtml('<svg width="auto" height="auto" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg"> <path d="M7.08268 14.1667C7.08268 14.9491 7.71695 15.5833 8.49935 15.5833C9.28175 15.5833 9.91602 14.9491 9.91602 14.1667C9.91602 13.3843 9.28175 12.75 8.49935 12.75C7.71695 12.75 7.08268 13.3843 7.08268 14.1667Z" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M12.7507 14.1667C12.7507 14.9491 13.3849 15.5833 14.1673 15.5833C14.9497 15.5833 15.584 14.9491 15.584 14.1667C15.584 13.3843 14.9497 12.75 14.1673 12.75C13.3849 12.75 12.7507 13.3843 12.7507 14.1667Z" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M1.41667 14.1667C1.41667 14.9491 2.05093 15.5833 2.83333 15.5833C3.61574 15.5833 4.25 14.9491 4.25 14.1667C4.25 13.3843 3.61574 12.75 2.83333 12.75C2.05093 12.75 1.41667 13.3843 1.41667 14.1667Z" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M7.08268 2.83335C7.08268 3.61576 7.71695 4.25002 8.49935 4.25002C9.28175 4.25002 9.91602 3.61576 9.91602 2.83335C9.91602 2.05095 9.28175 1.41669 8.49935 1.41669C7.71695 1.41669 7.08268 2.05095 7.08268 2.83335Z" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M8.5 4.25V12.75" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M14.166 12.75V9.91669C14.166 8.50002 13.4577 7.79169 12.041 7.79169L4.95768 7.79169C3.54102 7.79169 2.83268 8.50002 2.83268 9.91669V12.75" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> </svg>'),
-    usersSvg: (sanitizer) => sanitizer.bypassSecurityTrustHtml('<svg width="auto" height="auto" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg"> <path d="M12.7506 5.07166C12.7081 5.06458 12.6585 5.06458 12.616 5.07166C11.6385 5.03624 10.8594 4.23582 10.8594 3.24416C10.8594 2.23124 11.674 1.41666 12.6869 1.41666C13.6998 1.41666 14.5144 2.23832 14.5144 3.24416C14.5073 4.23582 13.7281 5.03624 12.7506 5.07166Z" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M12.0213 10.2283C12.9917 10.3912 14.0613 10.2212 14.8121 9.71831C15.8108 9.05248 15.8108 7.96165 14.8121 7.29582C14.0542 6.7929 12.9704 6.62289 12 6.79289" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M4.2286 5.07166C4.2711 5.06458 4.32068 5.06458 4.36318 5.07166C5.34068 5.03624 6.11984 4.23582 6.11984 3.24416C6.11984 2.23124 5.30526 1.41666 4.29235 1.41666C3.27943 1.41666 2.46484 2.23832 2.46484 3.24416C2.47193 4.23582 3.25109 5.03624 4.2286 5.07166Z" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M4.95786 10.2283C3.98745 10.3912 2.91786 10.2212 2.16703 9.71831C1.16828 9.05248 1.16828 7.96165 2.16703 7.29582C2.92495 6.7929 4.0087 6.62289 4.97911 6.79289" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M8.50062 10.3629C8.45812 10.3558 8.40854 10.3558 8.36604 10.3629C7.38854 10.3275 6.60938 9.52708 6.60938 8.53542C6.60938 7.5225 7.42396 6.70792 8.43687 6.70792C9.44979 6.70792 10.2644 7.52958 10.2644 8.53542C10.2573 9.52708 9.47812 10.3346 8.50062 10.3629Z" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M6.43852 12.5942C5.43977 13.26 5.43977 14.3509 6.43852 15.0167C7.57185 15.7746 9.42768 15.7746 10.561 15.0167C11.5598 14.3509 11.5598 13.26 10.561 12.5942C9.43477 11.8434 7.57185 11.8434 6.43852 12.5942Z" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> </svg>'),
-    assetsSvg: (sanitizer) => sanitizer.bypassSecurityTrustHtml('<svg width="auto" height="auto" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg"> <path d="M14.875 4.95832V12.0417C14.875 14.1667 13.8125 15.5833 11.3333 15.5833H5.66667C3.1875 15.5833 2.125 14.1667 2.125 12.0417V4.95832C2.125 2.83332 3.1875 1.41666 5.66667 1.41666H11.3333C13.8125 1.41666 14.875 2.83332 14.875 4.95832Z" stroke="#545454" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/> <path d="M10.2715 3.1875V4.60417C10.2715 5.38333 10.909 6.02083 11.6882 6.02083H13.1048" stroke="#545454" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/> <path d="M5.66602 9.20831H8.49935" stroke="#545454" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/> <path d="M5.66602 12.0417H11.3327" stroke="#545454" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/> </svg>'),
-    vehiclesSvg: (sanitizer) => sanitizer.bypassSecurityTrustHtml('<svg width="auto" height="auto" viewBox="0 0 19 15" fill="none" xmlns="http://www.w3.org/2000/svg"> <path d="M15.5451 11.7858H17.2724C17.7906 11.7858 18.136 11.3572 18.136 10.7144V7.5001C18.136 6.53582 17.5315 5.67868 16.8406 5.46439C15.286 4.92868 12.9542 4.28582 12.9542 4.28582C12.9542 4.28582 11.8315 2.78582 11.0542 1.82153C10.6224 1.39296 10.1042 1.07153 9.49964 1.07153H3.45419C2.93601 1.07153 2.50419 1.5001 2.2451 2.03582L1.03601 5.14296C0.921646 5.55677 0.863281 5.99122 0.863281 6.42868V10.7144C0.863281 11.3572 1.20874 11.7858 1.72692 11.7858H3.45419" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M5.18235 13.9285C6.1363 13.9285 6.90962 12.9691 6.90962 11.7857C6.90962 10.6022 6.1363 9.64282 5.18235 9.64282C4.2284 9.64282 3.45508 10.6022 3.45508 11.7857C3.45508 12.9691 4.2284 13.9285 5.18235 13.9285Z" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M6.9082 11.7856H12.09" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M13.8191 13.9285C14.773 13.9285 15.5463 12.9691 15.5463 11.7857C15.5463 10.6022 14.773 9.64282 13.8191 9.64282C12.8651 9.64282 12.0918 10.6022 12.0918 11.7857C12.0918 12.9691 12.8651 13.9285 13.8191 13.9285Z" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> </svg>'),
-    equipmentSvg: (sanitizer) => sanitizer.bypassSecurityTrustHtml('<svg width="auto" height="auto" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg"> <path d="M4.78813 15.5834H12.2115C14.1665 15.5834 14.9456 14.3863 15.0377 12.9271L15.406 7.07627C15.5052 5.54627 14.2869 4.25002 12.7498 4.25002C12.3177 4.25002 11.921 4.0021 11.7227 3.6196L11.2127 2.59252C10.8869 1.94794 10.0369 1.41669 9.31438 1.41669H7.69229C6.96271 1.41669 6.11271 1.94794 5.78688 2.59252L5.27688 3.6196C5.07854 4.0021 4.68188 4.25002 4.24979 4.25002C2.71271 4.25002 1.49438 5.54627 1.59354 7.07627L1.96188 12.9271C2.04688 14.3863 2.83313 15.5834 4.78813 15.5834Z" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M7.4375 5.66669H9.5625" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M8.49935 12.75C9.76727 12.75 10.8014 11.7158 10.8014 10.4479C10.8014 9.17998 9.76727 8.14581 8.49935 8.14581C7.23143 8.14581 6.19727 9.17998 6.19727 10.4479C6.19727 11.7158 7.23143 12.75 8.49935 12.75Z" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> </svg>'),
-    zonesSvg: (sanitizer) => sanitizer.bypassSecurityTrustHtml('<svg width="auto" height="auto" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg"> <g clip-path="url(#clip0_447_15078)"> <path d="M5.9612 10.0454H3.09438C2.93236 10.0455 2.77446 10.0965 2.64301 10.1912C2.51156 10.2859 2.4132 10.4195 2.36184 10.5732L0.813291 15.2095C0.774469 15.3257 0.76381 15.4494 0.782192 15.5705C0.800574 15.6916 0.847471 15.8065 0.919016 15.9059C0.990561 16.0053 1.08471 16.0863 1.19369 16.1422C1.30267 16.198 1.42337 16.2272 1.54584 16.2272H15.4549C15.5773 16.2271 15.6979 16.198 15.8068 16.1422C15.9157 16.0863 16.0098 16.0055 16.0813 15.9062C16.1529 15.8069 16.1998 15.692 16.2182 15.571C16.2367 15.4501 16.2261 15.3264 16.1875 15.2103L14.642 10.574C14.5907 10.42 14.4923 10.2861 14.3607 10.1913C14.2291 10.0964 14.0709 10.0454 13.9087 10.0454H11.0403" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M13.136 5.40907C13.136 8.20093 10.1463 11.1497 8.96869 12.2052C8.83398 12.3081 8.66916 12.3638 8.49965 12.3638C8.33013 12.3638 8.16531 12.3081 8.0306 12.2052C6.85374 11.1497 3.86328 8.20093 3.86328 5.40907C3.86328 4.17943 4.35175 3.00015 5.22124 2.13066C6.09073 1.26118 7.27 0.772705 8.49965 0.772705C9.72929 0.772705 10.9086 1.26118 11.7781 2.13066C12.6475 3.00015 13.136 4.17943 13.136 5.40907Z" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M8.50053 6.95443C9.35406 6.95443 10.046 6.26251 10.046 5.40898C10.046 4.55545 9.35406 3.86353 8.50053 3.86353C7.647 3.86353 6.95508 4.55545 6.95508 5.40898C6.95508 6.26251 7.647 6.95443 8.50053 6.95443Z" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> </g> <defs> <clipPath id="clip0_447_15078"> <rect width="17" height="17" fill="white"/> </clipPath> </defs> </svg>'),
-    AnalysisSvg: (sanitizer) => sanitizer.bypassSecurityTrustHtml('<svg width="auto" height="auto" viewBox="0 0 17 19" fill="none" xmlns="http://www.w3.org/2000/svg"> <g clip-path="url(#clip0_447_15136)"> <path d="M11.3342 0.86377H2.8342C2.33324 0.86377 1.85279 1.04575 1.49856 1.36968C1.14432 1.6936 0.945313 2.13294 0.945312 2.59104V16.4092C0.945313 16.8673 1.14432 17.3067 1.49856 17.6306C1.85279 17.9545 2.33324 18.1365 2.8342 18.1365H14.1675C14.6685 18.1365 15.1489 17.9545 15.5032 17.6306C15.8574 17.3067 16.0564 16.8673 16.0564 16.4092V5.18195L11.3342 0.86377Z" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M10.3887 0.863647V4.31819C10.3887 4.77629 10.5877 5.21563 10.9419 5.53956C11.2962 5.86349 11.7766 6.04547 12.2776 6.04547H16.0553" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M4.72266 14.6819V12.9546" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M8.5 14.6818V11.2273" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M12.2773 14.6818V9.5" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> </g> <defs> <clipPath id="clip0_447_15136"> <rect width="17" height="19" fill="white"/> </clipPath> </defs> </svg>'),
+    insightsSvg: (sanitizer) => sanitizer.bypassSecurityTrustHtml('<svg viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#clip0_447_13885)"> <path d="M14.4887 0.994431H2.58867C1.64979 0.994431 0.888672 1.75555 0.888672 2.69443V14.5944C0.888672 15.5333 1.64979 16.2944 2.58867 16.2944H14.4887C15.4276 16.2944 16.1887 15.5333 16.1887 14.5944V2.69443C16.1887 1.75555 15.4276 0.994431 14.4887 0.994431Z" stroke="#545454" stroke-linecap="round" stroke-linejoin="round" /> <path d="M5.98828 5.24438H11.9383" stroke="#545454" stroke-linecap="round" stroke-linejoin="round" /> <path d="M5.13867 8.64444H10.2387" stroke="#545454" stroke-linecap="round" stroke-linejoin="round" /> <path d="M7.68945 12.0444H11.9395" stroke="#545454" stroke-linecap="round" stroke-linejoin="round" /></g><defs> <clipPath id="clip0_447_13885"> <rect width="17" height="17" fill="white" /> </clipPath></defs></svg>'),
+    planningSvg: (sanitizer) => sanitizer.bypassSecurityTrustHtml('<svg viewBox="0 0 17 19" fill="none" xmlns="http://www.w3.org/2000/svg"> <g clip-path="url(#clip0_447_13976)"> <path d="M5.09961 0.863525V4.31807" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M11.9004 0.863525V4.31807" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M14.4496 2.59082H2.54961C1.61073 2.59082 0.849609 3.36415 0.849609 4.31809V16.409C0.849609 17.3629 1.61073 18.1363 2.54961 18.1363H14.4496C15.3885 18.1363 16.1496 17.3629 16.1496 16.409V4.31809C16.1496 3.36415 15.3885 2.59082 14.4496 2.59082Z" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M0.849609 7.77271H16.1496" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M5.09961 11.2273H5.10861" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M8.5 11.2273H8.509" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M11.9004 11.2273H11.9094" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M5.09961 14.6819H5.10861" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M8.5 14.6818H8.509" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M11.9004 14.6819H11.9094" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> </g> <defs> <clipPath id="clip0_447_13976"> <rect width="17" height="19" fill="white"/> </clipPath> </defs> </svg>'),
+    plansSvg: (sanitizer) => sanitizer.bypassSecurityTrustHtml('<svg viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg"> <path d="M2.47852 12.75V4.95834C2.47852 2.12501 3.18685 1.41667 6.02018 1.41667H10.9785C13.8118 1.41667 14.5202 2.12501 14.5202 4.95834V12.0417C14.5202 12.1408 14.5202 12.24 14.5131 12.3392" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M4.49727 10.625H14.5202V13.1042C14.5202 14.4713 13.4081 15.5833 12.041 15.5833H4.95768C3.5906 15.5833 2.47852 14.4713 2.47852 13.1042V12.6438C2.47852 11.5317 3.38518 10.625 4.49727 10.625Z" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M5.66602 4.95833H11.3327" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M5.66602 7.4375H9.20768" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> </svg>'),
+    tasksSvg: (sanitizer) => sanitizer.bypassSecurityTrustHtml('<svg viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg"> <path d="M6.37435 15.5833H10.6243C14.166 15.5833 15.5827 14.1667 15.5827 10.625V6.37501C15.5827 2.83334 14.166 1.41667 10.6243 1.41667H6.37435C2.83268 1.41667 1.41602 2.83334 1.41602 6.37501V10.625C1.41602 14.1667 2.83268 15.5833 6.37435 15.5833Z" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M8.76172 6.28999H12.4805" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M4.51953 6.28999L5.05078 6.82124L6.64453 5.22749" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M8.76172 11.2483H12.4805" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M4.51953 11.2483L5.05078 11.7796L6.64453 10.1858" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> </svg>'),
+    resourcesSvg: (sanitizer) => sanitizer.bypassSecurityTrustHtml('<svg viewBox="0 0 17 15" fill="none" xmlns="http://www.w3.org/2000/svg"> <g clip-path="url(#clip0_447_14259)"> <path d="M11.5916 14.25V12.75C11.5916 11.9544 11.266 11.1913 10.6863 10.6287C10.1067 10.0661 9.32047 9.75 8.50071 9.75H3.86435C3.04459 9.75 2.2584 10.0661 1.67874 10.6287C1.09909 11.1913 0.773438 11.9544 0.773438 12.75V14.25" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M6.18271 6.75C7.88977 6.75 9.27362 5.40685 9.27362 3.75C9.27362 2.09315 7.88977 0.75 6.18271 0.75C4.47564 0.75 3.0918 2.09315 3.0918 3.75C3.0918 5.40685 4.47564 6.75 6.18271 6.75Z" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M16.2264 14.2499V12.7499C16.2259 12.0852 15.9979 11.4395 15.5783 10.9141C15.1588 10.3888 14.5713 10.0136 13.9082 9.84741" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M11.5918 0.847412C12.2567 1.01264 12.846 1.38794 13.2668 1.91414C13.6876 2.44035 13.916 3.08753 13.916 3.75366C13.916 4.41979 13.6876 5.06697 13.2668 5.59318C12.846 6.11939 12.2567 6.49469 11.5918 6.65991" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> </g> <defs> <clipPath id="clip0_447_14259"> <rect width="17" height="15" fill="white"/> </clipPath> </defs> </svg>'),
+    teamsSvg: (sanitizer) => sanitizer.bypassSecurityTrustHtml('<svg viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg"> <path d="M7.08268 14.1667C7.08268 14.9491 7.71695 15.5833 8.49935 15.5833C9.28175 15.5833 9.91602 14.9491 9.91602 14.1667C9.91602 13.3843 9.28175 12.75 8.49935 12.75C7.71695 12.75 7.08268 13.3843 7.08268 14.1667Z" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M12.7507 14.1667C12.7507 14.9491 13.3849 15.5833 14.1673 15.5833C14.9497 15.5833 15.584 14.9491 15.584 14.1667C15.584 13.3843 14.9497 12.75 14.1673 12.75C13.3849 12.75 12.7507 13.3843 12.7507 14.1667Z" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M1.41667 14.1667C1.41667 14.9491 2.05093 15.5833 2.83333 15.5833C3.61574 15.5833 4.25 14.9491 4.25 14.1667C4.25 13.3843 3.61574 12.75 2.83333 12.75C2.05093 12.75 1.41667 13.3843 1.41667 14.1667Z" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M7.08268 2.83335C7.08268 3.61576 7.71695 4.25002 8.49935 4.25002C9.28175 4.25002 9.91602 3.61576 9.91602 2.83335C9.91602 2.05095 9.28175 1.41669 8.49935 1.41669C7.71695 1.41669 7.08268 2.05095 7.08268 2.83335Z" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M8.5 4.25V12.75" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M14.166 12.75V9.91669C14.166 8.50002 13.4577 7.79169 12.041 7.79169L4.95768 7.79169C3.54102 7.79169 2.83268 8.50002 2.83268 9.91669V12.75" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> </svg>'),
+    usersSvg: (sanitizer) => sanitizer.bypassSecurityTrustHtml('<svg viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg"> <path d="M12.7506 5.07166C12.7081 5.06458 12.6585 5.06458 12.616 5.07166C11.6385 5.03624 10.8594 4.23582 10.8594 3.24416C10.8594 2.23124 11.674 1.41666 12.6869 1.41666C13.6998 1.41666 14.5144 2.23832 14.5144 3.24416C14.5073 4.23582 13.7281 5.03624 12.7506 5.07166Z" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M12.0213 10.2283C12.9917 10.3912 14.0613 10.2212 14.8121 9.71831C15.8108 9.05248 15.8108 7.96165 14.8121 7.29582C14.0542 6.7929 12.9704 6.62289 12 6.79289" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M4.2286 5.07166C4.2711 5.06458 4.32068 5.06458 4.36318 5.07166C5.34068 5.03624 6.11984 4.23582 6.11984 3.24416C6.11984 2.23124 5.30526 1.41666 4.29235 1.41666C3.27943 1.41666 2.46484 2.23832 2.46484 3.24416C2.47193 4.23582 3.25109 5.03624 4.2286 5.07166Z" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M4.95786 10.2283C3.98745 10.3912 2.91786 10.2212 2.16703 9.71831C1.16828 9.05248 1.16828 7.96165 2.16703 7.29582C2.92495 6.7929 4.0087 6.62289 4.97911 6.79289" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M8.50062 10.3629C8.45812 10.3558 8.40854 10.3558 8.36604 10.3629C7.38854 10.3275 6.60938 9.52708 6.60938 8.53542C6.60938 7.5225 7.42396 6.70792 8.43687 6.70792C9.44979 6.70792 10.2644 7.52958 10.2644 8.53542C10.2573 9.52708 9.47812 10.3346 8.50062 10.3629Z" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M6.43852 12.5942C5.43977 13.26 5.43977 14.3509 6.43852 15.0167C7.57185 15.7746 9.42768 15.7746 10.561 15.0167C11.5598 14.3509 11.5598 13.26 10.561 12.5942C9.43477 11.8434 7.57185 11.8434 6.43852 12.5942Z" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> </svg>'),
+    assetsSvg: (sanitizer) => sanitizer.bypassSecurityTrustHtml('<svg viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg"> <path d="M14.875 4.95832V12.0417C14.875 14.1667 13.8125 15.5833 11.3333 15.5833H5.66667C3.1875 15.5833 2.125 14.1667 2.125 12.0417V4.95832C2.125 2.83332 3.1875 1.41666 5.66667 1.41666H11.3333C13.8125 1.41666 14.875 2.83332 14.875 4.95832Z" stroke="#545454" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/> <path d="M10.2715 3.1875V4.60417C10.2715 5.38333 10.909 6.02083 11.6882 6.02083H13.1048" stroke="#545454" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/> <path d="M5.66602 9.20831H8.49935" stroke="#545454" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/> <path d="M5.66602 12.0417H11.3327" stroke="#545454" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/> </svg>'),
+    vehiclesSvg: (sanitizer) => sanitizer.bypassSecurityTrustHtml('<svg viewBox="0 0 19 15" fill="none" xmlns="http://www.w3.org/2000/svg"> <path d="M15.5451 11.7858H17.2724C17.7906 11.7858 18.136 11.3572 18.136 10.7144V7.5001C18.136 6.53582 17.5315 5.67868 16.8406 5.46439C15.286 4.92868 12.9542 4.28582 12.9542 4.28582C12.9542 4.28582 11.8315 2.78582 11.0542 1.82153C10.6224 1.39296 10.1042 1.07153 9.49964 1.07153H3.45419C2.93601 1.07153 2.50419 1.5001 2.2451 2.03582L1.03601 5.14296C0.921646 5.55677 0.863281 5.99122 0.863281 6.42868V10.7144C0.863281 11.3572 1.20874 11.7858 1.72692 11.7858H3.45419" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M5.18235 13.9285C6.1363 13.9285 6.90962 12.9691 6.90962 11.7857C6.90962 10.6022 6.1363 9.64282 5.18235 9.64282C4.2284 9.64282 3.45508 10.6022 3.45508 11.7857C3.45508 12.9691 4.2284 13.9285 5.18235 13.9285Z" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M6.9082 11.7856H12.09" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M13.8191 13.9285C14.773 13.9285 15.5463 12.9691 15.5463 11.7857C15.5463 10.6022 14.773 9.64282 13.8191 9.64282C12.8651 9.64282 12.0918 10.6022 12.0918 11.7857C12.0918 12.9691 12.8651 13.9285 13.8191 13.9285Z" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> </svg>'),
+    equipmentSvg: (sanitizer) => sanitizer.bypassSecurityTrustHtml('<svg viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg"> <path d="M4.78813 15.5834H12.2115C14.1665 15.5834 14.9456 14.3863 15.0377 12.9271L15.406 7.07627C15.5052 5.54627 14.2869 4.25002 12.7498 4.25002C12.3177 4.25002 11.921 4.0021 11.7227 3.6196L11.2127 2.59252C10.8869 1.94794 10.0369 1.41669 9.31438 1.41669H7.69229C6.96271 1.41669 6.11271 1.94794 5.78688 2.59252L5.27688 3.6196C5.07854 4.0021 4.68188 4.25002 4.24979 4.25002C2.71271 4.25002 1.49438 5.54627 1.59354 7.07627L1.96188 12.9271C2.04688 14.3863 2.83313 15.5834 4.78813 15.5834Z" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M7.4375 5.66669H9.5625" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M8.49935 12.75C9.76727 12.75 10.8014 11.7158 10.8014 10.4479C10.8014 9.17998 9.76727 8.14581 8.49935 8.14581C7.23143 8.14581 6.19727 9.17998 6.19727 10.4479C6.19727 11.7158 7.23143 12.75 8.49935 12.75Z" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> </svg>'),
+    zonesSvg: (sanitizer) => sanitizer.bypassSecurityTrustHtml('<svg viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg"> <g clip-path="url(#clip0_447_15078)"> <path d="M5.9612 10.0454H3.09438C2.93236 10.0455 2.77446 10.0965 2.64301 10.1912C2.51156 10.2859 2.4132 10.4195 2.36184 10.5732L0.813291 15.2095C0.774469 15.3257 0.76381 15.4494 0.782192 15.5705C0.800574 15.6916 0.847471 15.8065 0.919016 15.9059C0.990561 16.0053 1.08471 16.0863 1.19369 16.1422C1.30267 16.198 1.42337 16.2272 1.54584 16.2272H15.4549C15.5773 16.2271 15.6979 16.198 15.8068 16.1422C15.9157 16.0863 16.0098 16.0055 16.0813 15.9062C16.1529 15.8069 16.1998 15.692 16.2182 15.571C16.2367 15.4501 16.2261 15.3264 16.1875 15.2103L14.642 10.574C14.5907 10.42 14.4923 10.2861 14.3607 10.1913C14.2291 10.0964 14.0709 10.0454 13.9087 10.0454H11.0403" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M13.136 5.40907C13.136 8.20093 10.1463 11.1497 8.96869 12.2052C8.83398 12.3081 8.66916 12.3638 8.49965 12.3638C8.33013 12.3638 8.16531 12.3081 8.0306 12.2052C6.85374 11.1497 3.86328 8.20093 3.86328 5.40907C3.86328 4.17943 4.35175 3.00015 5.22124 2.13066C6.09073 1.26118 7.27 0.772705 8.49965 0.772705C9.72929 0.772705 10.9086 1.26118 11.7781 2.13066C12.6475 3.00015 13.136 4.17943 13.136 5.40907Z" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M8.50053 6.95443C9.35406 6.95443 10.046 6.26251 10.046 5.40898C10.046 4.55545 9.35406 3.86353 8.50053 3.86353C7.647 3.86353 6.95508 4.55545 6.95508 5.40898C6.95508 6.26251 7.647 6.95443 8.50053 6.95443Z" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> </g> <defs> <clipPath id="clip0_447_15078"> <rect width="17" height="17" fill="white"/> </clipPath> </defs> </svg>'),
+    AnalysisSvg: (sanitizer) => sanitizer.bypassSecurityTrustHtml('<svg viewBox="0 0 17 19" fill="none" xmlns="http://www.w3.org/2000/svg"> <g clip-path="url(#clip0_447_15136)"> <path d="M11.3342 0.86377H2.8342C2.33324 0.86377 1.85279 1.04575 1.49856 1.36968C1.14432 1.6936 0.945313 2.13294 0.945312 2.59104V16.4092C0.945313 16.8673 1.14432 17.3067 1.49856 17.6306C1.85279 17.9545 2.33324 18.1365 2.8342 18.1365H14.1675C14.6685 18.1365 15.1489 17.9545 15.5032 17.6306C15.8574 17.3067 16.0564 16.8673 16.0564 16.4092V5.18195L11.3342 0.86377Z" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M10.3887 0.863647V4.31819C10.3887 4.77629 10.5877 5.21563 10.9419 5.53956C11.2962 5.86349 11.7766 6.04547 12.2776 6.04547H16.0553" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M4.72266 14.6819V12.9546" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M8.5 14.6818V11.2273" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> <path d="M12.2773 14.6818V9.5" stroke="#545454" stroke-linecap="round" stroke-linejoin="round"/> </g> <defs> <clipPath id="clip0_447_15136"> <rect width="17" height="19" fill="white"/> </clipPath> </defs> </svg>'),
 };
 const iconsDark = {
     insightsSvg: (sanitizer) => sanitizer.bypassSecurityTrustHtml('<svg width="inherit" height="inherit" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M14.4887 0.994446H2.58867C1.64979 0.994446 0.888672 1.75556 0.888672 2.69445V14.5944C0.888672 15.5333 1.64979 16.2944 2.58867 16.2944H14.4887C15.4276 16.2944 16.1887 15.5333 16.1887 14.5944V2.69445C16.1887 1.75556 15.4276 0.994446 14.4887 0.994446Z" fill="#147A72"/><path d="M5.98828 5.24438H11.9383" stroke="white" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.13867 8.64444H10.2387" stroke="white" stroke-linecap="round" stroke-linejoin="round"/><path d="M7.68945 12.0444H11.9395" stroke="white" stroke-linecap="round" stroke-linejoin="round"/></svg>'),
-    planningSvg: (sanitizer) => sanitizer.bypassSecurityTrustHtml('<svg width="auto" height="auto" viewBox="0 0 17 19" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#clip0_447_14069)"><path d="M5.09961 0.863525V4.31807" stroke="#147A72" stroke-linecap="round" stroke-linejoin="round"/><path d="M11.9004 0.863525V4.31807" stroke="#147A72" stroke-linecap="round" stroke-linejoin="round"/><path d="M14.4496 2.59082H2.54961C1.61073 2.59082 0.849609 3.36415 0.849609 4.31809V16.409C0.849609 17.3629 1.61073 18.1363 2.54961 18.1363H14.4496C15.3885 18.1363 16.1496 17.3629 16.1496 16.409V4.31809C16.1496 3.36415 15.3885 2.59082 14.4496 2.59082Z" fill="#147A72"/><path d="M0.849609 7.77271H16.1496" stroke="white" stroke-linecap="square" stroke-linejoin="round"/><path d="M5.09961 11.2273H5.10861" stroke="white" stroke-linecap="round" stroke-linejoin="round"/><path d="M8.5 11.2273H8.509" stroke="white" stroke-linecap="round" stroke-linejoin="round"/><path d="M11.9004 11.2273H11.9094" stroke="white" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.09961 14.6819H5.10861" stroke="white" stroke-linecap="round" stroke-linejoin="round"/><path d="M8.5 14.6818H8.509" stroke="white" stroke-linecap="round" stroke-linejoin="round"/><path d="M11.9004 14.6819H11.9094" stroke="white" stroke-linecap="round" stroke-linejoin="round"/></g><defs><clipPath id="clip0_447_14069"><rect width="17" height="19" fill="white"/></clipPath></defs></svg>'),
-    plansSvg: (sanitizer) => sanitizer.bypassSecurityTrustHtml('<svg width="auto" height="auto" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2.47852 12.75V4.95832C2.47852 2.12499 3.18685 1.41666 6.02018 1.41666H10.9785C13.8118 1.41666 14.5202 2.12499 14.5202 4.95832V12.0417C14.5202 12.1408 14.5202 12.24 14.5131 12.3392" fill="#147A72"/><path d="M2.47852 12.75V4.95832C2.47852 2.12499 3.18685 1.41666 6.02018 1.41666H10.9785C13.8118 1.41666 14.5202 2.12499 14.5202 4.95832V12.0417C14.5202 12.1408 14.5202 12.24 14.5131 12.3392" stroke="white" stroke-linecap="round" stroke-linejoin="round"/><path d="M4.49727 10.625H14.5202V13.1042C14.5202 14.4713 13.4081 15.5833 12.041 15.5833H4.95768C3.5906 15.5833 2.47852 14.4713 2.47852 13.1042V12.6438C2.47852 11.5317 3.38518 10.625 4.49727 10.625Z" fill="#147A72" stroke="white" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.66602 4.95834H11.3327" stroke="white" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.66602 7.4375H9.20768" stroke="white" stroke-linecap="round" stroke-linejoin="round"/></svg>'),
-    tasksSvg: (sanitizer) => sanitizer.bypassSecurityTrustHtml('<svg width="auto" height="auto" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6.37435 15.5834H10.6243C14.166 15.5834 15.5827 14.1667 15.5827 10.625V6.37502C15.5827 2.83335 14.166 1.41669 10.6243 1.41669H6.37435C2.83268 1.41669 1.41602 2.83335 1.41602 6.37502V10.625C1.41602 14.1667 2.83268 15.5834 6.37435 15.5834Z" fill="#147A72"/><path d="M8.76172 6.29001H12.4805" stroke="white" stroke-linecap="round" stroke-linejoin="round"/><path d="M4.51953 6.29001L5.05078 6.82126L6.64453 5.22751" stroke="white" stroke-linecap="round" stroke-linejoin="round"/><path d="M8.76172 11.2483H12.4805" stroke="white" stroke-linecap="round" stroke-linejoin="round"/><path d="M4.51953 11.2483L5.05078 11.7796L6.64453 10.1858" stroke="white" stroke-linecap="round" stroke-linejoin="round"/></svg>'),
-    resourcesSvg: (sanitizer) => sanitizer.bypassSecurityTrustHtml('<svg width="auto" height="auto" viewBox="0 0 17 15" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#clip0_529_19934)"><path d="M11.5916 14.25V12.75C11.5916 11.9544 11.266 11.1913 10.6863 10.6287C10.1067 10.0661 9.32047 9.75 8.50071 9.75H3.86435C3.04459 9.75 2.2584 10.0661 1.67874 10.6287C1.09909 11.1913 0.773438 11.9544 0.773438 12.75V14.25" fill="#147A72"/><path d="M11.5916 14.25V12.75C11.5916 11.9544 11.266 11.1913 10.6863 10.6287C10.1067 10.0661 9.32047 9.75 8.50071 9.75H3.86435C3.04459 9.75 2.2584 10.0661 1.67874 10.6287C1.09909 11.1913 0.773438 11.9544 0.773438 12.75V14.25" stroke="#147A72" stroke-linecap="round" stroke-linejoin="round"/><path d="M6.18271 6.75C7.88977 6.75 9.27362 5.40685 9.27362 3.75C9.27362 2.09315 7.88977 0.75 6.18271 0.75C4.47564 0.75 3.0918 2.09315 3.0918 3.75C3.0918 5.40685 4.47564 6.75 6.18271 6.75Z" fill="#147A72" stroke="#147A72" stroke-linecap="round" stroke-linejoin="round"/><path d="M16.2264 14.2499V12.7499C16.2259 12.0852 15.9979 11.4395 15.5783 10.9141C15.1588 10.3888 14.5713 10.0136 13.9082 9.84741" fill="#147A72"/><path d="M16.2264 14.2499V12.7499C16.2259 12.0852 15.9979 11.4395 15.5783 10.9141C15.1588 10.3888 14.5713 10.0136 13.9082 9.84741" stroke="#147A72" stroke-linecap="round" stroke-linejoin="round"/><path d="M11.5918 0.847412C12.2567 1.01264 12.846 1.38794 13.2668 1.91414C13.6876 2.44035 13.916 3.08753 13.916 3.75366C13.916 4.41979 13.6876 5.06697 13.2668 5.59318C12.846 6.11939 12.2567 6.49469 11.5918 6.65991" fill="#147A72"/><path d="M11.5918 0.847412C12.2567 1.01264 12.846 1.38794 13.2668 1.91414C13.6876 2.44035 13.916 3.08753 13.916 3.75366C13.916 4.41979 13.6876 5.06697 13.2668 5.59318C12.846 6.11939 12.2567 6.49469 11.5918 6.65991" stroke="#147A72" stroke-linecap="round" stroke-linejoin="round"/></g><defs><clipPath id="clip0_529_19934"><rect width="17" height="15" fill="white"/></clipPath></defs></svg>'),
-    teamsSvg: (sanitizer) => sanitizer.bypassSecurityTrustHtml('<svg width="auto" height="auto" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7.08268 14.1667C7.08268 14.9491 7.71695 15.5833 8.49935 15.5833C9.28175 15.5833 9.91602 14.9491 9.91602 14.1667C9.91602 13.3843 9.28175 12.75 8.49935 12.75C7.71695 12.75 7.08268 13.3843 7.08268 14.1667Z" stroke="#147A72" stroke-linecap="round" stroke-linejoin="round"/><path d="M12.7507 14.1667C12.7507 14.9491 13.3849 15.5833 14.1673 15.5833C14.9497 15.5833 15.584 14.9491 15.584 14.1667C15.584 13.3843 14.9497 12.75 14.1673 12.75C13.3849 12.75 12.7507 13.3843 12.7507 14.1667Z" stroke="#147A72" stroke-linecap="round" stroke-linejoin="round"/><path d="M1.41667 14.1667C1.41667 14.9491 2.05093 15.5833 2.83333 15.5833C3.61574 15.5833 4.25 14.9491 4.25 14.1667C4.25 13.3843 3.61574 12.75 2.83333 12.75C2.05093 12.75 1.41667 13.3843 1.41667 14.1667Z" stroke="#147A72" stroke-linecap="round" stroke-linejoin="round"/><path d="M7.08268 2.83335C7.08268 3.61576 7.71695 4.25002 8.49935 4.25002C9.28175 4.25002 9.91602 3.61576 9.91602 2.83335C9.91602 2.05095 9.28175 1.41669 8.49935 1.41669C7.71695 1.41669 7.08268 2.05095 7.08268 2.83335Z" stroke="#147A72" stroke-linecap="round" stroke-linejoin="round"/><path d="M8.5 4.25V12.75" stroke="#147A72" stroke-linecap="round" stroke-linejoin="round"/><path d="M14.166 12.75V9.91669C14.166 8.50002 13.4577 7.79169 12.041 7.79169L4.95768 7.79169C3.54102 7.79169 2.83268 8.50002 2.83268 9.91669V12.75" stroke="#147A72" stroke-linecap="round" stroke-linejoin="round"/></svg>'),
-    usersSvg: (sanitizer) => sanitizer.bypassSecurityTrustHtml('<svg width="auto" height="auto" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12.7506 5.07169C12.7081 5.06461 12.6585 5.06461 12.616 5.07169C11.6385 5.03627 10.8594 4.23585 10.8594 3.24419C10.8594 2.23127 11.674 1.41669 12.6869 1.41669C13.6998 1.41669 14.5144 2.23835 14.5144 3.24419C14.5073 4.23585 13.7281 5.03627 12.7506 5.07169Z" stroke="#147A72" stroke-linecap="round" stroke-linejoin="round"/><path d="M12.0213 10.2283C12.9917 10.3913 14.0613 10.2213 14.8121 9.71835C15.8108 9.05251 15.8108 7.96168 14.8121 7.29585C14.0542 6.79293 12.9704 6.62293 12 6.79293" stroke="#147A72" stroke-linecap="round" stroke-linejoin="round"/><path d="M4.2286 5.07169C4.2711 5.06461 4.32068 5.06461 4.36318 5.07169C5.34068 5.03627 6.11984 4.23585 6.11984 3.24419C6.11984 2.23127 5.30526 1.41669 4.29235 1.41669C3.27943 1.41669 2.46484 2.23835 2.46484 3.24419C2.47193 4.23585 3.25109 5.03627 4.2286 5.07169Z" stroke="#147A72" stroke-linecap="round" stroke-linejoin="round"/><path d="M4.95786 10.2283C3.98745 10.3913 2.91786 10.2213 2.16703 9.71835C1.16828 9.05251 1.16828 7.96168 2.16703 7.29585C2.92495 6.79293 4.0087 6.62293 4.97911 6.79293" stroke="#147A72" stroke-linecap="round" stroke-linejoin="round"/><path d="M8.50062 10.3629C8.45812 10.3559 8.40854 10.3559 8.36604 10.3629C7.38854 10.3275 6.60938 9.52711 6.60938 8.53545C6.60938 7.52253 7.42396 6.70795 8.43687 6.70795C9.44979 6.70795 10.2644 7.52961 10.2644 8.53545C10.2573 9.52711 9.47812 10.3346 8.50062 10.3629Z" stroke="#147A72" stroke-linecap="round" stroke-linejoin="round"/><path d="M6.43852 12.5942C5.43977 13.26 5.43977 14.3509 6.43852 15.0167C7.57185 15.7746 9.42768 15.7746 10.561 15.0167C11.5598 14.3509 11.5598 13.26 10.561 12.5942C9.43477 11.8434 7.57185 11.8434 6.43852 12.5942Z" stroke="#147A72" stroke-linecap="round" stroke-linejoin="round"/></svg>'),
-    assetsSvg: (sanitizer) => sanitizer.bypassSecurityTrustHtml('<svg width="auto" height="auto" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M14.875 4.95835V12.0417C14.875 14.1667 13.8125 15.5834 11.3333 15.5834H5.66667C3.1875 15.5834 2.125 14.1667 2.125 12.0417V4.95835C2.125 2.83335 3.1875 1.41669 5.66667 1.41669H11.3333C13.8125 1.41669 14.875 2.83335 14.875 4.95835Z" fill="#147A72"/><path d="M10.2715 3.1875V4.60417C10.2715 5.38333 10.909 6.02083 11.6882 6.02083H13.1048" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.66602 9.20831H8.49935" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.66602 12.0417H11.3327" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/></svg>'),
-    vehiclesSvg: (sanitizer) => sanitizer.bypassSecurityTrustHtml('<svg width="auto" height="auto" viewBox="0 0 19 15" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15.5451 11.7858H17.2724C17.7906 11.7858 18.136 11.3572 18.136 10.7144V7.5001C18.136 6.53582 17.5315 5.67868 16.8406 5.46439C15.286 4.92868 12.9542 4.28582 12.9542 4.28582C12.9542 4.28582 11.8315 2.78582 11.0542 1.82153C10.6224 1.39296 10.1042 1.07153 9.49964 1.07153H3.45419C2.93601 1.07153 2.50419 1.5001 2.2451 2.03582L1.03601 5.14296C0.921646 5.55677 0.863281 5.99122 0.863281 6.42868V10.7144C0.863281 11.3572 1.20874 11.7858 1.72692 11.7858H3.45419" fill="#147A72"></path><path d="M15.5451 11.7858H17.2724C17.7906 11.7858 18.136 11.3572 18.136 10.7144V7.5001C18.136 6.53582 17.5315 5.67868 16.8406 5.46439C15.286 4.92868 12.9542 4.28582 12.9542 4.28582C12.9542 4.28582 11.8315 2.78582 11.0542 1.82153C10.6224 1.39296 10.1042 1.07153 9.49964 1.07153H3.45419C2.93601 1.07153 2.50419 1.5001 2.2451 2.03582L1.03601 5.14296C0.921646 5.55677 0.863281 5.99122 0.863281 6.42868V10.7144C0.863281 11.3572 1.20874 11.7858 1.72692 11.7858H3.45419" stroke="white" stroke-linecap="round" stroke-linejoin="round"></path><path d="M6.9082 11.7856H12.09" stroke="white" stroke-linecap="round" stroke-linejoin="round"></path><path d="M5.18235 13.9285C6.1363 13.9285 6.90962 12.9691 6.90962 11.7857C6.90962 10.6022 6.1363 9.64282 5.18235 9.64282C4.2284 9.64282 3.45508 10.6022 3.45508 11.7857C3.45508 12.9691 4.2284 13.9285 5.18235 13.9285Z" stroke="white" stroke-linecap="round" stroke-linejoin="round" fill="#147A72"></path><path d="M13.8191 13.9285C14.773 13.9285 15.5463 12.9691 15.5463 11.7857C15.5463 10.6022 14.773 9.64282 13.8191 9.64282C12.8651 9.64282 12.0918 10.6022 12.0918 11.7857C12.0918 12.9691 12.8651 13.9285 13.8191 13.9285Z" stroke="white" stroke-linecap="round" stroke-linejoin="round" fill="#147A72"></path></svg>'),
-    equipmentSvg: (sanitizer) => sanitizer.bypassSecurityTrustHtml('<svg width="auto" height="auto" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4.78813 15.5834H12.2115C14.1665 15.5834 14.9456 14.3863 15.0377 12.9271L15.406 7.07627C15.5052 5.54627 14.2869 4.25002 12.7498 4.25002C12.3177 4.25002 11.921 4.0021 11.7227 3.6196L11.2127 2.59252C10.8869 1.94794 10.0369 1.41669 9.31438 1.41669H7.69229C6.96271 1.41669 6.11271 1.94794 5.78688 2.59252L5.27688 3.6196C5.07854 4.0021 4.68188 4.25002 4.24979 4.25002C2.71271 4.25002 1.49438 5.54627 1.59354 7.07627L1.96188 12.9271C2.04688 14.3863 2.83313 15.5834 4.78813 15.5834Z" fill="#147A72"/><path d="M7.4375 5.66669H9.5625" stroke="white" stroke-linecap="round" stroke-linejoin="round"/><path d="M8.49935 12.75C9.76727 12.75 10.8014 11.7159 10.8014 10.448C10.8014 9.18004 9.76727 8.14587 8.49935 8.14587C7.23143 8.14587 6.19727 9.18004 6.19727 10.448C6.19727 11.7159 7.23143 12.75 8.49935 12.75Z" stroke="white" stroke-linecap="round" stroke-linejoin="round"/></svg>'),
-    zonesSvg: (sanitizer) => sanitizer.bypassSecurityTrustHtml('<svg width="auto" height="auto" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#clip0_447_15070)"><path d="M5.9612 10.0454H3.09438C2.93236 10.0455 2.77446 10.0965 2.64301 10.1912C2.51156 10.2859 2.4132 10.4195 2.36184 10.5732L0.813291 15.2095C0.774469 15.3257 0.76381 15.4494 0.782192 15.5705C0.800574 15.6916 0.847471 15.8065 0.919016 15.9059C0.990561 16.0053 1.08471 16.0863 1.19369 16.1422C1.30267 16.198 1.42337 16.2272 1.54584 16.2272H15.4549C15.5773 16.2271 15.6979 16.198 15.8068 16.1422C15.9157 16.0863 16.0098 16.0055 16.0813 15.9062C16.1529 15.8069 16.1998 15.692 16.2182 15.571C16.2367 15.4501 16.2261 15.3264 16.1875 15.2103L14.642 10.574C14.5907 10.42 14.4923 10.2861 14.3607 10.1913C14.2291 10.0964 14.0709 10.0454 13.9087 10.0454H11.0403" fill="#147A72"/><path d="M5.9612 10.0454H3.09438C2.93236 10.0455 2.77446 10.0965 2.64301 10.1912C2.51156 10.2859 2.4132 10.4195 2.36184 10.5732L0.813291 15.2095C0.774469 15.3257 0.76381 15.4494 0.782192 15.5705C0.800574 15.6916 0.847471 15.8065 0.919016 15.9059C0.990561 16.0053 1.08471 16.0863 1.19369 16.1422C1.30267 16.198 1.42337 16.2272 1.54584 16.2272H15.4549C15.5773 16.2271 15.6979 16.198 15.8068 16.1422C15.9157 16.0863 16.0098 16.0055 16.0813 15.9062C16.1529 15.8069 16.1998 15.692 16.2182 15.571C16.2367 15.4501 16.2261 15.3264 16.1875 15.2103L14.642 10.574C14.5907 10.42 14.4923 10.2861 14.3607 10.1913C14.2291 10.0964 14.0709 10.0454 13.9087 10.0454H11.0403" stroke="#147A72" stroke-linecap="round" stroke-linejoin="round"/><path d="M13.136 5.40907C13.136 8.20093 10.1463 11.1497 8.96869 12.2052C8.83398 12.3081 8.66916 12.3638 8.49965 12.3638C8.33013 12.3638 8.16531 12.3081 8.0306 12.2052C6.85374 11.1497 3.86328 8.20093 3.86328 5.40907C3.86328 4.17943 4.35175 3.00015 5.22124 2.13066C6.09073 1.26118 7.27 0.772705 8.49965 0.772705C9.72929 0.772705 10.9086 1.26118 11.778 2.13066C12.6475 3.00015 13.136 4.17943 13.136 5.40907Z" fill="#147A72" stroke="white" stroke-linecap="round" stroke-linejoin="round"/><path d="M8.50053 6.95443C9.35406 6.95443 10.046 6.26251 10.046 5.40898C10.046 4.55545 9.35406 3.86353 8.50053 3.86353C7.647 3.86353 6.95508 4.55545 6.95508 5.40898C6.95508 6.26251 7.647 6.95443 8.50053 6.95443Z" stroke="white" stroke-linecap="round" stroke-linejoin="round"/></g><defs><clipPath id="clip0_447_15070"><rect width="17" height="17" fill="white"/></clipPath></defs></svg>'),
-    AnalysisSvg: (sanitizer) => sanitizer.bypassSecurityTrustHtml('<svg width="auto" height="auto" viewBox="0 0 17 19" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#clip0_447_15118)"><path d="M11.3342 0.86377H2.8342C2.33324 0.86377 1.85279 1.04575 1.49856 1.36968C1.14432 1.6936 0.945313 2.13294 0.945312 2.59104V16.4092C0.945313 16.8673 1.14432 17.3067 1.49856 17.6306C1.85279 17.9545 2.33324 18.1365 2.8342 18.1365H14.1675C14.6685 18.1365 15.1489 17.9545 15.5032 17.6306C15.8574 17.3067 16.0564 16.8673 16.0564 16.4092V5.18195L11.3342 0.86377Z" fill="#147A72" stroke="#147A72" stroke-linecap="round" stroke-linejoin="round"/><path d="M10.3887 0.863647V4.31819C10.3887 4.77629 10.5877 5.21563 10.9419 5.53956C11.2962 5.86349 11.7766 6.04547 12.2776 6.04547H16.0553" fill="white"/><path d="M10.3887 0.863647V4.31819C10.3887 4.77629 10.5877 5.21563 10.9419 5.53956C11.2962 5.86349 11.7766 6.04547 12.2776 6.04547H16.0553" stroke="white" stroke-linecap="round" stroke-linejoin="round"/><path d="M4.72266 14.6819V12.9546" stroke="white" stroke-linecap="round" stroke-linejoin="round"/><path d="M8.5 14.6818V11.2273" stroke="white" stroke-linecap="round" stroke-linejoin="round"/><path d="M12.2773 14.6818V9.5" stroke="white" stroke-linecap="round" stroke-linejoin="round"/></g><defs><clipPath id="clip0_447_15118"><rect width="17" height="19" fill="white"/></clipPath></defs></svg>'),
+    planningSvg: (sanitizer) => sanitizer.bypassSecurityTrustHtml('<svg viewBox="0 0 17 19" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#clip0_447_14069)"><path d="M5.09961 0.863525V4.31807" stroke="#147A72" stroke-linecap="round" stroke-linejoin="round"/><path d="M11.9004 0.863525V4.31807" stroke="#147A72" stroke-linecap="round" stroke-linejoin="round"/><path d="M14.4496 2.59082H2.54961C1.61073 2.59082 0.849609 3.36415 0.849609 4.31809V16.409C0.849609 17.3629 1.61073 18.1363 2.54961 18.1363H14.4496C15.3885 18.1363 16.1496 17.3629 16.1496 16.409V4.31809C16.1496 3.36415 15.3885 2.59082 14.4496 2.59082Z" fill="#147A72"/><path d="M0.849609 7.77271H16.1496" stroke="white" stroke-linecap="square" stroke-linejoin="round"/><path d="M5.09961 11.2273H5.10861" stroke="white" stroke-linecap="round" stroke-linejoin="round"/><path d="M8.5 11.2273H8.509" stroke="white" stroke-linecap="round" stroke-linejoin="round"/><path d="M11.9004 11.2273H11.9094" stroke="white" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.09961 14.6819H5.10861" stroke="white" stroke-linecap="round" stroke-linejoin="round"/><path d="M8.5 14.6818H8.509" stroke="white" stroke-linecap="round" stroke-linejoin="round"/><path d="M11.9004 14.6819H11.9094" stroke="white" stroke-linecap="round" stroke-linejoin="round"/></g><defs><clipPath id="clip0_447_14069"><rect width="17" height="19" fill="white"/></clipPath></defs></svg>'),
+    plansSvg: (sanitizer) => sanitizer.bypassSecurityTrustHtml('<svg viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2.47852 12.75V4.95832C2.47852 2.12499 3.18685 1.41666 6.02018 1.41666H10.9785C13.8118 1.41666 14.5202 2.12499 14.5202 4.95832V12.0417C14.5202 12.1408 14.5202 12.24 14.5131 12.3392" fill="#147A72"/><path d="M2.47852 12.75V4.95832C2.47852 2.12499 3.18685 1.41666 6.02018 1.41666H10.9785C13.8118 1.41666 14.5202 2.12499 14.5202 4.95832V12.0417C14.5202 12.1408 14.5202 12.24 14.5131 12.3392" stroke="white" stroke-linecap="round" stroke-linejoin="round"/><path d="M4.49727 10.625H14.5202V13.1042C14.5202 14.4713 13.4081 15.5833 12.041 15.5833H4.95768C3.5906 15.5833 2.47852 14.4713 2.47852 13.1042V12.6438C2.47852 11.5317 3.38518 10.625 4.49727 10.625Z" fill="#147A72" stroke="white" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.66602 4.95834H11.3327" stroke="white" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.66602 7.4375H9.20768" stroke="white" stroke-linecap="round" stroke-linejoin="round"/></svg>'),
+    tasksSvg: (sanitizer) => sanitizer.bypassSecurityTrustHtml('<svg viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6.37435 15.5834H10.6243C14.166 15.5834 15.5827 14.1667 15.5827 10.625V6.37502C15.5827 2.83335 14.166 1.41669 10.6243 1.41669H6.37435C2.83268 1.41669 1.41602 2.83335 1.41602 6.37502V10.625C1.41602 14.1667 2.83268 15.5834 6.37435 15.5834Z" fill="#147A72"/><path d="M8.76172 6.29001H12.4805" stroke="white" stroke-linecap="round" stroke-linejoin="round"/><path d="M4.51953 6.29001L5.05078 6.82126L6.64453 5.22751" stroke="white" stroke-linecap="round" stroke-linejoin="round"/><path d="M8.76172 11.2483H12.4805" stroke="white" stroke-linecap="round" stroke-linejoin="round"/><path d="M4.51953 11.2483L5.05078 11.7796L6.64453 10.1858" stroke="white" stroke-linecap="round" stroke-linejoin="round"/></svg>'),
+    resourcesSvg: (sanitizer) => sanitizer.bypassSecurityTrustHtml('<svg viewBox="0 0 17 15" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#clip0_529_19934)"><path d="M11.5916 14.25V12.75C11.5916 11.9544 11.266 11.1913 10.6863 10.6287C10.1067 10.0661 9.32047 9.75 8.50071 9.75H3.86435C3.04459 9.75 2.2584 10.0661 1.67874 10.6287C1.09909 11.1913 0.773438 11.9544 0.773438 12.75V14.25" fill="#147A72"/><path d="M11.5916 14.25V12.75C11.5916 11.9544 11.266 11.1913 10.6863 10.6287C10.1067 10.0661 9.32047 9.75 8.50071 9.75H3.86435C3.04459 9.75 2.2584 10.0661 1.67874 10.6287C1.09909 11.1913 0.773438 11.9544 0.773438 12.75V14.25" stroke="#147A72" stroke-linecap="round" stroke-linejoin="round"/><path d="M6.18271 6.75C7.88977 6.75 9.27362 5.40685 9.27362 3.75C9.27362 2.09315 7.88977 0.75 6.18271 0.75C4.47564 0.75 3.0918 2.09315 3.0918 3.75C3.0918 5.40685 4.47564 6.75 6.18271 6.75Z" fill="#147A72" stroke="#147A72" stroke-linecap="round" stroke-linejoin="round"/><path d="M16.2264 14.2499V12.7499C16.2259 12.0852 15.9979 11.4395 15.5783 10.9141C15.1588 10.3888 14.5713 10.0136 13.9082 9.84741" fill="#147A72"/><path d="M16.2264 14.2499V12.7499C16.2259 12.0852 15.9979 11.4395 15.5783 10.9141C15.1588 10.3888 14.5713 10.0136 13.9082 9.84741" stroke="#147A72" stroke-linecap="round" stroke-linejoin="round"/><path d="M11.5918 0.847412C12.2567 1.01264 12.846 1.38794 13.2668 1.91414C13.6876 2.44035 13.916 3.08753 13.916 3.75366C13.916 4.41979 13.6876 5.06697 13.2668 5.59318C12.846 6.11939 12.2567 6.49469 11.5918 6.65991" fill="#147A72"/><path d="M11.5918 0.847412C12.2567 1.01264 12.846 1.38794 13.2668 1.91414C13.6876 2.44035 13.916 3.08753 13.916 3.75366C13.916 4.41979 13.6876 5.06697 13.2668 5.59318C12.846 6.11939 12.2567 6.49469 11.5918 6.65991" stroke="#147A72" stroke-linecap="round" stroke-linejoin="round"/></g><defs><clipPath id="clip0_529_19934"><rect width="17" height="15" fill="white"/></clipPath></defs></svg>'),
+    teamsSvg: (sanitizer) => sanitizer.bypassSecurityTrustHtml('<svg viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7.08268 14.1667C7.08268 14.9491 7.71695 15.5833 8.49935 15.5833C9.28175 15.5833 9.91602 14.9491 9.91602 14.1667C9.91602 13.3843 9.28175 12.75 8.49935 12.75C7.71695 12.75 7.08268 13.3843 7.08268 14.1667Z" stroke="#147A72" stroke-linecap="round" stroke-linejoin="round"/><path d="M12.7507 14.1667C12.7507 14.9491 13.3849 15.5833 14.1673 15.5833C14.9497 15.5833 15.584 14.9491 15.584 14.1667C15.584 13.3843 14.9497 12.75 14.1673 12.75C13.3849 12.75 12.7507 13.3843 12.7507 14.1667Z" stroke="#147A72" stroke-linecap="round" stroke-linejoin="round"/><path d="M1.41667 14.1667C1.41667 14.9491 2.05093 15.5833 2.83333 15.5833C3.61574 15.5833 4.25 14.9491 4.25 14.1667C4.25 13.3843 3.61574 12.75 2.83333 12.75C2.05093 12.75 1.41667 13.3843 1.41667 14.1667Z" stroke="#147A72" stroke-linecap="round" stroke-linejoin="round"/><path d="M7.08268 2.83335C7.08268 3.61576 7.71695 4.25002 8.49935 4.25002C9.28175 4.25002 9.91602 3.61576 9.91602 2.83335C9.91602 2.05095 9.28175 1.41669 8.49935 1.41669C7.71695 1.41669 7.08268 2.05095 7.08268 2.83335Z" stroke="#147A72" stroke-linecap="round" stroke-linejoin="round"/><path d="M8.5 4.25V12.75" stroke="#147A72" stroke-linecap="round" stroke-linejoin="round"/><path d="M14.166 12.75V9.91669C14.166 8.50002 13.4577 7.79169 12.041 7.79169L4.95768 7.79169C3.54102 7.79169 2.83268 8.50002 2.83268 9.91669V12.75" stroke="#147A72" stroke-linecap="round" stroke-linejoin="round"/></svg>'),
+    usersSvg: (sanitizer) => sanitizer.bypassSecurityTrustHtml('<svg viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12.7506 5.07169C12.7081 5.06461 12.6585 5.06461 12.616 5.07169C11.6385 5.03627 10.8594 4.23585 10.8594 3.24419C10.8594 2.23127 11.674 1.41669 12.6869 1.41669C13.6998 1.41669 14.5144 2.23835 14.5144 3.24419C14.5073 4.23585 13.7281 5.03627 12.7506 5.07169Z" stroke="#147A72" stroke-linecap="round" stroke-linejoin="round"/><path d="M12.0213 10.2283C12.9917 10.3913 14.0613 10.2213 14.8121 9.71835C15.8108 9.05251 15.8108 7.96168 14.8121 7.29585C14.0542 6.79293 12.9704 6.62293 12 6.79293" stroke="#147A72" stroke-linecap="round" stroke-linejoin="round"/><path d="M4.2286 5.07169C4.2711 5.06461 4.32068 5.06461 4.36318 5.07169C5.34068 5.03627 6.11984 4.23585 6.11984 3.24419C6.11984 2.23127 5.30526 1.41669 4.29235 1.41669C3.27943 1.41669 2.46484 2.23835 2.46484 3.24419C2.47193 4.23585 3.25109 5.03627 4.2286 5.07169Z" stroke="#147A72" stroke-linecap="round" stroke-linejoin="round"/><path d="M4.95786 10.2283C3.98745 10.3913 2.91786 10.2213 2.16703 9.71835C1.16828 9.05251 1.16828 7.96168 2.16703 7.29585C2.92495 6.79293 4.0087 6.62293 4.97911 6.79293" stroke="#147A72" stroke-linecap="round" stroke-linejoin="round"/><path d="M8.50062 10.3629C8.45812 10.3559 8.40854 10.3559 8.36604 10.3629C7.38854 10.3275 6.60938 9.52711 6.60938 8.53545C6.60938 7.52253 7.42396 6.70795 8.43687 6.70795C9.44979 6.70795 10.2644 7.52961 10.2644 8.53545C10.2573 9.52711 9.47812 10.3346 8.50062 10.3629Z" stroke="#147A72" stroke-linecap="round" stroke-linejoin="round"/><path d="M6.43852 12.5942C5.43977 13.26 5.43977 14.3509 6.43852 15.0167C7.57185 15.7746 9.42768 15.7746 10.561 15.0167C11.5598 14.3509 11.5598 13.26 10.561 12.5942C9.43477 11.8434 7.57185 11.8434 6.43852 12.5942Z" stroke="#147A72" stroke-linecap="round" stroke-linejoin="round"/></svg>'),
+    assetsSvg: (sanitizer) => sanitizer.bypassSecurityTrustHtml('<svg viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M14.875 4.95835V12.0417C14.875 14.1667 13.8125 15.5834 11.3333 15.5834H5.66667C3.1875 15.5834 2.125 14.1667 2.125 12.0417V4.95835C2.125 2.83335 3.1875 1.41669 5.66667 1.41669H11.3333C13.8125 1.41669 14.875 2.83335 14.875 4.95835Z" fill="#147A72"/><path d="M10.2715 3.1875V4.60417C10.2715 5.38333 10.909 6.02083 11.6882 6.02083H13.1048" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.66602 9.20831H8.49935" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.66602 12.0417H11.3327" stroke="white" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/></svg>'),
+    vehiclesSvg: (sanitizer) => sanitizer.bypassSecurityTrustHtml('<svg viewBox="0 0 19 15" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15.5451 11.7858H17.2724C17.7906 11.7858 18.136 11.3572 18.136 10.7144V7.5001C18.136 6.53582 17.5315 5.67868 16.8406 5.46439C15.286 4.92868 12.9542 4.28582 12.9542 4.28582C12.9542 4.28582 11.8315 2.78582 11.0542 1.82153C10.6224 1.39296 10.1042 1.07153 9.49964 1.07153H3.45419C2.93601 1.07153 2.50419 1.5001 2.2451 2.03582L1.03601 5.14296C0.921646 5.55677 0.863281 5.99122 0.863281 6.42868V10.7144C0.863281 11.3572 1.20874 11.7858 1.72692 11.7858H3.45419" fill="#147A72"></path><path d="M15.5451 11.7858H17.2724C17.7906 11.7858 18.136 11.3572 18.136 10.7144V7.5001C18.136 6.53582 17.5315 5.67868 16.8406 5.46439C15.286 4.92868 12.9542 4.28582 12.9542 4.28582C12.9542 4.28582 11.8315 2.78582 11.0542 1.82153C10.6224 1.39296 10.1042 1.07153 9.49964 1.07153H3.45419C2.93601 1.07153 2.50419 1.5001 2.2451 2.03582L1.03601 5.14296C0.921646 5.55677 0.863281 5.99122 0.863281 6.42868V10.7144C0.863281 11.3572 1.20874 11.7858 1.72692 11.7858H3.45419" stroke="white" stroke-linecap="round" stroke-linejoin="round"></path><path d="M6.9082 11.7856H12.09" stroke="white" stroke-linecap="round" stroke-linejoin="round"></path><path d="M5.18235 13.9285C6.1363 13.9285 6.90962 12.9691 6.90962 11.7857C6.90962 10.6022 6.1363 9.64282 5.18235 9.64282C4.2284 9.64282 3.45508 10.6022 3.45508 11.7857C3.45508 12.9691 4.2284 13.9285 5.18235 13.9285Z" stroke="white" stroke-linecap="round" stroke-linejoin="round" fill="#147A72"></path><path d="M13.8191 13.9285C14.773 13.9285 15.5463 12.9691 15.5463 11.7857C15.5463 10.6022 14.773 9.64282 13.8191 9.64282C12.8651 9.64282 12.0918 10.6022 12.0918 11.7857C12.0918 12.9691 12.8651 13.9285 13.8191 13.9285Z" stroke="white" stroke-linecap="round" stroke-linejoin="round" fill="#147A72"></path></svg>'),
+    equipmentSvg: (sanitizer) => sanitizer.bypassSecurityTrustHtml('<svg viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4.78813 15.5834H12.2115C14.1665 15.5834 14.9456 14.3863 15.0377 12.9271L15.406 7.07627C15.5052 5.54627 14.2869 4.25002 12.7498 4.25002C12.3177 4.25002 11.921 4.0021 11.7227 3.6196L11.2127 2.59252C10.8869 1.94794 10.0369 1.41669 9.31438 1.41669H7.69229C6.96271 1.41669 6.11271 1.94794 5.78688 2.59252L5.27688 3.6196C5.07854 4.0021 4.68188 4.25002 4.24979 4.25002C2.71271 4.25002 1.49438 5.54627 1.59354 7.07627L1.96188 12.9271C2.04688 14.3863 2.83313 15.5834 4.78813 15.5834Z" fill="#147A72"/><path d="M7.4375 5.66669H9.5625" stroke="white" stroke-linecap="round" stroke-linejoin="round"/><path d="M8.49935 12.75C9.76727 12.75 10.8014 11.7159 10.8014 10.448C10.8014 9.18004 9.76727 8.14587 8.49935 8.14587C7.23143 8.14587 6.19727 9.18004 6.19727 10.448C6.19727 11.7159 7.23143 12.75 8.49935 12.75Z" stroke="white" stroke-linecap="round" stroke-linejoin="round"/></svg>'),
+    zonesSvg: (sanitizer) => sanitizer.bypassSecurityTrustHtml('<svg viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#clip0_447_15070)"><path d="M5.9612 10.0454H3.09438C2.93236 10.0455 2.77446 10.0965 2.64301 10.1912C2.51156 10.2859 2.4132 10.4195 2.36184 10.5732L0.813291 15.2095C0.774469 15.3257 0.76381 15.4494 0.782192 15.5705C0.800574 15.6916 0.847471 15.8065 0.919016 15.9059C0.990561 16.0053 1.08471 16.0863 1.19369 16.1422C1.30267 16.198 1.42337 16.2272 1.54584 16.2272H15.4549C15.5773 16.2271 15.6979 16.198 15.8068 16.1422C15.9157 16.0863 16.0098 16.0055 16.0813 15.9062C16.1529 15.8069 16.1998 15.692 16.2182 15.571C16.2367 15.4501 16.2261 15.3264 16.1875 15.2103L14.642 10.574C14.5907 10.42 14.4923 10.2861 14.3607 10.1913C14.2291 10.0964 14.0709 10.0454 13.9087 10.0454H11.0403" fill="#147A72"/><path d="M5.9612 10.0454H3.09438C2.93236 10.0455 2.77446 10.0965 2.64301 10.1912C2.51156 10.2859 2.4132 10.4195 2.36184 10.5732L0.813291 15.2095C0.774469 15.3257 0.76381 15.4494 0.782192 15.5705C0.800574 15.6916 0.847471 15.8065 0.919016 15.9059C0.990561 16.0053 1.08471 16.0863 1.19369 16.1422C1.30267 16.198 1.42337 16.2272 1.54584 16.2272H15.4549C15.5773 16.2271 15.6979 16.198 15.8068 16.1422C15.9157 16.0863 16.0098 16.0055 16.0813 15.9062C16.1529 15.8069 16.1998 15.692 16.2182 15.571C16.2367 15.4501 16.2261 15.3264 16.1875 15.2103L14.642 10.574C14.5907 10.42 14.4923 10.2861 14.3607 10.1913C14.2291 10.0964 14.0709 10.0454 13.9087 10.0454H11.0403" stroke="#147A72" stroke-linecap="round" stroke-linejoin="round"/><path d="M13.136 5.40907C13.136 8.20093 10.1463 11.1497 8.96869 12.2052C8.83398 12.3081 8.66916 12.3638 8.49965 12.3638C8.33013 12.3638 8.16531 12.3081 8.0306 12.2052C6.85374 11.1497 3.86328 8.20093 3.86328 5.40907C3.86328 4.17943 4.35175 3.00015 5.22124 2.13066C6.09073 1.26118 7.27 0.772705 8.49965 0.772705C9.72929 0.772705 10.9086 1.26118 11.778 2.13066C12.6475 3.00015 13.136 4.17943 13.136 5.40907Z" fill="#147A72" stroke="white" stroke-linecap="round" stroke-linejoin="round"/><path d="M8.50053 6.95443C9.35406 6.95443 10.046 6.26251 10.046 5.40898C10.046 4.55545 9.35406 3.86353 8.50053 3.86353C7.647 3.86353 6.95508 4.55545 6.95508 5.40898C6.95508 6.26251 7.647 6.95443 8.50053 6.95443Z" stroke="white" stroke-linecap="round" stroke-linejoin="round"/></g><defs><clipPath id="clip0_447_15070"><rect width="17" height="17" fill="white"/></clipPath></defs></svg>'),
+    AnalysisSvg: (sanitizer) => sanitizer.bypassSecurityTrustHtml('<svg viewBox="0 0 17 19" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#clip0_447_15118)"><path d="M11.3342 0.86377H2.8342C2.33324 0.86377 1.85279 1.04575 1.49856 1.36968C1.14432 1.6936 0.945313 2.13294 0.945312 2.59104V16.4092C0.945313 16.8673 1.14432 17.3067 1.49856 17.6306C1.85279 17.9545 2.33324 18.1365 2.8342 18.1365H14.1675C14.6685 18.1365 15.1489 17.9545 15.5032 17.6306C15.8574 17.3067 16.0564 16.8673 16.0564 16.4092V5.18195L11.3342 0.86377Z" fill="#147A72" stroke="#147A72" stroke-linecap="round" stroke-linejoin="round"/><path d="M10.3887 0.863647V4.31819C10.3887 4.77629 10.5877 5.21563 10.9419 5.53956C11.2962 5.86349 11.7766 6.04547 12.2776 6.04547H16.0553" fill="white"/><path d="M10.3887 0.863647V4.31819C10.3887 4.77629 10.5877 5.21563 10.9419 5.53956C11.2962 5.86349 11.7766 6.04547 12.2776 6.04547H16.0553" stroke="white" stroke-linecap="round" stroke-linejoin="round"/><path d="M4.72266 14.6819V12.9546" stroke="white" stroke-linecap="round" stroke-linejoin="round"/><path d="M8.5 14.6818V11.2273" stroke="white" stroke-linecap="round" stroke-linejoin="round"/><path d="M12.2773 14.6818V9.5" stroke="white" stroke-linecap="round" stroke-linejoin="round"/></g><defs><clipPath id="clip0_447_15118"><rect width="17" height="19" fill="white"/></clipPath></defs></svg>'),
 };
 
 const headerLogoSvg = `
@@ -6903,7 +6904,6 @@ class ExpandedBarComponent {
     collapseService;
     sanitizer;
     sidenav;
-    assetUrl = (string) => `assets/${string}`;
     tab = input({});
     collapseAll = new EventEmitter();
     arrowDownIcon;
@@ -6949,7 +6949,6 @@ class CollapsedBarComponent {
     collapseService;
     sanitizer;
     sidenav;
-    assetUrl = (str) => `assets/${str}`;
     tab = input({});
     collapseAll = new EventEmitter();
     arrowDownSmallIcon;
@@ -6988,7 +6987,7 @@ class CollapsedBarComponent {
         return this.collapseService.isActiveSubTab(tab, subTab);
     }
     static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "19.2.15", ngImport: i0, type: CollapsedBarComponent, deps: [{ token: CollapseService }, { token: i1$2.DomSanitizer }, { token: SidenavService }], target: i0.ɵɵFactoryTarget.Component });
-    static ɵcmp = i0.ɵɵngDeclareComponent({ minVersion: "17.0.0", version: "19.2.15", type: CollapsedBarComponent, isStandalone: true, selector: "app-collapsed-bar", inputs: { tab: { classPropertyName: "tab", publicName: "tab", isSignal: true, isRequired: false, transformFunction: null } }, outputs: { collapseAll: "collapseAll" }, ngImport: i0, template: "<li class=\"main-nav-list-item\">\n  <a\n    (click)=\"collapseService.onMainTabClick(tab())\"\n    [title]=\"tab().title | translate\"\n    class=\"collapsed-link-tag\"\n    [class]=\"{\n      'active-tab': isActiveTab(tab()),\n      'expanded-tab': isExpanded(tab()),\n    }\"\n  >\n    <div class=\"icon-container\">\n      <!-- 'bg-[#6026501C]': isActiveTab(tab()), -->\n      <div\n        class=\"svg-icon-collapsed\"\n        [innerHTML]=\"\n          isActiveTab(tab()) || isExpanded(tab())\n            ? getDarkIcon(tab().icon)\n            : getIcon(tab().icon)\n        \"\n      ></div>\n\n      <!-- if parent tab not sub tab -->\n      @if (!tab().link) {\n        <div class=\"absolute right-0\">\n          <!-- <custom-svg-icon\n          [path]=\"assetUrl('/images/svg/arrow-down-small.svg')\"\n          class=\"arrow-icon\"\n        ></custom-svg-icon> -->\n          <span class=\"arrow-icon\" [innerHTML]=\"arrowDownSmallIcon\"></span>\n        </div>\n      }\n      <!--  -->\n      @if (isExpanded(tab()) && !tab().link) {\n        <!--  -->\n        <ul\n          #expandedTabs\n          class=\"sub-nav-popup absolute left-[100%]\"\n          [clickOutside]=\"expandedTabs\"\n          (clickOutsideEmitter)=\"collapseService.toggleTab(tab())\"\n        >\n          @for (subTab of tab().subTabs; track subTab) {\n            <li\n              class=\"sub-nav-item\"\n              [DropdownAnimationObject]=\"isExpanded(tab())\"\n            >\n              <a\n                class=\"link-tag\"\n                (click)=\"collapseService.onSubTabClick(subTab)\"\n                [class]=\"{\n                  'active-tab': collapseService.isActiveSubTab(tab(), subTab),\n                }\"\n              >\n                <div class=\"header-container\">\n                  <div\n                    class=\"svg-icon\"\n                    [innerHTML]=\"\n                      collapseService.isActiveSubTab(tab(), subTab)\n                        ? getDarkIcon(subTab.icon)\n                        : getIcon(subTab.icon)\n                    \"\n                  ></div>\n                  <h2 class=\"main-title-text\">\n                    {{ subTab.title | translate }}\n                  </h2>\n                </div>\n              </a>\n            </li>\n          }\n        </ul>\n      }\n    </div>\n  </a>\n</li>\n", styles: [".svg-icon-collapsed{width:auto;height:auto;background-color:none}.arrow-icon{width:.625em;height:.625em;background-color:none;transition:transform .3s ease;transform-origin:center}.link-title{font-family:var(--FM-Light);line-height:1.37em}.main-nav-list-item{display:flex;color:var(--neutral-800);flex-direction:column;align-items:center}.main-nav-list-item .collapsed-link-tag{display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:all .4s;border-radius:var(--border-radius-m-16);width:min-content;color:var(--neutral-500)}.main-nav-list-item .collapsed-link-tag .icon-container{position:relative;display:flex;align-items:center;justify-content:center;padding:.5em;width:2.5em;height:2.5em}.main-nav-list-item .collapsed-link-tag .icon-container svg{width:1.06em;height:auto}.main-nav-list-item .collapsed-link-tag .icon-container .sub-nav-popup{background:var(--white);z-index:9999999;width:16.0625em;padding:1.5em;box-shadow:0 2px 8px #63636333;border-radius:var(--border-radius-m-16);left:calc(100% + 1em);position:absolute;top:0;display:flex;flex-direction:column;gap:.625em}.main-nav-list-item .collapsed-link-tag .icon-container .sub-nav-popup .sub-nav-item{color:var(--neutral-500);font-family:var(--FM-Light)}.main-nav-list-item .collapsed-link-tag .icon-container .sub-nav-popup .sub-nav-item .link-tag{display:flex;align-items:center;justify-content:start;gap:.5em;padding:.5em;border-radius:var(--border-radius-m-16);cursor:pointer;text-overflow:ellipsis;text-wrap:nowrap}.main-nav-list-item .collapsed-link-tag .icon-container .sub-nav-popup .sub-nav-item .link-tag.active-tab{background:var(--secondary-75);color:var(--link-color);font-family:var(--FM-Medium)}.main-nav-list-item .collapsed-link-tag .icon-container .sub-nav-popup .sub-nav-item .link-tag:hover:not(.active-tab):not(.expanded-tab){background-color:var(--neutral-100);color:var(--neutral-500)}.main-nav-list-item .collapsed-link-tag .icon-container .sub-nav-popup .sub-nav-item .link-tag:active{box-shadow:0 0 1px 0 var(--box-shadow-10);box-shadow:0 0 5px 0 var(--box-shadow-10)}.main-nav-list-item .collapsed-link-tag .icon-container .sub-nav-popup .sub-nav-item .link-tag .header-container{display:flex;align-items:center;gap:.5em;transition:all .4s ease-in-out}.main-nav-list-item .collapsed-link-tag .icon-container .sub-nav-popup .sub-nav-item .link-tag .header-container .svg-icon{width:1.06em;height:1.06em;background-color:none;transition:all .4s ease-in-out}.main-nav-list-item .collapsed-link-tag .icon-container .sub-nav-popup .sub-nav-item .link-tag .header-container .svg-icon g path{stroke:var(--neutral-500)}.main-nav-list-item .collapsed-link-tag .icon-container .sub-nav-popup .sub-nav-item .link-tag .header-container .svg-icon path{stroke:var(--neutral-500)}.main-nav-list-item .collapsed-link-tag:hover:not(.active-tab):not(.expanded-tab){background-color:var(--neutral-100)}.main-nav-list-item .collapsed-link-tag.expanded-tab,.main-nav-list-item .collapsed-link-tag.active-tab{background:var(--secondary-75);color:var(--link-color);font-family:var(--FM-Medium)}::ng-deep .collapsed-link-tag .icon-container .svg-icon-collapsed{width:1.06em;height:1.06em;background-color:none;transition:all .7s ease-in-out}::ng-deep .collapsed-link-tag .icon-container .svg-icon-collapsed :not(.active-tab):not(.expanded-tab) svg{width:inherit;height:inherit;fill:none;transition:all .7s ease-in-out}::ng-deep .collapsed-link-tag .icon-container .svg-icon-collapsed :not(.active-tab):not(.expanded-tab) svg g path{stroke:var(--neutral-500)}::ng-deep .collapsed-link-tag .icon-container .svg-icon-collapsed :not(.active-tab):not(.expanded-tab) svg path{stroke:var(--neutral-500)}::ng-deep .collapsed-link-tag.expanded-tab .icon-container .svg-icon-collapsed,::ng-deep .collapsed-link-tag.active-tab .icon-container .svg-icon-collapsed{width:1.06em;height:1.06em;background-color:none}::ng-deep .collapsed-link-tag.no-color.active-tab .icon-container .svg-icon-collapsed{width:1.06em;height:1.06em;background-color:none}::ng-deep .collapsed-link-tag.no-color.active-tab .icon-container .svg-icon-collapsed svg{fill:none}::ng-deep .collapsed-link-tag.no-color.active-tab .icon-container .svg-icon-collapsed svg g path{stroke:var(--link-color);stroke-width:1.3}::ng-deep .collapsed-link-tag.no-color.active-tab .icon-container .svg-icon-collapsed svg path{stroke:var(--link-color);stroke-width:1.3}::ng-deep .collapsed-link-tag:hover:not(.active-tab):not(.expanded-tab) .icon-container .svg-icon-collapsed{width:1.06em;height:1.06em;background-color:none}::ng-deep .collapsed-link-tag:hover:not(.active-tab):not(.expanded-tab) .icon-container .svg-icon-collapsed svg{fill:none}::ng-deep .collapsed-link-tag:hover:not(.active-tab):not(.expanded-tab) .icon-container .svg-icon-collapsed svg g path{stroke:var(--neutral-500)}::ng-deep .collapsed-link-tag:hover:not(.active-tab):not(.expanded-tab) .icon-container .svg-icon-collapsed svg path{stroke:var(--neutral-500)}\n"], dependencies: [{ kind: "ngmodule", type: TranslateModule }, { kind: "pipe", type: i3$1.TranslatePipe, name: "translate" }, { kind: "directive", type: ClickOutsideDirective, selector: "[clickOutside]", inputs: ["clickOutside"], outputs: ["clickOutsideEmitter"] }, { kind: "directive", type: DropdownsAnimationDirective, selector: "[DropdownAnimationObject]", inputs: ["DropdownAnimationObject"] }], animations: [dropdownAnimation] });
+    static ɵcmp = i0.ɵɵngDeclareComponent({ minVersion: "17.0.0", version: "19.2.15", type: CollapsedBarComponent, isStandalone: true, selector: "app-collapsed-bar", inputs: { tab: { classPropertyName: "tab", publicName: "tab", isSignal: true, isRequired: false, transformFunction: null } }, outputs: { collapseAll: "collapseAll" }, ngImport: i0, template: "<li class=\"main-nav-list-item\">\n  <a\n    (click)=\"collapseService.onMainTabClick(tab())\"\n    [title]=\"tab().title | translate\"\n    class=\"collapsed-link-tag\"\n    [class]=\"{\n      'active-tab': isActiveTab(tab()),\n      'expanded-tab': isExpanded(tab()),\n    }\"\n  >\n    <div class=\"icon-container\">\n      <!-- 'bg-[#6026501C]': isActiveTab(tab()), -->\n      <div\n        class=\"svg-icon-collapsed\"\n        [innerHTML]=\"\n          isActiveTab(tab()) || isExpanded(tab())\n            ? getDarkIcon(tab().icon)\n            : getIcon(tab().icon)\n        \"\n      ></div>\n\n      <!-- if parent tab not sub tab -->\n      @if (!tab().link) {\n        <div class=\"absolute right-0\">\n          <span class=\"arrow-icon\" [innerHTML]=\"arrowDownSmallIcon\"></span>\n        </div>\n      }\n      <!--  -->\n      @if (isExpanded(tab()) && !tab().link) {\n        <!--  -->\n        <ul\n          #expandedTabs\n          class=\"sub-nav-popup absolute left-[100%]\"\n          [clickOutside]=\"expandedTabs\"\n          (clickOutsideEmitter)=\"collapseService.toggleTab(tab())\"\n        >\n          @for (subTab of tab().subTabs; track subTab) {\n            <li\n              class=\"sub-nav-item\"\n              [DropdownAnimationObject]=\"isExpanded(tab())\"\n            >\n              <a\n                class=\"link-tag\"\n                (click)=\"collapseService.onSubTabClick(subTab)\"\n                [class]=\"{\n                  'active-tab': collapseService.isActiveSubTab(tab(), subTab),\n                }\"\n              >\n                <div class=\"header-container\">\n                  <div\n                    class=\"svg-icon\"\n                    [innerHTML]=\"\n                      collapseService.isActiveSubTab(tab(), subTab)\n                        ? getDarkIcon(subTab.icon)\n                        : getIcon(subTab.icon)\n                    \"\n                  ></div>\n                  <h2 class=\"main-title-text\">\n                    {{ subTab.title | translate }}\n                  </h2>\n                </div>\n              </a>\n            </li>\n          }\n        </ul>\n      }\n    </div>\n  </a>\n</li>\n", styles: [".svg-icon-collapsed{width:auto;height:auto;background-color:none}.arrow-icon{width:.625em;height:.625em;background-color:none;transition:transform .3s ease;transform-origin:center}.link-title{font-family:var(--FM-Light);line-height:1.37em}.main-nav-list-item{display:flex;color:var(--neutral-800);flex-direction:column;align-items:center}.main-nav-list-item .collapsed-link-tag{display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:all .4s;border-radius:var(--border-radius-m-16);width:min-content;color:var(--neutral-500)}.main-nav-list-item .collapsed-link-tag .icon-container{position:relative;display:flex;align-items:center;justify-content:center;padding:.5em;width:2.5em;height:2.5em}.main-nav-list-item .collapsed-link-tag .icon-container svg{width:1.06em;height:auto}.main-nav-list-item .collapsed-link-tag .icon-container .sub-nav-popup{background:var(--white);z-index:9999999;width:16.0625em;padding:1.5em;box-shadow:0 2px 8px #63636333;border-radius:var(--border-radius-m-16);left:calc(100% + 1em);position:absolute;top:0;display:flex;flex-direction:column;gap:.625em}.main-nav-list-item .collapsed-link-tag .icon-container .sub-nav-popup .sub-nav-item{color:var(--neutral-500);font-family:var(--FM-Light)}.main-nav-list-item .collapsed-link-tag .icon-container .sub-nav-popup .sub-nav-item .link-tag{display:flex;align-items:center;justify-content:start;gap:.5em;padding:.5em;border-radius:var(--border-radius-m-16);cursor:pointer;text-overflow:ellipsis;text-wrap:nowrap}.main-nav-list-item .collapsed-link-tag .icon-container .sub-nav-popup .sub-nav-item .link-tag.active-tab{background:var(--secondary-75);color:var(--link-color);font-family:var(--FM-Medium)}.main-nav-list-item .collapsed-link-tag .icon-container .sub-nav-popup .sub-nav-item .link-tag:hover:not(.active-tab):not(.expanded-tab){background-color:var(--neutral-100);color:var(--neutral-500)}.main-nav-list-item .collapsed-link-tag .icon-container .sub-nav-popup .sub-nav-item .link-tag:active{box-shadow:0 0 1px 0 var(--box-shadow-10);box-shadow:0 0 5px 0 var(--box-shadow-10)}.main-nav-list-item .collapsed-link-tag .icon-container .sub-nav-popup .sub-nav-item .link-tag .header-container{display:flex;align-items:center;gap:.5em;transition:all .4s ease-in-out}.main-nav-list-item .collapsed-link-tag .icon-container .sub-nav-popup .sub-nav-item .link-tag .header-container .svg-icon{width:1.06em;height:1.06em;background-color:none;transition:all .4s ease-in-out}.main-nav-list-item .collapsed-link-tag .icon-container .sub-nav-popup .sub-nav-item .link-tag .header-container .svg-icon g path{stroke:var(--neutral-500)}.main-nav-list-item .collapsed-link-tag .icon-container .sub-nav-popup .sub-nav-item .link-tag .header-container .svg-icon path{stroke:var(--neutral-500)}.main-nav-list-item .collapsed-link-tag:hover:not(.active-tab):not(.expanded-tab){background-color:var(--neutral-100)}.main-nav-list-item .collapsed-link-tag.expanded-tab,.main-nav-list-item .collapsed-link-tag.active-tab{background:var(--secondary-75);color:var(--link-color);font-family:var(--FM-Medium)}::ng-deep .collapsed-link-tag .icon-container .svg-icon-collapsed{width:1.06em;height:1.06em;background-color:none;transition:all .7s ease-in-out}::ng-deep .collapsed-link-tag .icon-container .svg-icon-collapsed :not(.active-tab):not(.expanded-tab) svg{width:inherit;height:inherit;fill:none;transition:all .7s ease-in-out}::ng-deep .collapsed-link-tag .icon-container .svg-icon-collapsed :not(.active-tab):not(.expanded-tab) svg g path{stroke:var(--neutral-500)}::ng-deep .collapsed-link-tag .icon-container .svg-icon-collapsed :not(.active-tab):not(.expanded-tab) svg path{stroke:var(--neutral-500)}::ng-deep .collapsed-link-tag.expanded-tab .icon-container .svg-icon-collapsed,::ng-deep .collapsed-link-tag.active-tab .icon-container .svg-icon-collapsed{width:1.06em;height:1.06em;background-color:none}::ng-deep .collapsed-link-tag.no-color.active-tab .icon-container .svg-icon-collapsed{width:1.06em;height:1.06em;background-color:none}::ng-deep .collapsed-link-tag.no-color.active-tab .icon-container .svg-icon-collapsed svg{fill:none}::ng-deep .collapsed-link-tag.no-color.active-tab .icon-container .svg-icon-collapsed svg g path{stroke:var(--link-color);stroke-width:1.3}::ng-deep .collapsed-link-tag.no-color.active-tab .icon-container .svg-icon-collapsed svg path{stroke:var(--link-color);stroke-width:1.3}::ng-deep .collapsed-link-tag:hover:not(.active-tab):not(.expanded-tab) .icon-container .svg-icon-collapsed{width:1.06em;height:1.06em;background-color:none}::ng-deep .collapsed-link-tag:hover:not(.active-tab):not(.expanded-tab) .icon-container .svg-icon-collapsed svg{fill:none}::ng-deep .collapsed-link-tag:hover:not(.active-tab):not(.expanded-tab) .icon-container .svg-icon-collapsed svg g path{stroke:var(--neutral-500)}::ng-deep .collapsed-link-tag:hover:not(.active-tab):not(.expanded-tab) .icon-container .svg-icon-collapsed svg path{stroke:var(--neutral-500)}\n"], dependencies: [{ kind: "ngmodule", type: TranslateModule }, { kind: "pipe", type: i3$1.TranslatePipe, name: "translate" }, { kind: "directive", type: ClickOutsideDirective, selector: "[clickOutside]", inputs: ["clickOutside"], outputs: ["clickOutsideEmitter"] }, { kind: "directive", type: DropdownsAnimationDirective, selector: "[DropdownAnimationObject]", inputs: ["DropdownAnimationObject"] }], animations: [dropdownAnimation] });
 }
 i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.15", ngImport: i0, type: CollapsedBarComponent, decorators: [{
             type: Component,
@@ -6996,7 +6995,7 @@ i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.15", ngImpo
                         TranslateModule,
                         ClickOutsideDirective,
                         DropdownsAnimationDirective,
-                    ], animations: [dropdownAnimation], template: "<li class=\"main-nav-list-item\">\n  <a\n    (click)=\"collapseService.onMainTabClick(tab())\"\n    [title]=\"tab().title | translate\"\n    class=\"collapsed-link-tag\"\n    [class]=\"{\n      'active-tab': isActiveTab(tab()),\n      'expanded-tab': isExpanded(tab()),\n    }\"\n  >\n    <div class=\"icon-container\">\n      <!-- 'bg-[#6026501C]': isActiveTab(tab()), -->\n      <div\n        class=\"svg-icon-collapsed\"\n        [innerHTML]=\"\n          isActiveTab(tab()) || isExpanded(tab())\n            ? getDarkIcon(tab().icon)\n            : getIcon(tab().icon)\n        \"\n      ></div>\n\n      <!-- if parent tab not sub tab -->\n      @if (!tab().link) {\n        <div class=\"absolute right-0\">\n          <!-- <custom-svg-icon\n          [path]=\"assetUrl('/images/svg/arrow-down-small.svg')\"\n          class=\"arrow-icon\"\n        ></custom-svg-icon> -->\n          <span class=\"arrow-icon\" [innerHTML]=\"arrowDownSmallIcon\"></span>\n        </div>\n      }\n      <!--  -->\n      @if (isExpanded(tab()) && !tab().link) {\n        <!--  -->\n        <ul\n          #expandedTabs\n          class=\"sub-nav-popup absolute left-[100%]\"\n          [clickOutside]=\"expandedTabs\"\n          (clickOutsideEmitter)=\"collapseService.toggleTab(tab())\"\n        >\n          @for (subTab of tab().subTabs; track subTab) {\n            <li\n              class=\"sub-nav-item\"\n              [DropdownAnimationObject]=\"isExpanded(tab())\"\n            >\n              <a\n                class=\"link-tag\"\n                (click)=\"collapseService.onSubTabClick(subTab)\"\n                [class]=\"{\n                  'active-tab': collapseService.isActiveSubTab(tab(), subTab),\n                }\"\n              >\n                <div class=\"header-container\">\n                  <div\n                    class=\"svg-icon\"\n                    [innerHTML]=\"\n                      collapseService.isActiveSubTab(tab(), subTab)\n                        ? getDarkIcon(subTab.icon)\n                        : getIcon(subTab.icon)\n                    \"\n                  ></div>\n                  <h2 class=\"main-title-text\">\n                    {{ subTab.title | translate }}\n                  </h2>\n                </div>\n              </a>\n            </li>\n          }\n        </ul>\n      }\n    </div>\n  </a>\n</li>\n", styles: [".svg-icon-collapsed{width:auto;height:auto;background-color:none}.arrow-icon{width:.625em;height:.625em;background-color:none;transition:transform .3s ease;transform-origin:center}.link-title{font-family:var(--FM-Light);line-height:1.37em}.main-nav-list-item{display:flex;color:var(--neutral-800);flex-direction:column;align-items:center}.main-nav-list-item .collapsed-link-tag{display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:all .4s;border-radius:var(--border-radius-m-16);width:min-content;color:var(--neutral-500)}.main-nav-list-item .collapsed-link-tag .icon-container{position:relative;display:flex;align-items:center;justify-content:center;padding:.5em;width:2.5em;height:2.5em}.main-nav-list-item .collapsed-link-tag .icon-container svg{width:1.06em;height:auto}.main-nav-list-item .collapsed-link-tag .icon-container .sub-nav-popup{background:var(--white);z-index:9999999;width:16.0625em;padding:1.5em;box-shadow:0 2px 8px #63636333;border-radius:var(--border-radius-m-16);left:calc(100% + 1em);position:absolute;top:0;display:flex;flex-direction:column;gap:.625em}.main-nav-list-item .collapsed-link-tag .icon-container .sub-nav-popup .sub-nav-item{color:var(--neutral-500);font-family:var(--FM-Light)}.main-nav-list-item .collapsed-link-tag .icon-container .sub-nav-popup .sub-nav-item .link-tag{display:flex;align-items:center;justify-content:start;gap:.5em;padding:.5em;border-radius:var(--border-radius-m-16);cursor:pointer;text-overflow:ellipsis;text-wrap:nowrap}.main-nav-list-item .collapsed-link-tag .icon-container .sub-nav-popup .sub-nav-item .link-tag.active-tab{background:var(--secondary-75);color:var(--link-color);font-family:var(--FM-Medium)}.main-nav-list-item .collapsed-link-tag .icon-container .sub-nav-popup .sub-nav-item .link-tag:hover:not(.active-tab):not(.expanded-tab){background-color:var(--neutral-100);color:var(--neutral-500)}.main-nav-list-item .collapsed-link-tag .icon-container .sub-nav-popup .sub-nav-item .link-tag:active{box-shadow:0 0 1px 0 var(--box-shadow-10);box-shadow:0 0 5px 0 var(--box-shadow-10)}.main-nav-list-item .collapsed-link-tag .icon-container .sub-nav-popup .sub-nav-item .link-tag .header-container{display:flex;align-items:center;gap:.5em;transition:all .4s ease-in-out}.main-nav-list-item .collapsed-link-tag .icon-container .sub-nav-popup .sub-nav-item .link-tag .header-container .svg-icon{width:1.06em;height:1.06em;background-color:none;transition:all .4s ease-in-out}.main-nav-list-item .collapsed-link-tag .icon-container .sub-nav-popup .sub-nav-item .link-tag .header-container .svg-icon g path{stroke:var(--neutral-500)}.main-nav-list-item .collapsed-link-tag .icon-container .sub-nav-popup .sub-nav-item .link-tag .header-container .svg-icon path{stroke:var(--neutral-500)}.main-nav-list-item .collapsed-link-tag:hover:not(.active-tab):not(.expanded-tab){background-color:var(--neutral-100)}.main-nav-list-item .collapsed-link-tag.expanded-tab,.main-nav-list-item .collapsed-link-tag.active-tab{background:var(--secondary-75);color:var(--link-color);font-family:var(--FM-Medium)}::ng-deep .collapsed-link-tag .icon-container .svg-icon-collapsed{width:1.06em;height:1.06em;background-color:none;transition:all .7s ease-in-out}::ng-deep .collapsed-link-tag .icon-container .svg-icon-collapsed :not(.active-tab):not(.expanded-tab) svg{width:inherit;height:inherit;fill:none;transition:all .7s ease-in-out}::ng-deep .collapsed-link-tag .icon-container .svg-icon-collapsed :not(.active-tab):not(.expanded-tab) svg g path{stroke:var(--neutral-500)}::ng-deep .collapsed-link-tag .icon-container .svg-icon-collapsed :not(.active-tab):not(.expanded-tab) svg path{stroke:var(--neutral-500)}::ng-deep .collapsed-link-tag.expanded-tab .icon-container .svg-icon-collapsed,::ng-deep .collapsed-link-tag.active-tab .icon-container .svg-icon-collapsed{width:1.06em;height:1.06em;background-color:none}::ng-deep .collapsed-link-tag.no-color.active-tab .icon-container .svg-icon-collapsed{width:1.06em;height:1.06em;background-color:none}::ng-deep .collapsed-link-tag.no-color.active-tab .icon-container .svg-icon-collapsed svg{fill:none}::ng-deep .collapsed-link-tag.no-color.active-tab .icon-container .svg-icon-collapsed svg g path{stroke:var(--link-color);stroke-width:1.3}::ng-deep .collapsed-link-tag.no-color.active-tab .icon-container .svg-icon-collapsed svg path{stroke:var(--link-color);stroke-width:1.3}::ng-deep .collapsed-link-tag:hover:not(.active-tab):not(.expanded-tab) .icon-container .svg-icon-collapsed{width:1.06em;height:1.06em;background-color:none}::ng-deep .collapsed-link-tag:hover:not(.active-tab):not(.expanded-tab) .icon-container .svg-icon-collapsed svg{fill:none}::ng-deep .collapsed-link-tag:hover:not(.active-tab):not(.expanded-tab) .icon-container .svg-icon-collapsed svg g path{stroke:var(--neutral-500)}::ng-deep .collapsed-link-tag:hover:not(.active-tab):not(.expanded-tab) .icon-container .svg-icon-collapsed svg path{stroke:var(--neutral-500)}\n"] }]
+                    ], animations: [dropdownAnimation], template: "<li class=\"main-nav-list-item\">\n  <a\n    (click)=\"collapseService.onMainTabClick(tab())\"\n    [title]=\"tab().title | translate\"\n    class=\"collapsed-link-tag\"\n    [class]=\"{\n      'active-tab': isActiveTab(tab()),\n      'expanded-tab': isExpanded(tab()),\n    }\"\n  >\n    <div class=\"icon-container\">\n      <!-- 'bg-[#6026501C]': isActiveTab(tab()), -->\n      <div\n        class=\"svg-icon-collapsed\"\n        [innerHTML]=\"\n          isActiveTab(tab()) || isExpanded(tab())\n            ? getDarkIcon(tab().icon)\n            : getIcon(tab().icon)\n        \"\n      ></div>\n\n      <!-- if parent tab not sub tab -->\n      @if (!tab().link) {\n        <div class=\"absolute right-0\">\n          <span class=\"arrow-icon\" [innerHTML]=\"arrowDownSmallIcon\"></span>\n        </div>\n      }\n      <!--  -->\n      @if (isExpanded(tab()) && !tab().link) {\n        <!--  -->\n        <ul\n          #expandedTabs\n          class=\"sub-nav-popup absolute left-[100%]\"\n          [clickOutside]=\"expandedTabs\"\n          (clickOutsideEmitter)=\"collapseService.toggleTab(tab())\"\n        >\n          @for (subTab of tab().subTabs; track subTab) {\n            <li\n              class=\"sub-nav-item\"\n              [DropdownAnimationObject]=\"isExpanded(tab())\"\n            >\n              <a\n                class=\"link-tag\"\n                (click)=\"collapseService.onSubTabClick(subTab)\"\n                [class]=\"{\n                  'active-tab': collapseService.isActiveSubTab(tab(), subTab),\n                }\"\n              >\n                <div class=\"header-container\">\n                  <div\n                    class=\"svg-icon\"\n                    [innerHTML]=\"\n                      collapseService.isActiveSubTab(tab(), subTab)\n                        ? getDarkIcon(subTab.icon)\n                        : getIcon(subTab.icon)\n                    \"\n                  ></div>\n                  <h2 class=\"main-title-text\">\n                    {{ subTab.title | translate }}\n                  </h2>\n                </div>\n              </a>\n            </li>\n          }\n        </ul>\n      }\n    </div>\n  </a>\n</li>\n", styles: [".svg-icon-collapsed{width:auto;height:auto;background-color:none}.arrow-icon{width:.625em;height:.625em;background-color:none;transition:transform .3s ease;transform-origin:center}.link-title{font-family:var(--FM-Light);line-height:1.37em}.main-nav-list-item{display:flex;color:var(--neutral-800);flex-direction:column;align-items:center}.main-nav-list-item .collapsed-link-tag{display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:all .4s;border-radius:var(--border-radius-m-16);width:min-content;color:var(--neutral-500)}.main-nav-list-item .collapsed-link-tag .icon-container{position:relative;display:flex;align-items:center;justify-content:center;padding:.5em;width:2.5em;height:2.5em}.main-nav-list-item .collapsed-link-tag .icon-container svg{width:1.06em;height:auto}.main-nav-list-item .collapsed-link-tag .icon-container .sub-nav-popup{background:var(--white);z-index:9999999;width:16.0625em;padding:1.5em;box-shadow:0 2px 8px #63636333;border-radius:var(--border-radius-m-16);left:calc(100% + 1em);position:absolute;top:0;display:flex;flex-direction:column;gap:.625em}.main-nav-list-item .collapsed-link-tag .icon-container .sub-nav-popup .sub-nav-item{color:var(--neutral-500);font-family:var(--FM-Light)}.main-nav-list-item .collapsed-link-tag .icon-container .sub-nav-popup .sub-nav-item .link-tag{display:flex;align-items:center;justify-content:start;gap:.5em;padding:.5em;border-radius:var(--border-radius-m-16);cursor:pointer;text-overflow:ellipsis;text-wrap:nowrap}.main-nav-list-item .collapsed-link-tag .icon-container .sub-nav-popup .sub-nav-item .link-tag.active-tab{background:var(--secondary-75);color:var(--link-color);font-family:var(--FM-Medium)}.main-nav-list-item .collapsed-link-tag .icon-container .sub-nav-popup .sub-nav-item .link-tag:hover:not(.active-tab):not(.expanded-tab){background-color:var(--neutral-100);color:var(--neutral-500)}.main-nav-list-item .collapsed-link-tag .icon-container .sub-nav-popup .sub-nav-item .link-tag:active{box-shadow:0 0 1px 0 var(--box-shadow-10);box-shadow:0 0 5px 0 var(--box-shadow-10)}.main-nav-list-item .collapsed-link-tag .icon-container .sub-nav-popup .sub-nav-item .link-tag .header-container{display:flex;align-items:center;gap:.5em;transition:all .4s ease-in-out}.main-nav-list-item .collapsed-link-tag .icon-container .sub-nav-popup .sub-nav-item .link-tag .header-container .svg-icon{width:1.06em;height:1.06em;background-color:none;transition:all .4s ease-in-out}.main-nav-list-item .collapsed-link-tag .icon-container .sub-nav-popup .sub-nav-item .link-tag .header-container .svg-icon g path{stroke:var(--neutral-500)}.main-nav-list-item .collapsed-link-tag .icon-container .sub-nav-popup .sub-nav-item .link-tag .header-container .svg-icon path{stroke:var(--neutral-500)}.main-nav-list-item .collapsed-link-tag:hover:not(.active-tab):not(.expanded-tab){background-color:var(--neutral-100)}.main-nav-list-item .collapsed-link-tag.expanded-tab,.main-nav-list-item .collapsed-link-tag.active-tab{background:var(--secondary-75);color:var(--link-color);font-family:var(--FM-Medium)}::ng-deep .collapsed-link-tag .icon-container .svg-icon-collapsed{width:1.06em;height:1.06em;background-color:none;transition:all .7s ease-in-out}::ng-deep .collapsed-link-tag .icon-container .svg-icon-collapsed :not(.active-tab):not(.expanded-tab) svg{width:inherit;height:inherit;fill:none;transition:all .7s ease-in-out}::ng-deep .collapsed-link-tag .icon-container .svg-icon-collapsed :not(.active-tab):not(.expanded-tab) svg g path{stroke:var(--neutral-500)}::ng-deep .collapsed-link-tag .icon-container .svg-icon-collapsed :not(.active-tab):not(.expanded-tab) svg path{stroke:var(--neutral-500)}::ng-deep .collapsed-link-tag.expanded-tab .icon-container .svg-icon-collapsed,::ng-deep .collapsed-link-tag.active-tab .icon-container .svg-icon-collapsed{width:1.06em;height:1.06em;background-color:none}::ng-deep .collapsed-link-tag.no-color.active-tab .icon-container .svg-icon-collapsed{width:1.06em;height:1.06em;background-color:none}::ng-deep .collapsed-link-tag.no-color.active-tab .icon-container .svg-icon-collapsed svg{fill:none}::ng-deep .collapsed-link-tag.no-color.active-tab .icon-container .svg-icon-collapsed svg g path{stroke:var(--link-color);stroke-width:1.3}::ng-deep .collapsed-link-tag.no-color.active-tab .icon-container .svg-icon-collapsed svg path{stroke:var(--link-color);stroke-width:1.3}::ng-deep .collapsed-link-tag:hover:not(.active-tab):not(.expanded-tab) .icon-container .svg-icon-collapsed{width:1.06em;height:1.06em;background-color:none}::ng-deep .collapsed-link-tag:hover:not(.active-tab):not(.expanded-tab) .icon-container .svg-icon-collapsed svg{fill:none}::ng-deep .collapsed-link-tag:hover:not(.active-tab):not(.expanded-tab) .icon-container .svg-icon-collapsed svg g path{stroke:var(--neutral-500)}::ng-deep .collapsed-link-tag:hover:not(.active-tab):not(.expanded-tab) .icon-container .svg-icon-collapsed svg path{stroke:var(--neutral-500)}\n"] }]
         }], ctorParameters: () => [{ type: CollapseService }, { type: i1$2.DomSanitizer }, { type: SidenavService }], propDecorators: { collapseAll: [{
                 type: Output
             }] } });
@@ -7006,7 +7005,6 @@ class SideBarListComponent {
     authContextService;
     sidenav;
     collapseService;
-    assetUrl = (str) => `assets/${str}`;
     constructor(authService, authContextService, sidenav, collapseService) {
         this.authService = authService;
         this.authContextService = authContextService;
@@ -7049,7 +7047,6 @@ class CustomNavBarComponent {
     authService;
     router;
     domSanitizer;
-    assetUrl = (str) => `assets/${str}`;
     headerLogo;
     collapseIcon;
     collapseDarkIcon;
@@ -7145,9 +7142,836 @@ i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.15", ngImpo
             args: [{ providedIn: 'root' }]
         }], ctorParameters: () => [{ type: i0.ApplicationRef }, { type: i0.EnvironmentInjector }] });
 
+const notifsBellSvg = `
+<svg width="23" height="24" viewBox="0 0 23 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M11.5015 6.44171V9.77171" stroke="#602650" stroke-miterlimit="10" stroke-linecap="round"/>
+  <path d="M11.5222 2.00024C7.99555 2.00024 5.13971 4.98024 5.13971 8.66024V10.7602C5.13971 11.4402 4.87138 12.4602 4.53596 13.0402L3.31888 15.1602C2.57138 16.4702 3.08888 17.9302 4.46888 18.4102C9.04971 20.0002 14.0043 20.0002 18.5851 18.4102C19.8789 17.9602 20.4347 16.3802 19.7351 15.1602L18.518 13.0402C18.1826 12.4602 17.9143 11.4302 17.9143 10.7602V8.66024C17.9047 5.00024 15.0297 2.00024 11.5222 2.00024Z" stroke="#602650" stroke-miterlimit="10" stroke-linecap="round"/>
+  <path d="M14.6932 18.8203C14.6932 20.6503 13.2557 22.1503 11.5019 22.1503C10.6299 22.1503 9.82487 21.7703 9.24987 21.1703C8.67487 20.5703 8.3107 19.7303 8.3107 18.8203" stroke="#602650" stroke-miterlimit="10"/>
+</svg>
+`;
+const editSvg = `
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path
+        d="M7.33398 1.33325H6.00065C2.66732 1.33325 1.33398 2.66659 1.33398 5.99992V9.99992C1.33398 13.3333 2.66732 14.6666 6.00065 14.6666H10.0007C13.334 14.6666 14.6673 13.3333 14.6673 9.99992V8.66658"
+        stroke="#292D32" stroke-linecap="round" stroke-linejoin="round" />
+    <path
+        d="M10.6933 2.01326L5.43992 7.26659C5.23992 7.46659 5.03992 7.85992 4.99992 8.14659L4.71325 10.1533C4.60659 10.8799 5.11992 11.3866 5.84659 11.2866L7.85325 10.9999C8.13325 10.9599 8.52659 10.7599 8.73325 10.5599L13.9866 5.30659C14.8933 4.39992 15.3199 3.34659 13.9866 2.01326C12.6533 0.679924 11.5999 1.10659 10.6933 2.01326Z"
+        stroke="#292D32" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M9.93945 2.7666C10.3861 4.35993 11.6328 5.6066 13.2328 6.05993" stroke="#292D32" stroke-miterlimit="10"
+        stroke-linecap="round" stroke-linejoin="round" />
+</svg>`;
+const changePassSvg = `
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path
+        d="M6.99344 1.48679L3.66677 2.74012C2.9001 3.02679 2.27344 3.93345 2.27344 4.74679V9.70012C2.27344 10.4868 2.79344 11.5201 3.42677 11.9935L6.29344 14.1335C7.23344 14.8401 8.7801 14.8401 9.7201 14.1335L12.5868 11.9935C13.2201 11.5201 13.7401 10.4868 13.7401 9.70012V4.74679C13.7401 3.92679 13.1134 3.02012 12.3468 2.73345L9.0201 1.48679C8.45344 1.28012 7.54677 1.28012 6.99344 1.48679Z"
+        stroke="#292D32" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M6.0332 7.91345L7.10654 8.98678L9.9732 6.12012" stroke="#292D32" stroke-linecap="round"
+        stroke-linejoin="round" />
+</svg>`;
+const darkModeSvg = `
+<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path
+        d="M2.02244 10.3377C2.31981 14.4567 5.9296 17.8078 10.2498 17.9918C13.2979 18.1197 16.0238 16.7441 17.6593 14.5767C18.3367 13.6889 17.9732 13.097 16.8416 13.297C16.2881 13.393 15.7181 13.4329 15.1234 13.409C11.0841 13.249 7.77992 9.97783 7.7634 6.11482C7.75514 5.07509 7.97817 4.09134 8.38293 3.19557C8.82899 2.20382 8.29207 1.73194 7.25952 2.15584C3.98841 3.49149 1.74984 6.68267 2.02244 10.3377Z"
+        stroke="#292D32" stroke-linecap="round" stroke-linejoin="round" />
+</svg>`;
+const arrowDownHeaderSvg = `
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M17.9201 8.94995L13.4001 14.47C12.6301 15.24 11.3701 15.24 10.6001 14.47L6.08008 8.94995" stroke="#B0B0B0"
+        stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+</svg>`;
+// NOTIF SVGS
+const tasksSvg = `
+<svg width="17" height="18" viewBox="0 0 17 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path
+        d="M5.94998 1.30469H1.69998C1.23053 1.30469 0.849976 1.68748 0.849976 2.15969V6.43469C0.849976 6.90689 1.23053 7.28969 1.69998 7.28969H5.94998C6.41942 7.28969 6.79998 6.90689 6.79998 6.43469V2.15969C6.79998 1.68748 6.41942 1.30469 5.94998 1.30469Z"
+        stroke="white" stroke-linecap="round" stroke-linejoin="round" />
+    <path
+        d="M5.94998 10.71H1.69998C1.23053 10.71 0.849976 11.0928 0.849976 11.565V15.84C0.849976 16.3122 1.23053 16.695 1.69998 16.695H5.94998C6.41942 16.695 6.79998 16.3122 6.79998 15.84V11.565C6.79998 11.0928 6.41942 10.71 5.94998 10.71Z"
+        stroke="white" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M10.2 2.16016H16.15" stroke="white" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M10.2 6.43457H16.15" stroke="white" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M10.2 11.5654H16.15" stroke="white" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M10.2 15.8398H16.15" stroke="white" stroke-linecap="round" stroke-linejoin="round" />
+</svg>`;
+const systemAlertSvg = `
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M20 9.6C20 5.6 18.4 4 14.4 4H9.6C5.6 4 4 5.6 4 9.6V14.4C4 18.4 5.6 20 9.6 20" stroke="white"
+        stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M16.35 8C15.8 7.3 14.88 7 13.5 7H10.5C8 7 7 8 7 10.5V13.5C7 14.88 7.3 15.8 7.99 16.35" stroke="white"
+        stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M8.01001 4V2" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M12 4V2" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M16 4V2" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M20 8H22" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M8.01001 20V22" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M2 8H4" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M2 12H4" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M2 16H4" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <path
+        d="M16.7101 18.5899C17.5882 18.5899 18.3001 17.878 18.3001 16.9999C18.3001 16.1218 17.5882 15.4099 16.7101 15.4099C15.832 15.4099 15.1201 16.1218 15.1201 16.9999C15.1201 17.878 15.832 18.5899 16.7101 18.5899Z"
+        stroke="white" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+    <path
+        d="M11.4099 17.46V16.53C11.4099 15.98 11.8599 15.53 12.4099 15.53C13.3699 15.53 13.7599 14.85 13.2799 14.02C12.9999 13.54 13.1699 12.92 13.6499 12.65L14.5599 12.12C14.9799 11.87 15.5199 12.02 15.7699 12.44L15.8299 12.54C16.3099 13.37 17.0899 13.37 17.5699 12.54L17.6299 12.44C17.8799 12.02 18.4199 11.88 18.8399 12.12L19.7499 12.65C20.2299 12.93 20.3999 13.54 20.1199 14.02C19.6399 14.85 20.0299 15.53 20.9899 15.53C21.5399 15.53 21.9899 15.98 21.9899 16.53V17.46C21.9899 18.01 21.5399 18.46 20.9899 18.46C20.0299 18.46 19.6399 19.14 20.1199 19.97C20.3999 20.45 20.2299 21.07 19.7499 21.34L18.8399 21.87C18.4199 22.12 17.8799 21.97 17.6299 21.55L17.5699 21.45C17.0899 20.62 16.3099 20.62 15.8299 21.45L15.7699 21.55C15.5199 21.97 14.9799 22.11 14.5599 21.87L13.6499 21.34C13.1699 21.06 12.9999 20.45 13.2799 19.97C13.7599 19.14 13.3699 18.46 12.4099 18.46C11.8599 18.47 11.4099 18.02 11.4099 17.46Z"
+        stroke="white" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+</svg>`;
+const welcomeMessageSvg = `
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path
+        d="M6.0901 13.2799H9.1801V20.4799C9.1801 22.1599 10.0901 22.4999 11.2001 21.2399L18.7701 12.6399C19.7001 11.5899 19.3101 10.7199 17.9001 10.7199H14.8101V3.5199C14.8101 1.8399 13.9001 1.4999 12.7901 2.7599L5.2201 11.3599C4.3001 12.4199 4.6901 13.2799 6.0901 13.2799Z"
+        stroke="white" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+</svg>`;
+const passwordResetSvg = `
+<svg width="17" height="12" viewBox="0 0 17 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M5.6 11.75L0 6.15L1.075 5.075L5.6 9.6L15.2 0L16.275 1.075L5.6 11.75Z" fill="white" />
+</svg>`;
+const generalSvg = `
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path
+        d="M12.0001 7.88989L10.9301 9.74989C10.6901 10.1599 10.8901 10.4999 11.3601 10.4999H12.6301C13.1101 10.4999 13.3001 10.8399 13.0601 11.2499L12.0001 13.1099"
+        stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <path
+        d="M8.30011 18.0399V16.8799C6.00011 15.4899 4.11011 12.7799 4.11011 9.89993C4.11011 4.94993 8.66011 1.06993 13.8001 2.18993C16.0601 2.68993 18.0401 4.18993 19.0701 6.25993C21.1601 10.4599 18.9601 14.9199 15.7301 16.8699V18.0299C15.7301 18.3199 15.8401 18.9899 14.7701 18.9899H9.26011C8.16011 18.9999 8.30011 18.5699 8.30011 18.0399Z"
+        stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M8.5 22C10.79 21.35 13.21 21.35 15.5 22" stroke="white" stroke-width="1.5" stroke-linecap="round"
+        stroke-linejoin="round" />
+</svg>`;
+const planSvg = `
+<svg width="17" height="19" viewBox="0 0 17 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g clip-path="url(#clip0_18731_108037)">
+        <path d="M5.09998 0.863281V4.31783" stroke="white" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M11.9 0.863281V4.31783" stroke="white" stroke-linecap="round" stroke-linejoin="round" />
+        <path
+            d="M14.45 2.59082H2.54998C1.61109 2.59082 0.849976 3.36415 0.849976 4.31809V16.409C0.849976 17.3629 1.61109 18.1363 2.54998 18.1363H14.45C15.3889 18.1363 16.15 17.3629 16.15 16.409V4.31809C16.15 3.36415 15.3889 2.59082 14.45 2.59082Z"
+            stroke="white" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M0.849976 7.77246H16.15" stroke="white" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M5.09998 11.2275H5.10898" stroke="white" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M8.5 11.2275H8.509" stroke="white" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M11.9 11.2275H11.909" stroke="white" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M5.09998 14.6816H5.10898" stroke="white" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M8.5 14.6816H8.509" stroke="white" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M11.9 14.6816H11.909" stroke="white" stroke-linecap="round" stroke-linejoin="round" />
+    </g>
+    <defs>
+        <clipPath id="clip0_18731_108037">
+            <rect width="17" height="19" fill="white" />
+        </clipPath>
+    </defs>
+</svg>`;
+
+class ProfileDataComponent {
+    authService;
+    sanitizer;
+    userProfile;
+    arrowDownIcon;
+    constructor(authService, sanitizer) {
+        this.authService = authService;
+        this.sanitizer = sanitizer;
+        this.arrowDownIcon =
+            this.sanitizer.bypassSecurityTrustHtml(arrowDownHeaderSvg);
+    }
+    ngOnInit() {
+        this.userProfile = this.authService.getCurrentUser();
+    }
+    getRoles(roles) {
+        if (roles && roles.length !== 0) {
+            return roles
+                .filter((role) => typeof role.name === 'string')
+                .map((role) => role.name.charAt(0).toUpperCase() +
+                role.name.slice(1).toLowerCase())
+                .join(', ');
+        }
+        return roles || [];
+    }
+    camelCase(str) {
+        return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+    }
+    static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "19.2.15", ngImport: i0, type: ProfileDataComponent, deps: [{ token: AuthService }, { token: i1$2.DomSanitizer }], target: i0.ɵɵFactoryTarget.Component });
+    static ɵcmp = i0.ɵɵngDeclareComponent({ minVersion: "14.0.0", version: "19.2.15", type: ProfileDataComponent, isStandalone: true, selector: "app-profile-data", ngImport: i0, template: "<span class=\"profile-icon\">\n  <h3>\n    {{ userProfile.fullName.charAt(0) }}\n  </h3>\n</span>\n<div [innerHtml]=\"arrowDownIcon\" class=\"dropdown\"></div>\n", styles: [":host{display:flex;flex-direction:row;align-items:center;cursor:pointer;gap:.4em}:host .profile-icon{width:3.2em;height:3.2em;border-radius:1.6em;display:flex;align-items:center;justify-content:center;box-shadow:0 .77px 3.08px #00000040}:host .profile-icon h3{line-height:1;font-size:1.4em;font-family:var(--FM-Bold);color:var(--2nd-color)}:host .profile-icon .dropdown{width:2.4em;height:2.4em}\n"] });
+}
+i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.15", ngImport: i0, type: ProfileDataComponent, decorators: [{
+            type: Component,
+            args: [{ selector: 'app-profile-data', imports: [], template: "<span class=\"profile-icon\">\n  <h3>\n    {{ userProfile.fullName.charAt(0) }}\n  </h3>\n</span>\n<div [innerHtml]=\"arrowDownIcon\" class=\"dropdown\"></div>\n", styles: [":host{display:flex;flex-direction:row;align-items:center;cursor:pointer;gap:.4em}:host .profile-icon{width:3.2em;height:3.2em;border-radius:1.6em;display:flex;align-items:center;justify-content:center;box-shadow:0 .77px 3.08px #00000040}:host .profile-icon h3{line-height:1;font-size:1.4em;font-family:var(--FM-Bold);color:var(--2nd-color)}:host .profile-icon .dropdown{width:2.4em;height:2.4em}\n"] }]
+        }], ctorParameters: () => [{ type: AuthService }, { type: i1$2.DomSanitizer }] });
+
+var NOTIF_ENUM;
+(function (NOTIF_ENUM) {
+    NOTIF_ENUM["TASK_ASSIGNED"] = "TASK_ASSIGNED";
+    NOTIF_ENUM["TASK_UPDATED"] = "TASK_UPDATED";
+    NOTIF_ENUM["TASK_COMPLETED"] = "TASK_COMPLETED";
+    NOTIF_ENUM["TASK_CANCELLED"] = "TASK_CANCELLED";
+    NOTIF_ENUM["TASK_DUE_SOON"] = "TASK_DUE_SOON";
+    NOTIF_ENUM["TASK_OVERDUE"] = "TASK_OVERDUE";
+    NOTIF_ENUM["SYSTEM_ALERT"] = "SYSTEM_ALERT";
+    NOTIF_ENUM["GENERAL_NOTIFICATION"] = "GENERAL_NOTIFICATION";
+    NOTIF_ENUM["WELCOME_MESSAGE"] = "WELCOME_MESSAGE";
+    NOTIF_ENUM["PASSWORD_RESET"] = "PASSWORD_RESET";
+    NOTIF_ENUM["TASK_PAUSED"] = "TASK_PAUSED";
+    NOTIF_ENUM["TASK_RESUMED"] = "TASK_RESUMED";
+})(NOTIF_ENUM || (NOTIF_ENUM = {}));
+const NOTIF_ACTION = {
+    [NOTIF_ENUM.TASK_ASSIGNED]: {
+        text: (data) => `${data}/hhh`,
+        action: (notif) => {
+            console.log('Task assigned:', notif);
+        },
+        color: '#34C759',
+        routePath: `${ModuleRoutes.PLAN_MANAGEMENT_HOME}/tasks`,
+        additionalData: {},
+        icon: 'images/svg/notifs/tasks.svg',
+    },
+    [NOTIF_ENUM.TASK_CANCELLED]: {
+        text: (data) => `${data}/hhh`,
+        action: (notif) => {
+            console.log('Task assigned:', notif);
+        },
+        color: '#34C759',
+        routePath: `${ModuleRoutes.PLAN_MANAGEMENT_HOME}/tasks`,
+        additionalData: {},
+        icon: 'images/svg/notifs/tasks.svg',
+    },
+    [NOTIF_ENUM.TASK_COMPLETED]: {
+        text: (data) => `${data}/hhh`,
+        action: (notif) => {
+            console.log('Task assigned:', notif);
+        },
+        color: '#34C759',
+        routePath: `${ModuleRoutes.PLAN_MANAGEMENT_HOME}/tasks`,
+        additionalData: {},
+        icon: 'images/svg/notifs/tasks.svg',
+    },
+    [NOTIF_ENUM.TASK_DUE_SOON]: {
+        text: (data) => `${data}/hhh`,
+        action: (notif) => {
+            console.log('Task assigned:', notif);
+        },
+        color: '#34C759',
+        routePath: `${ModuleRoutes.PLAN_MANAGEMENT_HOME}/tasks`,
+        additionalData: {},
+        icon: 'images/svg/notifs/tasks.svg',
+    },
+    [NOTIF_ENUM.TASK_OVERDUE]: {
+        text: (data) => `${data}/hhh`,
+        action: (notif) => {
+            console.log('Task assigned:', notif);
+        },
+        color: '#34C759',
+        routePath: `${ModuleRoutes.PLAN_MANAGEMENT_HOME}/tasks`,
+        additionalData: {},
+        icon: 'images/svg/notifs/tasks.svg',
+    },
+    [NOTIF_ENUM.TASK_PAUSED]: {
+        text: (data) => `${data}/hhh`,
+        action: (notif) => {
+            console.log('Task assigned:', notif);
+        },
+        color: '#34C759',
+        routePath: `${ModuleRoutes.PLAN_MANAGEMENT_HOME}/tasks`,
+        additionalData: {},
+        icon: 'images/svg/notifs/tasks.svg',
+    },
+    [NOTIF_ENUM.SYSTEM_ALERT]: {
+        text: (data) => `${data}/hhh`,
+        action: (notif) => {
+            console.log('Task assigned:', notif);
+        },
+        color: '#F43F5E',
+        routePath: '',
+        additionalData: {},
+        icon: 'images/svg/notifs/system.svg',
+    },
+    [NOTIF_ENUM.GENERAL_NOTIFICATION]: {
+        text: (data) => `${data}/hhh`,
+        action: (notif) => {
+            console.log('Task assigned:', notif);
+        },
+        color: '#E6B50D',
+        routePath: '',
+        additionalData: {},
+        icon: 'images/svg/notifs/general.svg',
+    },
+    [NOTIF_ENUM.WELCOME_MESSAGE]: {
+        text: (data) => `${data}/hhh`,
+        action: (notif) => {
+            console.log('Task assigned:', notif);
+        },
+        color: '#25C7BC',
+        routePath: '',
+        additionalData: {},
+        icon: 'images/svg/notifs/welcome.svg',
+    },
+    [NOTIF_ENUM.PASSWORD_RESET]: {
+        text: (data) => `${data}/hhh`,
+        action: (notif) => {
+            console.log('Task assigned:', notif);
+        },
+        color: '#34C759',
+        routePath: '',
+        additionalData: {},
+        icon: 'images/svg/notifs/password.svg',
+    },
+    [NOTIF_ENUM.TASK_RESUMED]: {
+        text: (data) => `${data}/hhh`,
+        action: (notif) => {
+            console.log('Task assigned:', notif);
+        },
+        color: '#34C759',
+        routePath: `${ModuleRoutes.PLAN_MANAGEMENT_HOME}/tasks`,
+        additionalData: {},
+        icon: 'images/svg/notifs/tasks.svg',
+    },
+    [NOTIF_ENUM.TASK_UPDATED]: {
+        text: (data) => `${data}/hhh`,
+        action: (notif) => {
+            console.log('Task assigned:', notif);
+        },
+        color: '#34C759',
+        routePath: `${ModuleRoutes.PLAN_MANAGEMENT_HOME}/tasks`,
+        additionalData: {},
+        icon: 'images/svg/notifs/tasks.svg',
+    },
+};
+
+class NotificationCardComponent {
+    assetUrl = (path) => `assets/${path}`;
+    router = inject(Router);
+    delete = new EventEmitter();
+    read = new EventEmitter();
+    notification = input({});
+    notificationAction = NOTIF_ACTION;
+    readNotification() {
+        this.read.emit();
+        if (this.notificationAction[this.notification().type].routePath !== '') {
+            const path = this.notificationAction[this.notification().type].routePath;
+            // TODO: add additional data
+            this.router.navigate([path]); // TODO: update general routes
+        }
+    }
+    getDate(value) {
+        // notification().createdAt)
+        // ? (notification().createdAt | date : "MMM dd, yyyy hh:mm a")
+        // : notification().createdAt
+        const datePipe = new DatePipe('en-US');
+        if (typeof value === 'string') {
+            return value;
+        }
+        // Handle array format: [year, month, day, hour, minute, second, millisecond]
+        const [year, month, day, hour, minute, second, millisecond] = value;
+        return (datePipe.transform(new Date(year, month - 1, day, hour, minute, second, Math.floor(millisecond / 1000000)), 'MMM dd, yyyy hh:mm a') || '');
+    }
+    static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "19.2.15", ngImport: i0, type: NotificationCardComponent, deps: [], target: i0.ɵɵFactoryTarget.Component });
+    static ɵcmp = i0.ɵɵngDeclareComponent({ minVersion: "17.1.0", version: "19.2.15", type: NotificationCardComponent, isStandalone: true, selector: "notification-card", inputs: { notification: { classPropertyName: "notification", publicName: "notification", isSignal: true, isRequired: false, transformFunction: null } }, outputs: { delete: "delete", read: "read" }, ngImport: i0, template: "<div\n  class=\"card-container\"\n  [ngClass]=\"{\n    'bg-[#F0FAFF]': !notification().isRead,\n    'rounded-[1em]': !notification().isRead,\n    'border-b border-b-[#ededed]': notification().isRead\n  }\"\n  (click)=\"$event.stopPropagation(); readNotification()\"\n>\n  <div class=\"main-content\">\n    <span\n      class=\"logo\"\n      [ngStyle]=\"{\n        backgroundColor: notificationAction[notification().type].color\n      }\"\n    >\n      <img\n        [src]=\"assetUrl(notificationAction[notification().type].icon)\"\n        alt=\"\"\n      />\n    </span>\n\n    <div class=\"notif-text\">\n      <h2>\n        {{ notification().message }}\n      </h2>\n      <p>\n        {{ getDate(notification().createdAt) | date : \"MMM dd, yyyy hh:mm a\" }}\n      </p>\n    </div>\n  </div>\n  <button\n    class=\"delete-notif\"\n    (click)=\"$event.stopPropagation(); delete.emit()\"\n  >\n    <svg\n      width=\"9\"\n      height=\"9\"\n      viewBox=\"0 0 10 10\"\n      fill=\"none\"\n      xmlns=\"http://www.w3.org/2000/svg\"\n    >\n      <g clip-path=\"url(#clip0_18731_108075)\">\n        <path\n          d=\"M8.35711 0.642578L0.642822 8.35686\"\n          stroke=\"currentColor\"\n          stroke-width=\"1.28571\"\n          stroke-linecap=\"round\"\n          stroke-linejoin=\"round\"\n        />\n        <path\n          d=\"M0.642822 0.642578L8.35711 8.35686\"\n          stroke=\"currentColor\"\n          stroke-width=\"1.28571\"\n          stroke-linecap=\"round\"\n          stroke-linejoin=\"round\"\n        />\n      </g>\n      <defs>\n        <clipPath id=\"clip0_18731_108075\">\n          <rect width=\"9\" height=\"9\" fill=\"white\" />\n        </clipPath>\n      </defs>\n    </svg>\n  </button>\n</div>\n", styles: [".card-container{display:grid;grid-template-columns:1fr auto;gap:.5em;padding:1em .8em;align-items:center;justify-content:flex-start;cursor:pointer}.card-container:hover{background-color:#e6f4fb!important;border-radius:1em!important;border-color:transparent}.card-container .main-content{display:grid;grid-template-columns:auto 1fr auto;gap:.8em;align-items:center;justify-content:flex-start}.card-container .main-content .logo{width:3.6em;height:3.6em;border-radius:2em;display:flex;align-items:center;justify-content:center;align-self:flex-start}.card-container .main-content .notif-text{display:flex;flex-direction:column;justify-content:space-between;height:100%;align-items:flex-start}.card-container .main-content .notif-text h2{font-size:1.3em}.card-container .main-content .notif-text p{font-family:var(--FM-Light);font-size:1.1em;align-self:flex-end}.card-container .delete-notif{align-self:flex-start;padding-block-start:.5em;cursor:pointer;width:1em;height:1.5em;color:#fb6666}.card-container .delete-notif:hover{color:#fb666699}\n"], dependencies: [{ kind: "pipe", type: DatePipe, name: "date" }, { kind: "directive", type: NgStyle, selector: "[ngStyle]", inputs: ["ngStyle"] }, { kind: "directive", type: NgClass, selector: "[ngClass]", inputs: ["class", "ngClass"] }] });
+}
+i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.15", ngImport: i0, type: NotificationCardComponent, decorators: [{
+            type: Component,
+            args: [{ selector: 'notification-card', imports: [DatePipe, NgStyle, NgClass], template: "<div\n  class=\"card-container\"\n  [ngClass]=\"{\n    'bg-[#F0FAFF]': !notification().isRead,\n    'rounded-[1em]': !notification().isRead,\n    'border-b border-b-[#ededed]': notification().isRead\n  }\"\n  (click)=\"$event.stopPropagation(); readNotification()\"\n>\n  <div class=\"main-content\">\n    <span\n      class=\"logo\"\n      [ngStyle]=\"{\n        backgroundColor: notificationAction[notification().type].color\n      }\"\n    >\n      <img\n        [src]=\"assetUrl(notificationAction[notification().type].icon)\"\n        alt=\"\"\n      />\n    </span>\n\n    <div class=\"notif-text\">\n      <h2>\n        {{ notification().message }}\n      </h2>\n      <p>\n        {{ getDate(notification().createdAt) | date : \"MMM dd, yyyy hh:mm a\" }}\n      </p>\n    </div>\n  </div>\n  <button\n    class=\"delete-notif\"\n    (click)=\"$event.stopPropagation(); delete.emit()\"\n  >\n    <svg\n      width=\"9\"\n      height=\"9\"\n      viewBox=\"0 0 10 10\"\n      fill=\"none\"\n      xmlns=\"http://www.w3.org/2000/svg\"\n    >\n      <g clip-path=\"url(#clip0_18731_108075)\">\n        <path\n          d=\"M8.35711 0.642578L0.642822 8.35686\"\n          stroke=\"currentColor\"\n          stroke-width=\"1.28571\"\n          stroke-linecap=\"round\"\n          stroke-linejoin=\"round\"\n        />\n        <path\n          d=\"M0.642822 0.642578L8.35711 8.35686\"\n          stroke=\"currentColor\"\n          stroke-width=\"1.28571\"\n          stroke-linecap=\"round\"\n          stroke-linejoin=\"round\"\n        />\n      </g>\n      <defs>\n        <clipPath id=\"clip0_18731_108075\">\n          <rect width=\"9\" height=\"9\" fill=\"white\" />\n        </clipPath>\n      </defs>\n    </svg>\n  </button>\n</div>\n", styles: [".card-container{display:grid;grid-template-columns:1fr auto;gap:.5em;padding:1em .8em;align-items:center;justify-content:flex-start;cursor:pointer}.card-container:hover{background-color:#e6f4fb!important;border-radius:1em!important;border-color:transparent}.card-container .main-content{display:grid;grid-template-columns:auto 1fr auto;gap:.8em;align-items:center;justify-content:flex-start}.card-container .main-content .logo{width:3.6em;height:3.6em;border-radius:2em;display:flex;align-items:center;justify-content:center;align-self:flex-start}.card-container .main-content .notif-text{display:flex;flex-direction:column;justify-content:space-between;height:100%;align-items:flex-start}.card-container .main-content .notif-text h2{font-size:1.3em}.card-container .main-content .notif-text p{font-family:var(--FM-Light);font-size:1.1em;align-self:flex-end}.card-container .delete-notif{align-self:flex-start;padding-block-start:.5em;cursor:pointer;width:1em;height:1.5em;color:#fb6666}.card-container .delete-notif:hover{color:#fb666699}\n"] }]
+        }], propDecorators: { delete: [{
+                type: Output
+            }], read: [{
+                type: Output
+            }] } });
+
+class NotificationSocketService {
+    baseUrl;
+    socket$;
+    authUser = inject(AuthService);
+    incomingNotifications$;
+    badgeUpdate$;
+    connectionStatus$ = signal('CLOSED');
+    baseUrlTemp = APP_BASE_HREF;
+    WS_URL;
+    constructor(baseUrl) {
+        this.baseUrl = baseUrl;
+        this.WS_URL =
+            this.baseUrl.replace('http', 'ws') +
+                '/api/v1/notif-mngt/ws/notifications';
+        console.log('WebSocket URL:', this.WS_URL);
+        this.socket$ = webSocket({
+            url: `${this.WS_URL}?userId=${this.authUser.getCurrentUser().id}`,
+            openObserver: {
+                next: () => {
+                    console.log('[Socket] OPEN');
+                    this.connectionStatus$.set('OPEN');
+                },
+            },
+            closeObserver: {
+                next: (event) => {
+                    console.log('[Socket] CLOSED', event);
+                    this.connectionStatus$.set('CLOSED');
+                },
+            },
+            closingObserver: {
+                next: () => {
+                    console.log('[Socket] CLOSING');
+                },
+            },
+        });
+        this.incomingNotifications$ = this.socket$.pipe(retry({ delay: 5000 }), 
+        // tap((msg) => console.log('[TEST SOCKET] RAW MESSAGE:', msg)),
+        filter((evt) => evt?.type === 'notification'));
+        // Handle badge updates
+        this.badgeUpdate$ = this.socket$.pipe(retry({ delay: 5000 }), 
+        // tap((msg) => console.log('[TEST SOCKET] RAW MESSAGE:', msg)),
+        filter((evt) => evt?.type === 'badge_update'));
+    }
+    /**
+     * Send subscription message to server
+     */
+    subscribe(userId) {
+        const message = { action: 'subscribe', userId };
+        console.log('[Socket] Sending:', message);
+        this.socket$.next(message);
+    }
+    /**
+     * Send unSubscription message to server
+     */
+    unsubscribe(userId) {
+        const message = { action: 'unsubscribe', userId };
+        console.log('[Socket] Sending:', message);
+        this.socket$.next(message);
+    }
+    /**
+     * Graceful cleanup
+     */
+    ngOnDestroy() {
+        console.log('[Socket] DESTROY - closing connection');
+        this.socket$.complete();
+    }
+    static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "19.2.15", ngImport: i0, type: NotificationSocketService, deps: [{ token: API_BASE_URL }], target: i0.ɵɵFactoryTarget.Injectable });
+    static ɵprov = i0.ɵɵngDeclareInjectable({ minVersion: "12.0.0", version: "19.2.15", ngImport: i0, type: NotificationSocketService });
+}
+i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.15", ngImport: i0, type: NotificationSocketService, decorators: [{
+            type: Injectable
+        }], ctorParameters: () => [{ type: undefined, decorators: [{
+                    type: Inject,
+                    args: [API_BASE_URL]
+                }] }] });
+
+const NOTIF_BASE = 'api/v1/notif-mngt/notifications';
+const NOTIF_ENDPOINTS = {
+    // PUT
+    MARK_READ: (notifId) => `${NOTIF_BASE}/${notifId}/mark-as-read`,
+    MARK_ALL_READ: `${NOTIF_BASE}/mark-all-read`, // recipientId as param
+    // GET
+    GET_NOTIF: `${NOTIF_BASE}/web`,
+    UN_READ_COUNT: `${NOTIF_BASE}/web/unread-count`,
+    // DELETE
+    DELETE_NOTIF: (notifId) => `${NOTIF_BASE}/${notifId}`,
+};
+
+class NotificationsHttpService {
+    commonHttp;
+    authContext;
+    authUser;
+    constructor(commonHttp, authContext) {
+        this.commonHttp = commonHttp;
+        this.authContext = authContext;
+        console.log(this.authContext.userLocalData$()?.user.id);
+        this.authUser =
+            this.authContext.userLocalData$()?.user ?? {};
+    }
+    markNotifRead(id) {
+        const url = NOTIF_ENDPOINTS.MARK_READ(id);
+        const params = {};
+        return this.commonHttp.CommonPutRequests(url, params);
+    }
+    markAllNotifRead() { }
+    getAllNotif(params) {
+        const url = NOTIF_ENDPOINTS.GET_NOTIF;
+        return this.commonHttp.CommonGetRequestsWithQuery(url, params);
+    }
+    getUnreadCount() {
+        const url = NOTIF_ENDPOINTS.UN_READ_COUNT;
+        return this.commonHttp.CommonGetRequests(url, {
+            context: new HttpContext().set(SKIP_LOADER, true),
+        });
+    }
+    deleteNotif(id) {
+        const url = NOTIF_ENDPOINTS.DELETE_NOTIF(id);
+        return this.commonHttp.CommonDeleteRequest(url, {
+            context: new HttpContext().set(SKIP_LOADER, true),
+        });
+    }
+    static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "19.2.15", ngImport: i0, type: NotificationsHttpService, deps: [{ token: CommonHttpService }, { token: AuthContextService }], target: i0.ɵɵFactoryTarget.Injectable });
+    static ɵprov = i0.ɵɵngDeclareInjectable({ minVersion: "12.0.0", version: "19.2.15", ngImport: i0, type: NotificationsHttpService, providedIn: 'root' });
+}
+i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.15", ngImport: i0, type: NotificationsHttpService, decorators: [{
+            type: Injectable,
+            args: [{
+                    providedIn: 'root',
+                }]
+        }], ctorParameters: () => [{ type: CommonHttpService }, { type: AuthContextService }] });
+
+class NotificationsStateService {
+    notificationsHttpService;
+    loadingService;
+    notifications = signal([]);
+    notificationCount = signal(0);
+    _toast = inject(ToastService);
+    pagination = signal({
+        pageNum: 1,
+        pageSize: 5,
+    });
+    totalCount = signal(0);
+    constructor(notificationsHttpService, loadingService) {
+        this.notificationsHttpService = notificationsHttpService;
+        this.loadingService = loadingService;
+    }
+    clearData() {
+        this.notifications.set([]);
+        this.pagination.set({
+            pageNum: 1,
+            pageSize: 10,
+        });
+        this.totalCount.set(0);
+    }
+    loadNotifications(newLoad) {
+        console.log('Loading notifications');
+        if (newLoad) {
+            this.loadingService.currentLoadingSection.set('NotificationFirstLoad');
+        }
+        else {
+            this.loadingService.currentLoadingSection.set('NotificationLoadMore');
+        }
+        this.notificationsHttpService
+            .getAllNotif({
+            page: this.pagination().pageNum - 1,
+            size: this.pagination().pageSize,
+        })
+            .subscribe({
+            next: (res) => {
+                if (this.notifications().length > 0) {
+                    this.addToNotifications(res);
+                }
+                else {
+                    this.setNotifications(res);
+                }
+            },
+            error: (err) => {
+                this._toast.toast(`Failed to load Notifications ${err.error.errorMessage}`, 'top-center', 'error', 6000);
+                // this.notifications.set([]);
+                // this.totalCount.set(0);
+            },
+        });
+    }
+    markNotificationRead(id) {
+        this.notifications.update((curr) => curr.map((n) => (n.notificationId === id ? { ...n, isRead: true } : n)));
+        this.notificationsHttpService.markNotifRead(id).subscribe({
+            next: (res) => {
+                // update list item with notificationId = id
+            },
+            error: (err) => {
+                this.notifications.update((curr) => curr.map((n) => n.notificationId === id ? { ...n, isRead: false } : n));
+                this._toast.toast(`Failed to Mark as Read ${err.error.errorMessage}`, 'top-center', 'error', 5000);
+            },
+        });
+    }
+    deleteNotification(id) {
+        this.notificationsHttpService.deleteNotif(id).subscribe({
+            next: (res) => {
+                // remove item notificationId = id from list
+                this.notifications.update((curr) => curr.filter((n) => n.notificationId !== id));
+                // adjust total count if needed
+                this.totalCount.update((c) => Math.max(0, c - 1));
+            },
+            error: (err) => {
+                this._toast.toast(`Failed to delete Notification`, 'top-center', 'error', 5000);
+            },
+        });
+    }
+    addToNotifications(res) {
+        this.notifications.update((curr) => {
+            const existingIds = new Set(curr.map((n) => n.notificationId));
+            const newItems = res.content.filter((n) => !existingIds.has(n.notificationId));
+            return [...curr, ...newItems];
+        });
+        if (res.content?.length > 0) {
+            this.totalCount.set(res.totalElements);
+            this.pagination.update((p) => ({ ...p, pageNum: p.pageNum + 1 }));
+        }
+    }
+    setNotifications(res) {
+        this.notifications.set(res.content);
+        if (res?.totalElements != null && res.content?.length > 0) {
+            this.totalCount.set(res.totalElements);
+            this.pagination.update((p) => ({ ...p, pageNum: p.pageNum + 1 }));
+        }
+    }
+    addNewSocketNotification(notif) {
+        console.log('[NOTIF] Adding new socket notification:', notif, this.notifications());
+        this.notifications.update((curr) => {
+            const existingIds = new Set(curr.map((n) => n.notificationId));
+            if (!existingIds.has(notif.notificationId)) {
+                return [notif, ...curr];
+            }
+            return [...curr];
+        });
+        this.totalCount.update((c) => c + 1);
+    }
+    updateUnreadCount(count) {
+        console.log('Updating unread count to:', count);
+        this.notificationCount.set(count);
+    }
+    static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "19.2.15", ngImport: i0, type: NotificationsStateService, deps: [{ token: NotificationsHttpService }, { token: LoadingService }], target: i0.ɵɵFactoryTarget.Injectable });
+    static ɵprov = i0.ɵɵngDeclareInjectable({ minVersion: "12.0.0", version: "19.2.15", ngImport: i0, type: NotificationsStateService, providedIn: 'root' });
+}
+i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.15", ngImport: i0, type: NotificationsStateService, decorators: [{
+            type: Injectable,
+            args: [{
+                    providedIn: 'root',
+                }]
+        }], ctorParameters: () => [{ type: NotificationsHttpService }, { type: LoadingService }] });
+
+class NotificationsManagementComponent {
+    state;
+    loadingService;
+    unreadCount;
+    notificationSocketService = inject(NotificationSocketService);
+    ngZone = inject(NgZone);
+    constructor(state, loadingService) {
+        this.state = state;
+        this.loadingService = loadingService;
+    }
+    ngOnInit() { }
+    markNotificationRead(id) {
+        this.state.markNotificationRead(id);
+    }
+    deleteNotification(id) {
+        this.state.deleteNotification(id);
+    }
+    ngOnDestroy() {
+        // this.state.clearData();
+    }
+    static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "19.2.15", ngImport: i0, type: NotificationsManagementComponent, deps: [{ token: NotificationsStateService }, { token: LoadingService }], target: i0.ɵɵFactoryTarget.Component });
+    static ɵcmp = i0.ɵɵngDeclareComponent({ minVersion: "17.0.0", version: "19.2.15", type: NotificationsManagementComponent, isStandalone: true, selector: "app-notifications-management", inputs: { unreadCount: "unreadCount" }, ngImport: i0, template: "<div class=\"notifs-header\">\n  <h2>{{ \"HEADER.NOTIFICATIONS.TITLE\" | translate }}</h2>\n  <span class=\"unread\">\n    <p>{{ unreadCount ?? 0 }}</p>\n    <p>{{ \"HEADER.NOTIFICATIONS.UNREAD\" | translate }}</p>\n  </span>\n</div>\n<div class=\"notifs-content\">\n  <!--  -->\n\n  <div class=\"notifs\">\n    @if (\n      state.notifications().length <= 0 &&\n      loadingService.loading() &&\n      loadingService.currentLoadingSection() === \"NotificationFirstLoad\"\n    ) {\n      <custom-loading-spinner\n        [local]=\"true\"\n        class=\"loading-spinner-overlay\"\n      ></custom-loading-spinner>\n    }\n    @if (state.notifications().length > 0) {\n      <!--  -->\n      @for (notif of state.notifications(); track notif) {\n        <notification-card\n          [notification]=\"notif\"\n          (delete)=\"deleteNotification(notif.notificationId)\"\n          (read)=\"markNotificationRead(notif.notificationId)\"\n        ></notification-card>\n      }\n    } @else {\n      <p class=\"empty-state\">\n        {{ \"HEADER.NOTIFICATIONS.NO_NOTIFICATIONS\" | translate }}\n      </p>\n    }\n  </div>\n\n  <!-- [disabled]=\"state.notifications().length <= 0\" -->\n  <div class=\"notifs-footer\">\n    <button\n      class=\"custom-btn-class\"\n      [disabled]=\"\n        loadingService.loading() &&\n        (loadingService.currentLoadingSection() === 'NotificationFirstLoad' ||\n          loadingService.currentLoadingSection() === 'NotificationLoadMore')\n      \"\n      [ngClass]=\"{\n        loading:\n          loadingService.loading() &&\n          loadingService.currentLoadingSection() === 'NotificationLoadMore',\n      }\"\n    >\n      <!-- (click)=\"state.loadNotifications(false)\" -->\n      <span class=\"load-span\">\n        {{ \"HEADER.NOTIFICATIONS.LOAD_MORE\" | translate }}\n      </span>\n    </button>\n  </div>\n</div>\n", styles: [":host{width:32em;max-height:44.8em;display:grid;grid-template-rows:auto 1fr;align-items:flex-start}:host .notifs-header{width:100%;border-bottom:1px solid #ededed;padding:1em 1.6em;display:flex;justify-content:space-between}:host .notifs-header h2{font-size:1.6em;font-family:var(--FM-Bold)}:host .notifs-header span.unread{background-color:#f3861233;padding:.2em .7em;color:#f38612;display:flex;align-items:center;justify-content:center;gap:.5em;border-radius:.5em}:host .notifs-header span.unread p{font-size:1.2em;line-height:1}:host .notifs-content{display:grid;grid-template-rows:1fr auto;max-height:40.5em}:host .notifs-content .notifs{padding:1em .8em 0;display:flex;flex-direction:column;gap:.2em;height:100%;overflow-y:scroll;overflow-x:hidden;position:relative;min-height:10em}:host .notifs-content .empty-state{font-style:italic;color:#d1d5db;width:100%;height:100%;display:flex;justify-content:center;align-items:center;font-size:1.2em}:host .notifs-content .notifs-footer{border-top:1px solid #ededed;padding:1.3em;display:flex;align-items:center;box-shadow:0 -5px 50px #0000000d}:host .notifs-content .notifs-footer .custom-btn-class{width:100%;padding:.3em 1.2em;border-radius:.5em;background-color:#f3f3f3;cursor:pointer}:host .notifs-content .notifs-footer .custom-btn-class:disabled{box-shadow:inset 0 0 0 1000px #fff5;cursor:not-allowed}:host .notifs-content .notifs-footer .custom-btn-class.loading{position:relative;box-shadow:inset 0 0 0 1000px #fff5;cursor:not-allowed;color:transparent}:host .notifs-content .notifs-footer .custom-btn-class.loading:after{content:\"\";position:absolute;top:50%;left:50%;width:16px;height:16px;margin:-8px 0 0 -8px;border:2px solid rgba(37,199,188,.2);border-top-color:#25c7bc;border-radius:50%;animation:spin 1s linear infinite;pointer-events:none}:host .notifs-content .notifs-footer .custom-btn-class .load-span{line-height:2;font-size:1.2em;font-family:var(--FM-Bold)}@keyframes spin{0%{transform:rotate(0)}to{transform:rotate(360deg)}}\n"], dependencies: [{ kind: "ngmodule", type: TranslateModule }, { kind: "pipe", type: i3$1.TranslatePipe, name: "translate" }, { kind: "component", type: NotificationCardComponent, selector: "notification-card", inputs: ["notification"], outputs: ["delete", "read"] }, { kind: "directive", type: NgClass, selector: "[ngClass]", inputs: ["class", "ngClass"] }, { kind: "component", type: CustomLoadingSpinnerComponent, selector: "custom-loading-spinner", inputs: ["local"] }] });
+}
+i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.15", ngImport: i0, type: NotificationsManagementComponent, decorators: [{
+            type: Component,
+            args: [{ selector: 'app-notifications-management', imports: [
+                        TranslateModule,
+                        NotificationCardComponent,
+                        NgClass,
+                        CustomLoadingSpinnerComponent,
+                    ], template: "<div class=\"notifs-header\">\n  <h2>{{ \"HEADER.NOTIFICATIONS.TITLE\" | translate }}</h2>\n  <span class=\"unread\">\n    <p>{{ unreadCount ?? 0 }}</p>\n    <p>{{ \"HEADER.NOTIFICATIONS.UNREAD\" | translate }}</p>\n  </span>\n</div>\n<div class=\"notifs-content\">\n  <!--  -->\n\n  <div class=\"notifs\">\n    @if (\n      state.notifications().length <= 0 &&\n      loadingService.loading() &&\n      loadingService.currentLoadingSection() === \"NotificationFirstLoad\"\n    ) {\n      <custom-loading-spinner\n        [local]=\"true\"\n        class=\"loading-spinner-overlay\"\n      ></custom-loading-spinner>\n    }\n    @if (state.notifications().length > 0) {\n      <!--  -->\n      @for (notif of state.notifications(); track notif) {\n        <notification-card\n          [notification]=\"notif\"\n          (delete)=\"deleteNotification(notif.notificationId)\"\n          (read)=\"markNotificationRead(notif.notificationId)\"\n        ></notification-card>\n      }\n    } @else {\n      <p class=\"empty-state\">\n        {{ \"HEADER.NOTIFICATIONS.NO_NOTIFICATIONS\" | translate }}\n      </p>\n    }\n  </div>\n\n  <!-- [disabled]=\"state.notifications().length <= 0\" -->\n  <div class=\"notifs-footer\">\n    <button\n      class=\"custom-btn-class\"\n      [disabled]=\"\n        loadingService.loading() &&\n        (loadingService.currentLoadingSection() === 'NotificationFirstLoad' ||\n          loadingService.currentLoadingSection() === 'NotificationLoadMore')\n      \"\n      [ngClass]=\"{\n        loading:\n          loadingService.loading() &&\n          loadingService.currentLoadingSection() === 'NotificationLoadMore',\n      }\"\n    >\n      <!-- (click)=\"state.loadNotifications(false)\" -->\n      <span class=\"load-span\">\n        {{ \"HEADER.NOTIFICATIONS.LOAD_MORE\" | translate }}\n      </span>\n    </button>\n  </div>\n</div>\n", styles: [":host{width:32em;max-height:44.8em;display:grid;grid-template-rows:auto 1fr;align-items:flex-start}:host .notifs-header{width:100%;border-bottom:1px solid #ededed;padding:1em 1.6em;display:flex;justify-content:space-between}:host .notifs-header h2{font-size:1.6em;font-family:var(--FM-Bold)}:host .notifs-header span.unread{background-color:#f3861233;padding:.2em .7em;color:#f38612;display:flex;align-items:center;justify-content:center;gap:.5em;border-radius:.5em}:host .notifs-header span.unread p{font-size:1.2em;line-height:1}:host .notifs-content{display:grid;grid-template-rows:1fr auto;max-height:40.5em}:host .notifs-content .notifs{padding:1em .8em 0;display:flex;flex-direction:column;gap:.2em;height:100%;overflow-y:scroll;overflow-x:hidden;position:relative;min-height:10em}:host .notifs-content .empty-state{font-style:italic;color:#d1d5db;width:100%;height:100%;display:flex;justify-content:center;align-items:center;font-size:1.2em}:host .notifs-content .notifs-footer{border-top:1px solid #ededed;padding:1.3em;display:flex;align-items:center;box-shadow:0 -5px 50px #0000000d}:host .notifs-content .notifs-footer .custom-btn-class{width:100%;padding:.3em 1.2em;border-radius:.5em;background-color:#f3f3f3;cursor:pointer}:host .notifs-content .notifs-footer .custom-btn-class:disabled{box-shadow:inset 0 0 0 1000px #fff5;cursor:not-allowed}:host .notifs-content .notifs-footer .custom-btn-class.loading{position:relative;box-shadow:inset 0 0 0 1000px #fff5;cursor:not-allowed;color:transparent}:host .notifs-content .notifs-footer .custom-btn-class.loading:after{content:\"\";position:absolute;top:50%;left:50%;width:16px;height:16px;margin:-8px 0 0 -8px;border:2px solid rgba(37,199,188,.2);border-top-color:#25c7bc;border-radius:50%;animation:spin 1s linear infinite;pointer-events:none}:host .notifs-content .notifs-footer .custom-btn-class .load-span{line-height:2;font-size:1.2em;font-family:var(--FM-Bold)}@keyframes spin{0%{transform:rotate(0)}to{transform:rotate(360deg)}}\n"] }]
+        }], ctorParameters: () => [{ type: NotificationsStateService }, { type: LoadingService }], propDecorators: { unreadCount: [{
+                type: Input
+            }] } });
+
+class ProfileDropdownComponent {
+    authService;
+    router;
+    sanitizer;
+    darkMode = false;
+    userProfile;
+    profileDropDown = [
+        {
+            nameEn: 'Edit My Account',
+            nameAr: 'تعديل حسابي',
+            id: 'EDIT_ACCOUNT',
+            iconConst: editSvg, //'edit-icon.svg',
+            function: () => this.routePage(`${ModuleRoutes.USER_PROFILE}/edit`),
+        },
+        {
+            nameEn: 'Change Password',
+            nameAr: 'تغيير كلمة المرور',
+            id: 'CHANGE_PASS',
+            iconConst: changePassSvg,
+            function: () => this.routePage(`${ModuleRoutes.USER_PROFILE}/change-password`),
+        },
+        {
+            nameEn: 'Dark Mode',
+            nameAr: 'الوضع الداكن',
+            id: 'DARK_MODE',
+            iconConst: darkModeSvg,
+            function: () => this.toggleDark(),
+        },
+    ];
+    constructor(authService, router, sanitizer) {
+        this.authService = authService;
+        this.router = router;
+        this.sanitizer = sanitizer;
+    }
+    getSafeHtml(iconConst) {
+        return this.sanitizer.bypassSecurityTrustHtml(iconConst);
+    }
+    ngOnInit() {
+        this.userProfile = this.authService.getCurrentUser();
+    }
+    routePage(path) {
+        this.router.navigate([path]);
+    }
+    toggleDark() {
+        console.log('toggle Dark Mode');
+        this.darkMode = !this.darkMode;
+    }
+    static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "19.2.15", ngImport: i0, type: ProfileDropdownComponent, deps: [{ token: AuthService }, { token: i3.Router }, { token: i1$2.DomSanitizer }], target: i0.ɵɵFactoryTarget.Component });
+    static ɵcmp = i0.ɵɵngDeclareComponent({ minVersion: "17.0.0", version: "19.2.15", type: ProfileDropdownComponent, isStandalone: true, selector: "app-profile-dropdown", inputs: { userProfile: "userProfile" }, ngImport: i0, template: "<div class=\"profile-section\">\n  <custom-avatars\n    [items]=\"[\n      {\n        name: userProfile.fullName,\n      },\n    ]\"\n    [size]=\"4.8\"\n    [removeOutline]=\"true\"\n  ></custom-avatars>\n  <h2 class=\"profile-name\">{{ userProfile.fullName }}</h2>\n</div>\n<ul class=\"select-list\">\n  @for (item of profileDropDown; track item) {\n    <button class=\"selection-li\" (click)=\"item.function()\">\n      <li class=\"button-container\">\n        <span [innerHtml]=\"getSafeHtml(item.iconConst)\" alt=\"\"></span>\n        <p>{{ item.nameEn }}</p>\n        @if (item.id === \"DARK_MODE\") {\n          <div class=\"dark-mode\">\n            <custom-toggle-switch\n              [value]=\"darkMode\"\n              size=\"medium\"\n              [onColor]=\"'#26C6BB'\"\n              [offColor]=\"'#D0D5DD'\"\n              (valueChange)=\"item.function()\"\n            ></custom-toggle-switch>\n          </div>\n        }\n      </li>\n    </button>\n  }\n</ul>\n", styles: [":host{display:flex;flex-direction:column;width:100%;gap:1.6em;padding:1.6em .8em}:host .profile-section{width:30em;padding:.8em .8em 1.6em;display:flex;align-items:center;justify-content:start;gap:.8em;border-bottom:1px solid #e3e3e3}:host .profile-section .profile-name{font-size:1.6em;font-family:var(--FM-Bold)}:host .select-list{display:flex;flex-direction:column;gap:.8em;width:100%;justify-content:start}:host .select-list .selection-li{padding:.8em;border-radius:var(--border-radius-m-10)}:host .select-list .selection-li .button-container{padding:0 1.9em;cursor:pointer;display:flex;align-items:center;justify-content:flex-start;gap:1.6em}:host .select-list .selection-li .button-container p{font-size:1.4em;text-align:start}:host .select-list .selection-li .button-container .dark-mode{padding-inline-start:8.4em}:host .select-list .selection-li:hover{background-color:var(--neutral-100)}:host .select-list .selection-li:active{box-shadow:0 0 1px 0 var(--box-shadow-10);box-shadow:0 0 5px 0 var(--box-shadow-10)}:host .hover-action:hover{background-color:#80517310}\n"], dependencies: [{ kind: "component", type: CustomAvatarsComponent, selector: "custom-avatars", inputs: ["items", "size", "overlapOffset", "removeOutline"] }, { kind: "component", type: CustomToggleSwitchComponent, selector: "custom-toggle-switch", inputs: ["value", "label", "labelPosition", "disabled", "size", "onColor", "offColor", "thumbColor"], outputs: ["valueChange"] }, { kind: "ngmodule", type: TranslateModule }] });
+}
+i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.15", ngImport: i0, type: ProfileDropdownComponent, decorators: [{
+            type: Component,
+            args: [{ selector: 'app-profile-dropdown', imports: [
+                        CustomAvatarsComponent,
+                        CustomToggleSwitchComponent,
+                        TranslateModule,
+                    ], template: "<div class=\"profile-section\">\n  <custom-avatars\n    [items]=\"[\n      {\n        name: userProfile.fullName,\n      },\n    ]\"\n    [size]=\"4.8\"\n    [removeOutline]=\"true\"\n  ></custom-avatars>\n  <h2 class=\"profile-name\">{{ userProfile.fullName }}</h2>\n</div>\n<ul class=\"select-list\">\n  @for (item of profileDropDown; track item) {\n    <button class=\"selection-li\" (click)=\"item.function()\">\n      <li class=\"button-container\">\n        <span [innerHtml]=\"getSafeHtml(item.iconConst)\" alt=\"\"></span>\n        <p>{{ item.nameEn }}</p>\n        @if (item.id === \"DARK_MODE\") {\n          <div class=\"dark-mode\">\n            <custom-toggle-switch\n              [value]=\"darkMode\"\n              size=\"medium\"\n              [onColor]=\"'#26C6BB'\"\n              [offColor]=\"'#D0D5DD'\"\n              (valueChange)=\"item.function()\"\n            ></custom-toggle-switch>\n          </div>\n        }\n      </li>\n    </button>\n  }\n</ul>\n", styles: [":host{display:flex;flex-direction:column;width:100%;gap:1.6em;padding:1.6em .8em}:host .profile-section{width:30em;padding:.8em .8em 1.6em;display:flex;align-items:center;justify-content:start;gap:.8em;border-bottom:1px solid #e3e3e3}:host .profile-section .profile-name{font-size:1.6em;font-family:var(--FM-Bold)}:host .select-list{display:flex;flex-direction:column;gap:.8em;width:100%;justify-content:start}:host .select-list .selection-li{padding:.8em;border-radius:var(--border-radius-m-10)}:host .select-list .selection-li .button-container{padding:0 1.9em;cursor:pointer;display:flex;align-items:center;justify-content:flex-start;gap:1.6em}:host .select-list .selection-li .button-container p{font-size:1.4em;text-align:start}:host .select-list .selection-li .button-container .dark-mode{padding-inline-start:8.4em}:host .select-list .selection-li:hover{background-color:var(--neutral-100)}:host .select-list .selection-li:active{box-shadow:0 0 1px 0 var(--box-shadow-10);box-shadow:0 0 5px 0 var(--box-shadow-10)}:host .hover-action:hover{background-color:#80517310}\n"] }]
+        }], ctorParameters: () => [{ type: AuthService }, { type: i3.Router }, { type: i1$2.DomSanitizer }], propDecorators: { userProfile: [{
+                type: Input
+            }] } });
+
+class SocketTestTempComponent {
+    httpClient;
+    constructor(httpClient) {
+        this.httpClient = httpClient;
+    }
+    postTestNotifSocket() {
+        this.httpClient
+            .post('https://dispatching-api-gateway-821cc537b8b6.herokuapp.com/api/v1/notif-mngt/notifications/test/websocket/notification', {}, {
+            headers: {
+                'X-User-Id': '123',
+                Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+            },
+        })
+            .subscribe((res) => { });
+    }
+    postTestBadgeSocket() {
+        this.httpClient
+            .post('https://dispatching-api-gateway-821cc537b8b6.herokuapp.com/api/v1/notif-mngt/notifications/test/websocket/badge', {}, {
+            headers: {
+                'X-User-Id': '123',
+                Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+            },
+        })
+            .subscribe((res) => { });
+    }
+    static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "19.2.15", ngImport: i0, type: SocketTestTempComponent, deps: [{ token: i1.HttpClient }], target: i0.ɵɵFactoryTarget.Component });
+    static ɵcmp = i0.ɵɵngDeclareComponent({ minVersion: "14.0.0", version: "19.2.15", type: SocketTestTempComponent, isStandalone: true, selector: "app-socket-test-temp", ngImport: i0, template: "<button\n  (click)=\"postTestNotifSocket()\"\n  class=\"bg-blue-600 text-white px-5 py-2.5 border-0 rounded cursor-pointer\"\n>\n  Test new notif\n</button>\n<button\n  (click)=\"postTestBadgeSocket()\"\n  class=\"bg-blue-600 text-white px-5 py-2.5 border-0 rounded cursor-pointer\"\n>\n  Test new badge\n</button>\n", styles: [":host{display:flex;justify-content:center;align-items:center;gap:1em}\n"] });
+}
+i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.15", ngImport: i0, type: SocketTestTempComponent, decorators: [{
+            type: Component,
+            args: [{ selector: 'app-socket-test-temp', template: "<button\n  (click)=\"postTestNotifSocket()\"\n  class=\"bg-blue-600 text-white px-5 py-2.5 border-0 rounded cursor-pointer\"\n>\n  Test new notif\n</button>\n<button\n  (click)=\"postTestBadgeSocket()\"\n  class=\"bg-blue-600 text-white px-5 py-2.5 border-0 rounded cursor-pointer\"\n>\n  Test new badge\n</button>\n", styles: [":host{display:flex;justify-content:center;align-items:center;gap:1em}\n"] }]
+        }], ctorParameters: () => [{ type: i1.HttpClient }] });
+
+class CustomHeaderComponent {
+    router;
+    authService;
+    authContextService;
+    sidenav;
+    notificationsHttpService;
+    state;
+    sanitizer;
+    _toast = inject(ToastService);
+    notificationSocketService = inject(NotificationSocketService);
+    connectionState = computed(() => {
+        return this.notificationSocketService.connectionStatus$;
+    });
+    updateReadCountSub$ = new Subscription();
+    newNotificationsSub$ = new Subscription();
+    ngZone = inject(NgZone);
+    notifsBellIcon;
+    constructor(router, authService, authContextService, sidenav, notificationsHttpService, state, sanitizer) {
+        this.router = router;
+        this.authService = authService;
+        this.authContextService = authContextService;
+        this.sidenav = sidenav;
+        this.notificationsHttpService = notificationsHttpService;
+        this.state = state;
+        this.sanitizer = sanitizer;
+        this.loadNotificationCount();
+        this.notifsBellIcon = this.sanitizer.bypassSecurityTrustHtml(notifsBellSvg);
+        effect(() => {
+            if (this.connectionState()() === 'OPEN') {
+                //&& this.taskId()) {
+                this.notificationSocketService.subscribe(this.authService.getCurrentUser().id);
+            }
+        });
+    }
+    ngOnInit() {
+        this.state.loadNotifications(true);
+        this.newNotificationsSub$.add(this.notificationSocketService.incomingNotifications$
+            // .pipe(takeUntilDestroyed())
+            .subscribe((event) => {
+            this.ngZone.run(() => this.state.addNewSocketNotification(event.data));
+            console.log('EVENT:', event);
+        }));
+        this.updateReadCountSub$.add(this.notificationSocketService.badgeUpdate$
+            // .pipe(takeUntilDestroyed())
+            .subscribe((event) => {
+            this.ngZone.run(() => this.state.updateUnreadCount(event.unreadCount || 0));
+            console.log('EVENT:', event);
+            // this.realtimeShared.addEvent(event);
+        }));
+    }
+    loadNotificationCount() {
+        this.notificationsHttpService.getUnreadCount().subscribe({
+            next: (res) => {
+                this.state.notificationCount.set(res.unreadCount);
+            },
+            error: (err) => {
+                this._toast.toast(`Failed to load notifications count`, 'top-center', 'error', 5000);
+            },
+        });
+    }
+    selectItem(item) {
+        console.log('Selected item:', item);
+    }
+    static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "19.2.15", ngImport: i0, type: CustomHeaderComponent, deps: [{ token: i3.Router }, { token: AuthService }, { token: AuthContextService }, { token: SidenavService }, { token: NotificationsHttpService }, { token: NotificationsStateService }, { token: i1$2.DomSanitizer }], target: i0.ɵɵFactoryTarget.Component });
+    static ɵcmp = i0.ɵɵngDeclareComponent({ minVersion: "17.0.0", version: "19.2.15", type: CustomHeaderComponent, isStandalone: true, selector: "app-custom-header", providers: [NotificationSocketService], ngImport: i0, template: "<div class=\"header-container\">\n  <div class=\"header-inner\">\n    <div class=\"left\"></div>\n\n    <div class=\"left\">\n      <app-socket-test-temp [hidden]=\"true\"></app-socket-test-temp>\n    </div>\n    <div class=\"right\">\n      <!-- PROFILE -->\n      <div class=\"header-item-wrapper\">\n        <overlay-panel [overlayClass]=\"'custom-class'\">\n          <ng-template #target>\n            <app-profile-data></app-profile-data>\n          </ng-template>\n          <ng-template #overlay>\n            <app-profile-dropdown></app-profile-dropdown>\n          </ng-template>\n        </overlay-panel>\n      </div>\n\n      <!-- NOTIFICATIONS -->\n      <div class=\"header-item-wrapper\">\n        <overlay-panel [overlayClass]=\"'notif-overlay'\">\n          <ng-template #target>\n            <div class=\"notif\">\n              @if (state.notificationCount() > 0) {\n                <span class=\"notif-count\">\n                  <p>{{ state.notificationCount() }}</p>\n                </span>\n              }\n              <span [innerHtml]=\"notifsBellIcon\" class=\"notif-icon\"></span>\n            </div>\n          </ng-template>\n          <ng-template #overlay>\n            <app-notifications-management\n              [unreadCount]=\"state.notificationCount()\"\n            ></app-notifications-management>\n          </ng-template>\n        </overlay-panel>\n      </div>\n    </div>\n  </div>\n</div>\n<!--\n<modal\n  #changePasswordModal\n  [modalTitle]=\"'HEADER.CHANGE_PASS.TITLE' | translate\"\n  class=\"w-[40vw] text-[1.6em]\"\n>\n  <app-change-pass-form (hideModal)=\"closeModal()\"></app-change-pass-form>\n</modal> -->\n", styles: [".header-container{display:flex;flex-direction:row;padding-top:1.2em;padding-bottom:1.2em;height:7.87em;padding-inline-end:1.5em}.header-inner{display:flex;justify-content:space-between;padding-left:1.6em;padding-right:1.6em;width:100%;align-items:center}.left{display:flex;align-items:center}.right{display:flex;flex-direction:row-reverse;padding-left:.8em;padding-right:.8em}.header-item-wrapper{padding-left:.8em;padding-right:.8em;display:flex;align-items:center}.notif-icon{width:2.4em;height:2.4em}.notif{position:relative;cursor:pointer;display:flex;align-items:center;padding-left:.8em;padding-right:.8em;height:100%}.notif .notif-count{position:absolute;z-index:10;top:-.7em;right:-.3em;background-color:#2bc128;box-shadow:0 0 0 1.5px #fff;border-radius:.8em;height:1.6em;min-width:1.6em;color:#fff;display:flex;align-items:center;justify-content:center}.notif .notif-count p{font-size:1.2em;font-family:var(--FM-Bold)}::ng-deep overlay-panel{display:flex}::ng-deep .overlay.show{border-radius:1em!important}\n"], dependencies: [{ kind: "component", type: ProfileDataComponent, selector: "app-profile-data" }, { kind: "ngmodule", type: CommonModule }, { kind: "component", type: OverlayPanelComponent, selector: "overlay-panel", inputs: ["overlayClass", "expandSide", "minWidth"] }, { kind: "ngmodule", type: TranslateModule }, { kind: "component", type: NotificationsManagementComponent, selector: "app-notifications-management", inputs: ["unreadCount"] }, { kind: "component", type: ProfileDropdownComponent, selector: "app-profile-dropdown", inputs: ["userProfile"] }, { kind: "component", type: SocketTestTempComponent, selector: "app-socket-test-temp" }] });
+}
+i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.15", ngImport: i0, type: CustomHeaderComponent, decorators: [{
+            type: Component,
+            args: [{ selector: 'app-custom-header', imports: [
+                        ProfileDataComponent,
+                        CommonModule,
+                        OverlayPanelComponent,
+                        TranslateModule,
+                        NotificationsManagementComponent,
+                        ProfileDropdownComponent,
+                        SocketTestTempComponent,
+                    ], providers: [NotificationSocketService], template: "<div class=\"header-container\">\n  <div class=\"header-inner\">\n    <div class=\"left\"></div>\n\n    <div class=\"left\">\n      <app-socket-test-temp [hidden]=\"true\"></app-socket-test-temp>\n    </div>\n    <div class=\"right\">\n      <!-- PROFILE -->\n      <div class=\"header-item-wrapper\">\n        <overlay-panel [overlayClass]=\"'custom-class'\">\n          <ng-template #target>\n            <app-profile-data></app-profile-data>\n          </ng-template>\n          <ng-template #overlay>\n            <app-profile-dropdown></app-profile-dropdown>\n          </ng-template>\n        </overlay-panel>\n      </div>\n\n      <!-- NOTIFICATIONS -->\n      <div class=\"header-item-wrapper\">\n        <overlay-panel [overlayClass]=\"'notif-overlay'\">\n          <ng-template #target>\n            <div class=\"notif\">\n              @if (state.notificationCount() > 0) {\n                <span class=\"notif-count\">\n                  <p>{{ state.notificationCount() }}</p>\n                </span>\n              }\n              <span [innerHtml]=\"notifsBellIcon\" class=\"notif-icon\"></span>\n            </div>\n          </ng-template>\n          <ng-template #overlay>\n            <app-notifications-management\n              [unreadCount]=\"state.notificationCount()\"\n            ></app-notifications-management>\n          </ng-template>\n        </overlay-panel>\n      </div>\n    </div>\n  </div>\n</div>\n<!--\n<modal\n  #changePasswordModal\n  [modalTitle]=\"'HEADER.CHANGE_PASS.TITLE' | translate\"\n  class=\"w-[40vw] text-[1.6em]\"\n>\n  <app-change-pass-form (hideModal)=\"closeModal()\"></app-change-pass-form>\n</modal> -->\n", styles: [".header-container{display:flex;flex-direction:row;padding-top:1.2em;padding-bottom:1.2em;height:7.87em;padding-inline-end:1.5em}.header-inner{display:flex;justify-content:space-between;padding-left:1.6em;padding-right:1.6em;width:100%;align-items:center}.left{display:flex;align-items:center}.right{display:flex;flex-direction:row-reverse;padding-left:.8em;padding-right:.8em}.header-item-wrapper{padding-left:.8em;padding-right:.8em;display:flex;align-items:center}.notif-icon{width:2.4em;height:2.4em}.notif{position:relative;cursor:pointer;display:flex;align-items:center;padding-left:.8em;padding-right:.8em;height:100%}.notif .notif-count{position:absolute;z-index:10;top:-.7em;right:-.3em;background-color:#2bc128;box-shadow:0 0 0 1.5px #fff;border-radius:.8em;height:1.6em;min-width:1.6em;color:#fff;display:flex;align-items:center;justify-content:center}.notif .notif-count p{font-size:1.2em;font-family:var(--FM-Bold)}::ng-deep overlay-panel{display:flex}::ng-deep .overlay.show{border-radius:1em!important}\n"] }]
+        }], ctorParameters: () => [{ type: i3.Router }, { type: AuthService }, { type: AuthContextService }, { type: SidenavService }, { type: NotificationsHttpService }, { type: NotificationsStateService }, { type: i1$2.DomSanitizer }] });
+
+class HeaderMainService {
+    appRef;
+    injector;
+    headerComponentRef;
+    constructor(appRef, injector) {
+        this.appRef = appRef;
+        this.injector = injector;
+    }
+    pushHeaderToLayout() {
+        console.log('Pushing sidebar to layout');
+        const headerHost = document.getElementById('header-host');
+        if (headerHost) {
+            // Create component reference
+            this.headerComponentRef = createComponent(CustomHeaderComponent, {
+                environmentInjector: this.injector,
+            });
+            // Attach the component to the Angular application
+            this.appRef.attachView(this.headerComponentRef.hostView);
+            // Append the component's DOM element to the sidebar host
+            headerHost.appendChild(this.headerComponentRef.location.nativeElement);
+        }
+    }
+    sideBarLoaded() {
+        return !!this.headerComponentRef;
+    }
+    removeHeaderFromLayout() {
+        if (this.headerComponentRef) {
+            this.appRef.detachView(this.headerComponentRef.hostView);
+            this.headerComponentRef.destroy();
+            this.headerComponentRef = undefined;
+        }
+    }
+    static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "19.2.15", ngImport: i0, type: HeaderMainService, deps: [{ token: i0.ApplicationRef }, { token: i0.EnvironmentInjector }], target: i0.ɵɵFactoryTarget.Injectable });
+    static ɵprov = i0.ɵɵngDeclareInjectable({ minVersion: "12.0.0", version: "19.2.15", ngImport: i0, type: HeaderMainService, providedIn: 'root' });
+}
+i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.15", ngImport: i0, type: HeaderMainService, decorators: [{
+            type: Injectable,
+            args: [{ providedIn: 'root' }]
+        }], ctorParameters: () => [{ type: i0.ApplicationRef }, { type: i0.EnvironmentInjector }] });
+
 /**
  * Generated bundle index. Do not edit.
  */
 
-export { API_BASE_URL, AllowNumberOnlyDirective, ArabicOnlyDirective, AuthBeService, AuthConstant, AuthContextService, AuthDirective, AuthInterceptor, AuthService, BlurBackdropDirective, ClickOutsideDirective, CollapsedBarComponent, CommonHttpService, ComponentFormErrorConstant, CustomActionsDropdownComponent, CustomAppErrorComponent, CustomAvatarsComponent, CustomBreadcrumbComponent, CustomBulkActionsComponent, CustomButtonComponent, CustomCalendarComponent, CustomCalendarExpandedComponent, CustomCalenderFormComponent, CustomCategoryTableComponent, CustomCheckBoxComponent, CustomCheckBoxFormComponent, CustomColorComponent, CustomConfirmPopupComponent, CustomDetailsHeaderComponent, CustomDetailsModalComponent, CustomDetailsNavComponent, CustomDropdownButtonComponent, CustomDropdownComponent, CustomDropdownFormComponent, CustomDynamicTableWithCategoriesComponent, CustomFieldsFormComponent, CustomFileUploadComponent, CustomFileViewerComponent, CustomFilterDropdownComponent, CustomFilterDynamicFormComponent, CustomInputComponent, CustomInputFormComponent, CustomLoadingSpinnerComponent, CustomModalComponent, CustomMultiSelectDropdownComponent, CustomMultiSelectFormComponent, CustomNavBarComponent, CustomPaginationComponent, CustomPlaceHolderComponent, CustomPlateNumberInputFormComponent, CustomPopUpComponent, CustomProgressBarComponent, CustomProgressRingComponent, CustomRadioComponentComponent, CustomRadioGroupFormComponent, CustomReactiveSearchInputComponent, CustomSearchInputComponent, CustomSteppersContainerComponent, CustomSteppersControllersComponent, CustomSvgIconComponent, CustomTableComponent, CustomTabsComponent, CustomTextareaComponent, CustomTextareaFormComponent, CustomTimeInputFormComponent, CustomTitleContentComponent, CustomToastComponent, CustomToggleSwitchComponent, CustomToggleSwitchFormComponent, CustomTooltipComponent, DispatchingFeComponentsService, DropdownsAnimationDirective, EmptyRouteComponent, EnglishOnlyDirective, ErrorInterceptor, GeoLocationService, I18nConstant, LoadingService, ModuleRoutes, NetworkConnectionInterceptor, OverlayPanelComponent, PermissionGuard, Permissions, Resources, Roles, SHOW_SUCCESS_TOASTER, SKIP_LOADER, SKIP_TOKEN, SideBarListComponent, SidenavMainService, SidenavService, StepperService, StorageService, TaskPriorityComponent, ToastService, ToggleElementDirective, TranslationService, Types, USE_TOKEN, UserDataService, UserStatus, actionAssignTaskSvg, actionDeleteSvg$1 as actionDeleteSvg, actionDuplicateSvg, actionEdiSquaretSvg, actionEditSvg$1 as actionEditSvg, actionPermission, actionRenameSvg, assignTaskSvg, authGuard, b64toBlob, blobToB64, collapseAnimation, convertDateFormat, convertFileToBase64, convertFormGroupToFormData, diffTime, downloadBlob, dropdownAnimation, excelDateToJSDate, flattenTree, formatDate, formatDateWithTime, formatTimestamp, formatinitialTakeTime, generateRandomColor, generateUniqueNumber, getFormValidationErrors, isDocumentPath, isImagePath, isVedioPath, loadingInterceptor, logger, noAuthGuard, someFieldsContainData, timeAgo, viewIconSVG };
+export { API_BASE_URL, AllowNumberOnlyDirective, ArabicOnlyDirective, AuthBeService, AuthConstant, AuthContextService, AuthDirective, AuthInterceptor, AuthService, BlurBackdropDirective, ClickOutsideDirective, CollapsedBarComponent, CommonHttpService, ComponentFormErrorConstant, CustomActionsDropdownComponent, CustomAppErrorComponent, CustomAvatarsComponent, CustomBreadcrumbComponent, CustomBulkActionsComponent, CustomButtonComponent, CustomCalendarComponent, CustomCalendarExpandedComponent, CustomCalenderFormComponent, CustomCategoryTableComponent, CustomCheckBoxComponent, CustomCheckBoxFormComponent, CustomColorComponent, CustomConfirmPopupComponent, CustomDetailsHeaderComponent, CustomDetailsModalComponent, CustomDetailsNavComponent, CustomDropdownButtonComponent, CustomDropdownComponent, CustomDropdownFormComponent, CustomDynamicTableWithCategoriesComponent, CustomFieldsFormComponent, CustomFileUploadComponent, CustomFileViewerComponent, CustomFilterDropdownComponent, CustomFilterDynamicFormComponent, CustomHeaderComponent, CustomInputComponent, CustomInputFormComponent, CustomLoadingSpinnerComponent, CustomModalComponent, CustomMultiSelectDropdownComponent, CustomMultiSelectFormComponent, CustomNavBarComponent, CustomPaginationComponent, CustomPlaceHolderComponent, CustomPlateNumberInputFormComponent, CustomPopUpComponent, CustomProgressBarComponent, CustomProgressRingComponent, CustomRadioComponentComponent, CustomRadioGroupFormComponent, CustomReactiveSearchInputComponent, CustomSearchInputComponent, CustomSteppersContainerComponent, CustomSteppersControllersComponent, CustomSvgIconComponent, CustomTableComponent, CustomTabsComponent, CustomTextareaComponent, CustomTextareaFormComponent, CustomTimeInputFormComponent, CustomTitleContentComponent, CustomToastComponent, CustomToggleSwitchComponent, CustomToggleSwitchFormComponent, CustomTooltipComponent, DispatchingFeComponentsService, DropdownsAnimationDirective, EmptyRouteComponent, EnglishOnlyDirective, ErrorInterceptor, GeoLocationService, HeaderMainService, I18nConstant, LoadingService, ModuleRoutes, NetworkConnectionInterceptor, OverlayPanelComponent, PermissionGuard, Permissions, Resources, Roles, SHOW_SUCCESS_TOASTER, SKIP_LOADER, SKIP_TOKEN, SideBarListComponent, SidenavMainService, SidenavService, StepperService, StorageService, TaskPriorityComponent, ToastService, ToggleElementDirective, TranslationService, Types, USE_TOKEN, UserDataService, UserStatus, actionAssignTaskSvg, actionDeleteSvg$1 as actionDeleteSvg, actionDuplicateSvg, actionEdiSquaretSvg, actionEditSvg$1 as actionEditSvg, actionPermission, actionRenameSvg, assignTaskSvg, authGuard, b64toBlob, blobToB64, collapseAnimation, convertDateFormat, convertFileToBase64, convertFormGroupToFormData, diffTime, downloadBlob, dropdownAnimation, excelDateToJSDate, flattenTree, formatDate, formatDateWithTime, formatTimestamp, formatinitialTakeTime, generateRandomColor, generateUniqueNumber, getFormValidationErrors, isDocumentPath, isImagePath, isVedioPath, loadingInterceptor, logger, noAuthGuard, someFieldsContainData, timeAgo, viewIconSVG };
 //# sourceMappingURL=dispatching-fe-components.mjs.map

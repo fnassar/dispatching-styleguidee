@@ -9,7 +9,6 @@ export declare class CustomNavBarComponent {
     private authService;
     private router;
     private domSanitizer;
-    protected readonly assetUrl: (str: string) => string;
     headerLogo: SafeHtml;
     collapseIcon: SafeHtml;
     collapseDarkIcon: SafeHtml;

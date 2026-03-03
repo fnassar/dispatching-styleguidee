@@ -8,7 +8,6 @@ export declare class SideBarListComponent implements OnInit {
     private authContextService;
     protected sidenav: SidenavService;
     protected collapseService: CollapseService;
-    protected readonly assetUrl: (str: string) => string;
     constructor(authService: AuthService, authContextService: AuthContextService, sidenav: SidenavService, collapseService: CollapseService);
     ngOnInit(): void;
     static ɵfac: i0.ɵɵFactoryDeclaration<SideBarListComponent, never>;

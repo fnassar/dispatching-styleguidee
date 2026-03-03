@@ -1,0 +1,31 @@
+import { OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { NotificationsHttpService } from '../notifications/services/notifications-http.service';
+import { NotificationSocketService } from '../../core/services/notification-socket.service';
+import { NotificationsStateService } from '../notifications/services/notifications.state.service';
+import { AuthContextService, AuthService } from '../../../../services';
+import { SidenavService } from '../../../services';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import * as i0 from "@angular/core";
+export declare class CustomHeaderComponent implements OnInit {
+    private router;
+    private authService;
+    private authContextService;
+    sidenav: SidenavService;
+    private notificationsHttpService;
+    protected state: NotificationsStateService;
+    private sanitizer;
+    private _toast;
+    notificationSocketService: NotificationSocketService;
+    connectionState: import("@angular/core").Signal<import("@angular/core").WritableSignal<"ERROR" | "OPEN" | "CLOSED">>;
+    private updateReadCountSub$;
+    private newNotificationsSub$;
+    private ngZone;
+    notifsBellIcon: SafeHtml;
+    constructor(router: Router, authService: AuthService, authContextService: AuthContextService, sidenav: SidenavService, notificationsHttpService: NotificationsHttpService, state: NotificationsStateService, sanitizer: DomSanitizer);
+    ngOnInit(): void;
+    loadNotificationCount(): void;
+    selectItem(item: any): void;
+    static ɵfac: i0.ɵɵFactoryDeclaration<CustomHeaderComponent, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<CustomHeaderComponent, "app-custom-header", never, {}, {}, never, never, true, never>;
+}
