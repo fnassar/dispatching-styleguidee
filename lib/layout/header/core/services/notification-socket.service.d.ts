@@ -12,7 +12,7 @@ export declare class NotificationSocketService implements OnDestroy {
         userId: string;
         unreadCount: number;
     }>>;
-    connectionStatus$: import("@angular/core").WritableSignal<"OPEN" | "CLOSED" | "ERROR">;
+    connectionStatus$: import("@angular/core").WritableSignal<"ERROR" | "OPEN" | "CLOSED">;
     baseUrlTemp: import("@angular/core").InjectionToken<string>;
     private readonly WS_URL;
     constructor(baseUrl: string);
