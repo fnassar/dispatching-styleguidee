@@ -25,6 +25,7 @@ export declare class CustomDetailsHeaderComponent {
     constructor(sanitizer: DomSanitizer);
     sanitizeSvg(svg: string): SafeHtml;
     toggleDropdown(event: MouseEvent): void;
+    closeModal(index: number): void;
     static ɵfac: i0.ɵɵFactoryDeclaration<CustomDetailsHeaderComponent, never>;
     static ɵcmp: i0.ɵɵComponentDeclaration<CustomDetailsHeaderComponent, "custom-details-header", never, { "showX": { "alias": "showX"; "required": false; }; "BreadCrumbs": { "alias": "BreadCrumbs"; "required": true; }; "actionsDropdown": { "alias": "actionsDropdown"; "required": false; "isSignal": true; }; }, { "closeContainer": "closeContainer"; "dropdownSelectAction": "dropdownSelectAction"; }, never, never, true, never>;
 }
