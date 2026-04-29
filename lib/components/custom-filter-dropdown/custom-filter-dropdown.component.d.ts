@@ -40,7 +40,7 @@ export declare class CustomFilterDropdownComponent {
     protected readonly errorConstant: typeof ComponentFormErrorConstant;
     constructor(fb: FormBuilder);
     ngOnInit(): void;
-    getDefaultInitialValue(type: FilterType): "" | never[] | null;
+    getDefaultInitialValue(type: FilterType): never[] | "" | null;
     getValidatorsFromConfig(validations?: IComponentFormError[]): (typeof Validators.required)[];
     getAvailableOptions(activeIndex: number): IDropdownOption[];
     addFilterRow(): void;

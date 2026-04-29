@@ -548,7 +548,7 @@ class AuthService {
             next: (res) => {
                 if (res.success) {
                     this.authContextService.saveTokens(res.data);
-                    // window.location.reload();
+                    window.location.reload();
                 }
                 else {
                     this.logOutUser();
