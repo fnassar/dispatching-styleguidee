@@ -1310,12 +1310,16 @@ const AuthInterceptor = (request, next) => {
             }
             //  body['statusCode'] = event.status;
             // console.log('body: ', body['success'] );
-            //    console.log('request.method: ', request.method);
+            // console.log('request.method: ', request.method);
+            // console.log('request.url: ', request.url);
             if (body &&
                 body.success &&
                 (request.method === 'POST' ||
                     request.method === 'PUT' ||
-                    request.method === 'DELETE')) {
+                    request.method === 'DELETE') &&
+                !request.url.includes('/validate')
+            // check path is not /validate
+            ) {
                 if (showSuccessToaster) {
                     toastService.toast(`${body.message}`, 'top-center', 'success', 4000);
                 }
@@ -1339,24 +1343,7 @@ const ErrorInterceptor = (req, next) => {
     let authContextService = inject(AuthContextService);
     let router = inject(Router);
     let toastService = inject(ToastService);
-    return next(req).pipe(
-    // retry({
-    //   count: 3,
-    //   delay: (error) => {
-    //     if (error.status === 503) {
-    //       // Retry logic for 503 errors
-    //       return timer(1000); // Retry after 1 second
-    //     }
-    //     return throwError(() => error);
-    //   },
-    // }),
-    catchError((error) => {
-        // if (error && isPlatformBrowser(PLATFORM_ID)) {
-        // } else {
-        // }
-        //      if (error.status === 503) {
-        //   toastService.toast('Service unavailable. Please try again later.', 'top-center', 'error', 2000);
-        // }
+    return next(req).pipe(catchError((error) => {
         switch (error.status) {
             case 400:
                 toastService.toast(error.error.errorMessage, 'top-center', 'error', 2000);
@@ -1364,9 +1351,6 @@ const ErrorInterceptor = (req, next) => {
             case 401:
                 // access token expired / au auth
                 authService.handleRefreshToken();
-                //  authContextService.clearData();
-                // window.dispatchEvent(new CustomEvent('auth-logout'));
-                // router.navigate(['/auth/login']);
                 break;
             case 403:
                 // no permission
@@ -1393,18 +1377,6 @@ const ErrorInterceptor = (req, next) => {
         // access token
         // 503 -- service idle -- error message
         // 404 -- end point not found // /
-        // if (error.error && isPlatformBrowser(PLATFORM_ID)) {
-        //   if (error.error.errors) {
-        //     const errorMessages = Object.values(error.error.errors).flat();
-        //     errorMessages.forEach((errorMessage: any) => {
-        //       console.error(errorMessage);
-        //     });
-        //   } else if (error?.error?.message) {
-        //     console.error(error.error.message);
-        //   } else {
-        //     console.error('Something went wrong');
-        //   }
-        // }
         return throwError(error);
     }));
 };
