@@ -1367,13 +1367,14 @@ const AuthInterceptor = (request, next) => {
             //  body['statusCode'] = event.status;
             // console.log('body: ', body['success'] );
             // console.log('request.method: ', request.method);
-            // console.log('request.url: ', request.url);
+            console.log('request.url: ', request.url, request.url.includes('/validate'));
             if (body &&
                 body.success &&
                 (request.method === 'POST' ||
                     request.method === 'PUT' ||
                     request.method === 'DELETE') &&
-                !request.url.includes('/validate')
+                !request.url.includes('/validate') &&
+                !request.url.includes('/refresh')
             // check path is not /validate
             ) {
                 if (showSuccessToaster) {
