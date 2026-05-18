@@ -1,3 +1,4 @@
+import { DestroyRef } from '@angular/core';
 import { INotification, IPageResInterface } from '../interfaces/main.notif.interfaces';
 import { NotificationsHttpService } from './notifications-http.service';
 import { LoadingService } from '../../../../../services';
@@ -5,6 +6,7 @@ import * as i0 from "@angular/core";
 export declare class NotificationsStateService {
     private notificationsHttpService;
     private loadingService;
+    private destroyRef;
     notifications: import("@angular/core").WritableSignal<INotification[]>;
     notificationCount: import("@angular/core").WritableSignal<number>;
     private readonly _toast;
@@ -13,7 +15,7 @@ export declare class NotificationsStateService {
         pageSize: number;
     }>;
     totalCount: import("@angular/core").WritableSignal<number>;
-    constructor(notificationsHttpService: NotificationsHttpService, loadingService: LoadingService);
+    constructor(notificationsHttpService: NotificationsHttpService, loadingService: LoadingService, destroyRef: DestroyRef);
     clearData(): void;
     loadNotifications(newLoad: boolean): void;
     markNotificationRead(id: string): void;

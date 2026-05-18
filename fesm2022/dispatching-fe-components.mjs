@@ -1,5 +1,6 @@
 import * as i0 from '@angular/core';
-import { Injectable, signal, InjectionToken, Inject, computed, Optional, inject, input, Input, Component, EventEmitter, Output, HostListener, Directive, PLATFORM_ID, effect, HostBinding, ViewChild, ContentChild, ViewEncapsulation, model, createComponent, NgZone } from '@angular/core';
+import { Injectable, signal, InjectionToken, Inject, computed, Optional, inject, input, Input, Component, EventEmitter, Output, HostListener, Directive, PLATFORM_ID, effect, HostBinding, DestroyRef, ViewChild, ContentChild, ViewEncapsulation, model, createComponent, NgZone } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import * as i1 from '@angular/common/http';
 import { HttpContextToken, HttpContext, HttpResponse } from '@angular/common/http';
 import { retry, catchError, BehaviorSubject, Observable, map, throwError, finalize, tap, Subscription, fromEvent, filter, Subject, takeUntil, debounceTime, distinctUntilChanged } from 'rxjs';
@@ -13,7 +14,6 @@ import * as i2 from '@angular/common';
 import { isPlatformBrowser, CommonModule, NgStyle, NgClass, NgComponentOutlet, NgTemplateOutlet, DecimalPipe, DatePipe, APP_BASE_HREF } from '@angular/common';
 import { trigger, transition, style, animate, state, keyframes, group, query } from '@angular/animations';
 import * as i1$2 from '@angular/platform-browser';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { webSocket } from 'rxjs/webSocket';
 
 const ModuleRoutes = {
@@ -483,20 +483,29 @@ class AuthService {
     router;
     storageService;
     toastService;
+    destroyRef;
+    refreshLockKey = 'vms_auth_refresh_lock';
+    refreshLockTtlMs = 15000;
     Roles = Roles;
     Permissions = Permissions;
-    constructor(authContextService, authBeService, router, storageService, toastService) {
+    constructor(authContextService, authBeService, router, storageService, toastService, destroyRef) {
         this.authContextService = authContextService;
         this.authBeService = authBeService;
         this.router = router;
         this.storageService = storageService;
         this.toastService = toastService;
+        this.destroyRef = destroyRef;
     }
     login(data) {
-        this.authBeService.login(data).subscribe({
+        localStorage.setItem('is-logging-in', 'true');
+        this.authBeService
+            .login(data)
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe({
             next: (res) => {
                 if (res.success) {
                     this.authContextService.saveTokens(res.data);
+                    localStorage.removeItem('is-logging-in');
                     //window.dispatchEvent(new CustomEvent('auth-login'));
                     //           window.history.pushState({}, '', window.location.pathname);
                     // window.dispatchEvent(new PopStateEvent('popstate', {}));
@@ -507,7 +516,10 @@ class AuthService {
         });
     }
     forgetPassword(data) {
-        this.authBeService.forgetPassword(data).subscribe({
+        this.authBeService
+            .forgetPassword(data)
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe({
             next: (res) => {
                 if (res.success) {
                     this.router.navigate(['/auth/login']);
@@ -516,7 +528,10 @@ class AuthService {
         });
     }
     resetPassword(data) {
-        this.authBeService.resetPassword(data).subscribe({
+        this.authBeService
+            .resetPassword(data)
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe({
             next: (res) => {
                 if (res.success) {
                     this.router.navigate(['/auth/login']);
@@ -526,12 +541,16 @@ class AuthService {
     }
     logOutUser() {
         this.authContextService.clearData();
+        localStorage.removeItem('is-logging-in');
         // window.dispatchEvent(new CustomEvent('auth-logout'));
-        this.router.navigate(['/auth/login']);
+        this.router.navigate(['/auth']);
         window.location.reload();
     }
     logout() {
-        this.authBeService.logout().subscribe({
+        this.authBeService
+            .logout()
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe({
             next: (res) => {
                 if (res.success) {
                     this.logOutUser();
@@ -540,27 +559,60 @@ class AuthService {
         });
     }
     handleRefreshToken() {
+        if (!this.tryAcquireRefreshLock()) {
+            return;
+        }
+        const refreshToken = this.getRefreshToken();
+        if (!refreshToken) {
+            this.releaseRefreshLock();
+            this.logOutUser();
+            return;
+        }
         const body = {
-            refreshToken: this.getRefreshToken(),
+            refreshToken,
         };
         const firstLoad = !this.getToken() && !!this.getRefreshToken();
-        this.authBeService.refreshToken(body, firstLoad).subscribe({
+        this.authBeService
+            .refreshToken(body, firstLoad)
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe({
             next: (res) => {
                 if (res.success) {
                     this.authContextService.saveTokens(res.data);
+                    this.releaseRefreshLock();
                     window.location.reload();
                 }
                 else {
+                    this.releaseRefreshLock();
                     this.logOutUser();
                 }
             },
             error: () => {
+                this.releaseRefreshLock();
                 this.logOutUser();
             },
         });
     }
+    tryAcquireRefreshLock() {
+        const now = Date.now();
+        const lockRaw = localStorage.getItem(this.refreshLockKey);
+        if (lockRaw) {
+            const lockTime = Number(lockRaw);
+            if (!Number.isNaN(lockTime) && now - lockTime < this.refreshLockTtlMs) {
+                return false;
+            }
+        }
+        localStorage.setItem(this.refreshLockKey, String(now));
+        return true;
+    }
+    releaseRefreshLock() {
+        localStorage.removeItem(this.refreshLockKey);
+    }
     handlePermissionConfig() {
-        this.authBeService.validateToken().subscribe({
+        this.authBeService
+            .validateToken()
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe({
             next: (res) => {
                 if (res.success) {
                     this.authContextService.savePermissionsAndRoles(res.data);
@@ -570,39 +622,43 @@ class AuthService {
                 }
             },
         });
-        // const dummySessionData: ISessionData = {
-        //   roles: [Roles.ADMIN],
-        //   permissions: [
-        //     Permissions.UserReadSelf,
-        //     Permissions.VehicleCreateOrganization,
-        //     Permissions.EquipmentViewListOrganization,
-        //     Permissions.MobileTaskStartSelf,
-        //     Permissions.MobileTaskResumeSelf,
-        //     Permissions.MobileTaskViewListSelf,
-        //     Permissions.TaskViewListSelf,
-        //     Permissions.MobileUserViewProfileSelf,
-        //     Permissions.PlanCreatePublishTeam,
-        //     Permissions.TaskCreateTeam,
-        //     Permissions.EquipmentCreateOrganization,
-        //     Permissions.PlanCreateDraftTeam,
-        //     Permissions.MobileTaskPauseSelf,
-        //     Permissions.MobileLandingViewLandingSelf,
-        //     Permissions.PlanUpdateSelf,
-        //     Permissions.MobileTaskStopSelf,
-        //     Permissions.VehicleViewListOrganization,
-        //     Permissions.MobileTaskViewDetailsSelf,
-        //     Permissions.TaskViewDetailsSelf,
-        //     Permissions.PlanViewGanttChartSelf,
-        //     Permissions.PlanViewDetailsSelf,
-        //   ],
-        // };
-        //     setTimeout(()=>{
-        //       this.authContextService.savePermissionsAndRoles(  dummySessionData as ISessionData)
-        //     },500)
     }
+    // const dummySessionData: ISessionData = {
+    //   roles: [Roles.ADMIN],
+    //   permissions: [
+    //     Permissions.UserReadSelf,
+    //     Permissions.VehicleCreateOrganization,
+    //     Permissions.EquipmentViewListOrganization,
+    //     Permissions.MobileTaskStartSelf,
+    //     Permissions.MobileTaskResumeSelf,
+    //     Permissions.MobileTaskViewListSelf,
+    //     Permissions.TaskViewListSelf,
+    //     Permissions.MobileUserViewProfileSelf,
+    //     Permissions.PlanCreatePublishTeam,
+    //     Permissions.TaskCreateTeam,
+    //     Permissions.EquipmentCreateOrganization,
+    //     Permissions.PlanCreateDraftTeam,
+    //     Permissions.MobileTaskPauseSelf,
+    //     Permissions.MobileLandingViewLandingSelf,
+    //     Permissions.PlanUpdateSelf,
+    //     Permissions.MobileTaskStopSelf,
+    //     Permissions.VehicleViewListOrganization,
+    //     Permissions.MobileTaskViewDetailsSelf,
+    //     Permissions.TaskViewDetailsSelf,
+    //     Permissions.PlanViewGanttChartSelf,
+    //     Permissions.PlanViewDetailsSelf,
+    //   ],
+    // };
+    //     setTimeout(()=>{
+    //       this.authContextService.savePermissionsAndRoles(  dummySessionData as ISessionData)
+    //     },500)
+    // }
     // Get Auth Data
     isLoggedIn() {
         return localStorage.getItem(AuthConstant.TOKEN) !== null;
+    }
+    isLoggingIn() {
+        return localStorage.getItem('is-logging-in') !== null;
     }
     getToken() {
         return this.storageService.getLocalStorageItem(AuthConstant.TOKEN);
@@ -664,7 +720,7 @@ class AuthService {
         }
         return false;
     }
-    static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "19.2.15", ngImport: i0, type: AuthService, deps: [{ token: AuthContextService }, { token: AuthBeService }, { token: i3.Router }, { token: StorageService }, { token: ToastService }], target: i0.ɵɵFactoryTarget.Injectable });
+    static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "19.2.15", ngImport: i0, type: AuthService, deps: [{ token: AuthContextService }, { token: AuthBeService }, { token: i3.Router }, { token: StorageService }, { token: ToastService }, { token: i0.DestroyRef }], target: i0.ɵɵFactoryTarget.Injectable });
     static ɵprov = i0.ɵɵngDeclareInjectable({ minVersion: "12.0.0", version: "19.2.15", ngImport: i0, type: AuthService, providedIn: 'root' });
 }
 i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.15", ngImport: i0, type: AuthService, decorators: [{
@@ -672,7 +728,7 @@ i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.15", ngImpo
             args: [{
                     providedIn: 'root',
                 }]
-        }], ctorParameters: () => [{ type: AuthContextService }, { type: AuthBeService }, { type: i3.Router }, { type: StorageService }, { type: ToastService }] });
+        }], ctorParameters: () => [{ type: AuthContextService }, { type: AuthBeService }, { type: i3.Router }, { type: StorageService }, { type: ToastService }, { type: i0.DestroyRef }] });
 
 class UserDataService {
     // Private signal for user data
@@ -2061,12 +2117,13 @@ class CustomCalenderFormComponent {
     constructor() {
         this.generateCalendar();
     }
+    destroyRef = inject(DestroyRef);
     ngOnInit() {
         if (this.parentForm && this.controlName) {
             const control = this.parentForm.get(this.controlName);
             if (control) {
                 this.value = control.value;
-                control.valueChanges.subscribe((value) => {
+                control.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((value) => {
                     this.value = value;
                 });
             }
@@ -2463,6 +2520,7 @@ class CustomDropdownFormComponent {
     filteredOptions = [];
     filterText = '';
     value;
+    destroyRef = inject(DestroyRef);
     ngOnInit() {
         this.filteredOptions = [...this.options];
         this.setupFormControlSubscription();
@@ -2487,7 +2545,9 @@ class CustomDropdownFormComponent {
                     this.updateSelectedOptionFromFormValue();
                 }
                 // Subscribe to future changes
-                control.valueChanges.subscribe((value) => {
+                control.valueChanges
+                    .pipe(takeUntilDestroyed(this.destroyRef))
+                    .subscribe((value) => {
                     this.value = value;
                     this.updateSelectedOptionFromFormValue();
                 });
@@ -5670,6 +5730,7 @@ class CustomPlateNumberInputFormComponent {
     maxLetterLength = 3;
     // maxLetterLength
     valueChange = new EventEmitter();
+    destroyRef = inject(DestroyRef);
     PlateInputForm = new FormGroup({
         plateNumberNumeric: new FormControl('', [
             Validators.required,
@@ -5695,7 +5756,7 @@ class CustomPlateNumberInputFormComponent {
             this.parentForm.controls[this.controlName].markAllAsTouched();
         }
         // Subscribe to changes in the PlateInputForm to update the parent form
-        this.PlateInputForm.valueChanges.subscribe(() => {
+        this.PlateInputForm.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
             const numberValue = this.PlateInputForm.get('plateNumberNumeric')?.value || '';
             const lettersValue = this.PlateInputForm.get('plateNumberLetters')?.value || '';
             this.parentForm.controls[this.controlName].setValue(numberValue + ' ' + lettersValue);
@@ -6013,6 +6074,7 @@ class CustomFilterDropdownComponent {
         this.fb = fb;
         this.filterOptions = [];
     }
+    destroyRef = inject(DestroyRef);
     ngOnInit() {
         this.filterOptions = this.filtersConfig.map((f) => ({
             id: f.id,
@@ -6036,8 +6098,8 @@ class CustomFilterDropdownComponent {
             }
         });
         this.filterForm.valueChanges
-            .pipe(filter((val) => !this.isFilterFormEmpty()) // only run if there's data
-        )
+            .pipe(filter((val) => !this.isFilterFormEmpty()), // only run if there's data
+        takeUntilDestroyed(this.destroyRef))
             .subscribe((val) => {
             const transformed = { ...val };
             Object.keys(transformed).forEach((key) => {
@@ -7585,6 +7647,7 @@ i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.15", ngImpo
 class NotificationsStateService {
     notificationsHttpService;
     loadingService;
+    destroyRef;
     notifications = signal([]);
     notificationCount = signal(0);
     _toast = inject(ToastService);
@@ -7593,9 +7656,10 @@ class NotificationsStateService {
         pageSize: 5,
     });
     totalCount = signal(0);
-    constructor(notificationsHttpService, loadingService) {
+    constructor(notificationsHttpService, loadingService, destroyRef) {
         this.notificationsHttpService = notificationsHttpService;
         this.loadingService = loadingService;
+        this.destroyRef = destroyRef;
     }
     clearData() {
         this.notifications.set([]);
@@ -7618,6 +7682,7 @@ class NotificationsStateService {
             page: this.pagination().pageNum - 1,
             size: this.pagination().pageSize,
         })
+            .pipe(takeUntilDestroyed(this.destroyRef))
             .subscribe({
             next: (res) => {
                 if (this.notifications().length > 0) {
@@ -7636,7 +7701,10 @@ class NotificationsStateService {
     }
     markNotificationRead(id) {
         this.notifications.update((curr) => curr.map((n) => (n.notificationId === id ? { ...n, isRead: true } : n)));
-        this.notificationsHttpService.markNotifRead(id).subscribe({
+        this.notificationsHttpService
+            .markNotifRead(id)
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe({
             next: (res) => {
                 // update list item with notificationId = id
             },
@@ -7647,7 +7715,10 @@ class NotificationsStateService {
         });
     }
     deleteNotification(id) {
-        this.notificationsHttpService.deleteNotif(id).subscribe({
+        this.notificationsHttpService
+            .deleteNotif(id)
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe({
             next: (res) => {
                 // remove item notificationId = id from list
                 this.notifications.update((curr) => curr.filter((n) => n.notificationId !== id));
@@ -7692,7 +7763,7 @@ class NotificationsStateService {
         console.log('Updating unread count to:', count);
         this.notificationCount.set(count);
     }
-    static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "19.2.15", ngImport: i0, type: NotificationsStateService, deps: [{ token: NotificationsHttpService }, { token: LoadingService }], target: i0.ɵɵFactoryTarget.Injectable });
+    static ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "19.2.15", ngImport: i0, type: NotificationsStateService, deps: [{ token: NotificationsHttpService }, { token: LoadingService }, { token: i0.DestroyRef }], target: i0.ɵɵFactoryTarget.Injectable });
     static ɵprov = i0.ɵɵngDeclareInjectable({ minVersion: "12.0.0", version: "19.2.15", ngImport: i0, type: NotificationsStateService, providedIn: 'root' });
 }
 i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.15", ngImport: i0, type: NotificationsStateService, decorators: [{
@@ -7700,7 +7771,7 @@ i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "19.2.15", ngImpo
             args: [{
                     providedIn: 'root',
                 }]
-        }], ctorParameters: () => [{ type: NotificationsHttpService }, { type: LoadingService }] });
+        }], ctorParameters: () => [{ type: NotificationsHttpService }, { type: LoadingService }, { type: i0.DestroyRef }] });
 
 class NotificationsManagementComponent {
     state;
@@ -7841,11 +7912,10 @@ class CustomHeaderComponent {
     sanitizer;
     _toast = inject(ToastService);
     notificationSocketService = inject(NotificationSocketService);
+    destroyRef = inject(DestroyRef);
     connectionState = computed(() => {
         return this.notificationSocketService.connectionStatus$;
     });
-    updateReadCountSub$ = new Subscription();
-    newNotificationsSub$ = new Subscription();
     ngZone = inject(NgZone);
     notifsBellIcon;
     constructor(router, authService, authContextService, sidenav, notificationsHttpService, state, sanitizer) {
@@ -7867,22 +7937,24 @@ class CustomHeaderComponent {
     }
     ngOnInit() {
         this.state.loadNotifications(true);
-        this.newNotificationsSub$.add(this.notificationSocketService.incomingNotifications$
-            // .pipe(takeUntilDestroyed())
+        this.notificationSocketService.incomingNotifications$
+            .pipe(takeUntilDestroyed(this.destroyRef))
             .subscribe((event) => {
             this.ngZone.run(() => this.state.addNewSocketNotification(event.data));
             console.log('EVENT:', event);
-        }));
-        this.updateReadCountSub$.add(this.notificationSocketService.badgeUpdate$
-            // .pipe(takeUntilDestroyed())
+        });
+        this.notificationSocketService.badgeUpdate$
+            .pipe(takeUntilDestroyed(this.destroyRef))
             .subscribe((event) => {
             this.ngZone.run(() => this.state.updateUnreadCount(event.unreadCount || 0));
             console.log('EVENT:', event);
-            // this.realtimeShared.addEvent(event);
-        }));
+        });
     }
     loadNotificationCount() {
-        this.notificationsHttpService.getUnreadCount().subscribe({
+        this.notificationsHttpService
+            .getUnreadCount()
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe({
             next: (res) => {
                 this.state.notificationCount.set(res.unreadCount);
             },

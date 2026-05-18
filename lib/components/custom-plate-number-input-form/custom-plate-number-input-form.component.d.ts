@@ -13,6 +13,7 @@ export declare class CustomPlateNumberInputFormComponent implements OnInit {
     maxNumberLength: number;
     maxLetterLength: number;
     valueChange: EventEmitter<string>;
+    private destroyRef;
     PlateInputForm: FormGroup;
     ngOnInit(): void;
     containRequiredError(): boolean;
