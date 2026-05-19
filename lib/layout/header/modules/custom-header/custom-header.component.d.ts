@@ -18,7 +18,7 @@ export declare class CustomHeaderComponent implements OnInit {
     private _toast;
     notificationSocketService: NotificationSocketService;
     private destroyRef;
-    connectionState: import("@angular/core").Signal<import("@angular/core").WritableSignal<"OPEN" | "CLOSED" | "ERROR">>;
+    connectionState: import("@angular/core").Signal<import("@angular/core").WritableSignal<"ERROR" | "OPEN" | "CLOSED">>;
     private ngZone;
     notifsBellIcon: SafeHtml;
     constructor(router: Router, authService: AuthService, authContextService: AuthContextService, sidenav: SidenavService, notificationsHttpService: NotificationsHttpService, state: NotificationsStateService, sanitizer: DomSanitizer);
