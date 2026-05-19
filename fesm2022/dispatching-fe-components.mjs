@@ -580,7 +580,7 @@ class AuthService {
                 if (res.success) {
                     this.authContextService.saveTokens(res.data);
                     this.releaseRefreshLock();
-                    // window.location.reload();
+                    window.location.reload();
                 }
                 else {
                     this.releaseRefreshLock();
