@@ -558,11 +558,11 @@ class AuthService {
             },
         });
     }
-    handleRefreshToken() {
+    async handleRefreshToken() {
         if (!this.tryAcquireRefreshLock()) {
             return;
         }
-        const refreshToken = this.getRefreshToken();
+        const refreshToken = await this.waitForRefreshToken();
         if (!refreshToken) {
             this.releaseRefreshLock();
             this.logOutUser();
@@ -571,7 +571,7 @@ class AuthService {
         const body = {
             refreshToken,
         };
-        const firstLoad = !this.getToken() && !!this.getRefreshToken();
+        const firstLoad = !this.getToken() && !!refreshToken;
         this.authBeService
             .refreshToken(body, firstLoad)
             .pipe(takeUntilDestroyed(this.destroyRef))
@@ -592,6 +592,15 @@ class AuthService {
                 this.logOutUser();
             },
         });
+    }
+    async waitForRefreshToken(retries = 3, delayMs = 1000) {
+        let refreshToken = this.getRefreshToken();
+        while (!refreshToken && retries > 0) {
+            await new Promise((resolve) => setTimeout(resolve, delayMs));
+            refreshToken = this.getRefreshToken();
+            retries -= 1;
+        }
+        return refreshToken;
     }
     tryAcquireRefreshLock() {
         const now = Date.now();
