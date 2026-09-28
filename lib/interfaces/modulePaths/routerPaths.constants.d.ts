@@ -5,4 +5,5 @@ export declare const ModuleRoutes: {
     PLAN_MANAGEMENT_HOME: string;
     ASSET_MANAGEMENT_HOME: string;
     USER_MANAGEMENT_HOME: string;
+    SETTINGS: string;
 };

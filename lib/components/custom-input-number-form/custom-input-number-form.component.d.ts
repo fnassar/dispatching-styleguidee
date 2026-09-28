@@ -1,0 +1,42 @@
+import { EventEmitter, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { AbstractControl, FormGroup } from '@angular/forms';
+import { IComponentFormError } from '../../interfaces';
+import * as i0 from "@angular/core";
+export type CustomInputNumberType = 'number';
+export declare class CustomInputNumberFormComponent implements OnInit, OnChanges {
+    private _toast;
+    class: string;
+    labelClass: string;
+    label: string;
+    placeholder: string;
+    name: string;
+    controlName: string;
+    parentForm: FormGroup;
+    validation: IComponentFormError[];
+    numberType: CustomInputNumberType;
+    min: number;
+    max: number;
+    step: number;
+    /** Unit text rendered inside the input right after the value (translation key or plain text). */
+    typeName: string;
+    height: string;
+    width: string;
+    disabled: boolean;
+    numberValueChange: EventEmitter<number>;
+    get control(): AbstractControl;
+    get maxAttr(): number | null;
+    get showError(): boolean;
+    ngOnInit(): void;
+    ngOnChanges(changes: SimpleChanges): void;
+    containRequiredError(): boolean;
+    preventInvalidNumberInput(event: KeyboardEvent): void;
+    handlePaste(event: ClipboardEvent): void;
+    onBlur(): void;
+    incrementValue(): void;
+    decrementValue(): void;
+    private clamp;
+    private setValue;
+    private syncDisabled;
+    static ɵfac: i0.ɵɵFactoryDeclaration<CustomInputNumberFormComponent, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<CustomInputNumberFormComponent, "custom-input-number-form", never, { "class": { "alias": "class"; "required": false; }; "labelClass": { "alias": "labelClass"; "required": false; }; "label": { "alias": "label"; "required": false; }; "placeholder": { "alias": "placeholder"; "required": false; }; "name": { "alias": "name"; "required": true; }; "controlName": { "alias": "controlName"; "required": true; }; "parentForm": { "alias": "parentForm"; "required": true; }; "validation": { "alias": "validation"; "required": true; }; "numberType": { "alias": "numberType"; "required": false; }; "min": { "alias": "min"; "required": false; }; "max": { "alias": "max"; "required": false; }; "step": { "alias": "step"; "required": false; }; "typeName": { "alias": "typeName"; "required": false; }; "height": { "alias": "height"; "required": false; }; "width": { "alias": "width"; "required": false; }; "disabled": { "alias": "disabled"; "required": false; }; }, { "numberValueChange": "numberValueChange"; }, never, never, true, never>;
+}
