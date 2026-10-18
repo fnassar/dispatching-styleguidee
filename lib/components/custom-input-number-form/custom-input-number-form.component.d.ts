@@ -24,13 +24,19 @@ export declare class CustomInputNumberFormComponent implements OnInit, OnChanges
     disabled: boolean;
     numberValueChange: EventEmitter<number>;
     get control(): AbstractControl;
-    get maxAttr(): number | null;
+    isFocused: boolean;
+    /** Max number of digits, derived from `max` (e.g. 2147483647 -> 10). */
+    get maxChars(): number | null;
+    get reachedMaxChars(): boolean;
+    private get valueText();
     get showError(): boolean;
     ngOnInit(): void;
     ngOnChanges(changes: SimpleChanges): void;
     containRequiredError(): boolean;
     preventInvalidNumberInput(event: KeyboardEvent): void;
+    private hasSelection;
     handlePaste(event: ClipboardEvent): void;
+    onFocus(): void;
     onBlur(): void;
     incrementValue(): void;
     decrementValue(): void;

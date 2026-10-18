@@ -6,6 +6,7 @@ export declare class OverlayPanelComponent {
     overlayClass: string;
     expandSide: 'LEFT' | 'RIGHT';
     minWidth: string;
+    allowOverflow: boolean;
     targetTemplate: TemplateRef<any>;
     overlayTemplate: TemplateRef<any>;
     isOpen: boolean;
@@ -16,5 +17,5 @@ export declare class OverlayPanelComponent {
     closeDropdown(): void;
     private detectVerticalPosition;
     static ɵfac: i0.ɵɵFactoryDeclaration<OverlayPanelComponent, never>;
-    static ɵcmp: i0.ɵɵComponentDeclaration<OverlayPanelComponent, "overlay-panel", never, { "overlayClass": { "alias": "overlayClass"; "required": false; }; "expandSide": { "alias": "expandSide"; "required": false; }; "minWidth": { "alias": "minWidth"; "required": false; }; }, {}, ["targetTemplate", "overlayTemplate"], never, true, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<OverlayPanelComponent, "overlay-panel", never, { "overlayClass": { "alias": "overlayClass"; "required": false; }; "expandSide": { "alias": "expandSide"; "required": false; }; "minWidth": { "alias": "minWidth"; "required": false; }; "allowOverflow": { "alias": "allowOverflow"; "required": false; }; }, {}, ["targetTemplate", "overlayTemplate"], never, true, never>;
 }
